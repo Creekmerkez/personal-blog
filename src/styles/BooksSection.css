@@ -1,0 +1,307 @@
+.books-section {
+  margin: 4rem auto;
+  max-width: 1200px;
+  padding: 2rem 0 0 0;
+  border-top: 1px solid #eee;
+}
+
+.section-title,
+.section-title-link {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  text-align: center;
+  color: #a3834b;
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.books-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0.3rem;
+  align-items: center;
+}
+
+.book-display {
+  display: flex;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px 0 rgba(180, 150, 100, 0.07);
+  padding: 2rem 2.5rem;
+  gap: 2.5rem;
+  width: 100%;
+  max-width: 1000px;
+  align-items: flex-start;
+}
+
+.book-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  max-width: 200px;
+}
+
+.book-cover {
+  width: 180px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 rgba(180, 150, 100, 0.10);
+  background: #f8f6f2;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.book-cover:hover {
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+.book-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  max-width: 700px;
+  text-align: left;
+}
+
+.book-title {
+  color: #a3834b;
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.book-title-link {
+  color: #a3834b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.book-title-link:hover {
+  color: #7a5c2e;
+  text-decoration: underline;
+}
+
+.book-subtitle {
+  display: block;
+  color: #7a5c2e;
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-style: italic;
+  margin-top: 0.2rem;
+  margin-left: 0.5rem;
+}
+
+.book-description {
+  color: #7a5c2e;
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0 0;
+  font-family: inherit;
+  line-height: 1.7;
+  white-space: pre-line;
+  max-width: 100%;
+}
+
+.read-more-button {
+  background: none;
+  border: none;
+  color: #a3834b;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  padding: 0;
+  font-family: inherit;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.read-more-button:hover {
+  color: #7a5c2e;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 30, 30, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+  padding: 0;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-image {
+  max-width: 80vw;
+  max-height: 80vh;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  background: #fff;
+}
+
+.modal-close {
+  position: absolute;
+  top: -32px;
+  right: -32px;
+  background: none;
+  border: none;
+  font-size: 3.5rem;
+  color: #a3834b;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  font-weight: 900;
+  line-height: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.modal-close:hover {
+  color: #7a5c2e;
+  background: none;
+}
+
+.modal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a3834b;
+  font-size: 3rem;
+  font-weight: 900;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  box-shadow: none;
+  transition: color 0.2s, transform 0.2s;
+}
+.modal-arrow-left {
+  left: -70px;
+}
+.modal-arrow-right {
+  right: -70px;
+}
+.modal-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.modal-arrow:hover:not(:disabled) {
+  color: #7a5c2e;
+  background: none;
+}
+
+.modal-thumbnails {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+  justify-content: center;
+}
+.modal-thumb {
+  width: 60px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px 0 rgba(180, 150, 100, 0.10);
+  background: #f8f6f2;
+  cursor: pointer;
+  opacity: 0.7;
+  border: 2px solid transparent;
+  transition: opacity 0.2s, border 0.2s;
+}
+.modal-thumb.active {
+  opacity: 1;
+  border: 2px solid #a3834b;
+}
+
+@media (max-width: 900px) {
+  .book-display {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+    max-width: 98vw;
+  }
+  .book-image-container {
+    min-width: 0;
+    max-width: 100%;
+    justify-content: center;
+  }
+  .book-cover {
+    width: 120px;
+  }
+  .book-title {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  .book-info {
+    max-width: 100%;
+    text-align: center;
+  }
+  .book-description {
+    font-size: 1rem;
+    text-align: center;
+  }
+  .book-title-link {
+    text-align: center;
+  }
+  .book-subtitle {
+    font-size: 1rem;
+    margin-left: 0;
+  }
+  .modal-image {
+    max-width: 98vw;
+    max-height: 70vh;
+  }
+  .modal-arrow-left {
+    left: 0;
+  }
+  .modal-arrow-right {
+    right: 0;
+  }
+  .modal-thumbnails {
+    gap: 0.7rem;
+  }
+  .modal-thumb {
+    width: 40px;
+  }
+} 

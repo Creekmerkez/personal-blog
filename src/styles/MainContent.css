@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap');
+
+@font-face {
+  font-family: 'Nathgomy';
+  src: url('/fonts/Nathgomy.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.content-section {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.content-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #7a5c2e;
+  text-align: center;
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+  font-weight: 600;
+}
+
+.bio-content.centered-bio {
+  max-width: 1100px;
+  margin: 0 auto;
+  line-height: 1.8;
+  text-align: center;
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+}
+
+.bio-content.centered-bio p {
+  font-size: 1.25rem;
+  color: #7a5c2e;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.bio-content.centered-bio p:last-child {
+  margin-bottom: 0;
+}
+
+.bio-content.centered-bio p.bio-narrow:first-child {
+  text-align: center;
+}
+
+.bio-content.centered-bio p.bio-narrow {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bio-content.centered-bio p.bio-wide {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.highlight {
+  color: #a3834b;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.signature {
+  position: relative;
+  display: inline-block;
+  margin: 3rem auto 0 auto;
+  font-family: 'Nathgomy', cursive;
+  font-size: 3.7rem;
+  color: #7a6a53;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  background: transparent;
+  transform: rotate(-3deg) skew(-2deg, 1deg);
+  text-shadow: 0.5px 1px 2px rgba(80, 60, 30, 0.07);
+  opacity: 0.92;
+  font-style: italic;
+}
+
+.signature-flourish {
+  font-size: 2.5rem;
+  color: #e5e1db;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.signature::after {
+  content: '';
+  display: block;
+  width: 420px;
+  max-width: 60vw;
+  height: 2px;
+  background: linear-gradient(90deg, #e5e1db 60%, transparent 100%);
+  position: absolute;
+  left: -420px;
+  top: 50%;
+  z-index: 0;
+}
+
+.video-section,
+.social-section {
+  padding: 2rem 0;
+  border-top: 1px solid #eee;
+}
+
+.video-section h2,
+.social-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #7a5c2e;
+  text-align: center;
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+  font-weight: 600;
+}
+
+.ps-section {
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px dashed #e5e1db;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.85rem !important;
+}
+
+.ps-section .ps-heading {
+  font-family: 'EB Garamond', Garamond, Georgia, Times New Roman, Times, serif;
+  font-size: 0.92rem !important;
+  color: #7a5c2e;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.ps-section p {
+  color: #7a5c2e;
+  font-size: 0.88rem !important;
+  margin-bottom: 0.9rem;
+  text-align: center;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.ps-section p:last-child {
+  margin-bottom: 0;
+}
+
+.ps-section .ps-link {
+  color: #a3834b;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.92rem !important;
+  transition: color 0.2s;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+
+.ps-section .ps-link:hover {
+  color: #7a5c2e;
+  text-decoration: underline;
+}
+
+.ps-section .ps-thanks {
+  font-size: 0.92rem !important;
+  font-weight: 500;
+  margin-top: 1rem;
+  color: #7a5c2e;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+.ps-heart {
+  font-size: 1.5em;
+  vertical-align: middle;
+  margin-left: 0.1em;
+  margin-right: 0.1em;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    gap: 2rem;
+  }
+
+  .content-section h1 {
+    font-size: 2rem;
+  }
+
+  .bio-content.centered-bio {
+    padding: 0 1rem;
+  }
+
+  .bio-content.centered-bio p {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .signature {
+    font-size: 2.2rem;
+  }
+  .signature-flourish {
+    font-size: 1.5rem;
+  }
+  .signature::after {
+    width: 180px;
+    left: -180px;
+  }
+
+  .video-section h2,
+  .social-section h2 {
+    font-size: 1.5rem;
+  }
+} 

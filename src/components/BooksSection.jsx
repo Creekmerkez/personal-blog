@@ -1,0 +1,47 @@
+import React from 'react';
+import BookDisplay from './BookDisplay';
+import '../styles/BooksSection.css';
+
+const BooksSection = () => {
+  const books = [
+    {
+      isbn: '9798281743426',
+      amazonLink: "https://a.co/d/a22IEUU",
+      title: "Все про добу, рік, місяць, тиждень та особливі дні",
+      description: `Ця книжка — справжня подорож через всі 12 місяців року разом із милими маленькими звірятами. На кожній сторінці маленькі читачі відкривають нову атмосферу: від сніжної казки січня до запашного травня, від сонячного літа до яскравого осіннього листопаду. Пори року та їхні особливості: зміна погоди, природи, настроїв. Свята й важливі події року: прихід весни, Гелловін, підготовка до зимових свят. Емоційне сприйняття часу: радість, здивування, тепло родинних моментів. Дружба, турбота і цікавість до навколишнього світу. Зрозумілі короткі історії: ідеальні для маленької дитини, яку легко зацікавити, але важко довго утримати увагу. Живі 3D-ілюстрації у стилі Disney: яскраві, об'ємні образи героїв оживають на сторінках і миттєво завойовують любов дітей. Легкість і теплий настрій: кожна історія просякнута позитивом і світлом, вона вчить бачити прекрасне в простих речах. Навчання через гру: дитина без зусиль запам'ятовує місяці року, зміни в природі та пов'язує події з часом. Вони впізнаватимуть знайомі природні явища — перший сніг, перші квіти, теплий літній дощик. Вони дружитимуть із милими героями — зайчиком, ведмедиком, мишкою, лисичкою та іншими. Вони разом із героями святкуватимуть зміни сезону, радітимуть кожному новому дню. Вона стане чудовою традицією: читати щомісяця нову історію, розмовляти про зміни в природі, планувати маленькі сімейні свята. Вона допоможе легко та невимушено розвивати мовлення, уяву й емоційний інтелект малюка. Вона створює теплі моменти разом — те, що залишиться в пам'яті назавжди.`,
+      coverImage: "/images/book1.jpg",
+      backCoverImage: "/images/book1-back.jpg"
+    },
+    {
+      isbn: '9798314933527',
+      amazonLink: "https://a.co/d/f92RZ8W",
+      title: "Алфавітні віршики",
+      subtitle: "with Alphabet Poems and numbers, colors",
+      description: `"Абетка віршів" — ця яскрава книжка запрошує дітей у чарівний світ українських та англійських літер! У першій частині малята знайдуть веселі віршики до кожної букви українського алфавіту, доповнені яскравими ілюстраціями. Друга частина відкриє англійський алфавіт у римованих рядках, а барвисті малюнки зроблять навчання веселим і захопливим!
+
+Також у книжці представлені числа з цікавими віршами, кольори у легких римах та інтерактивна розмальовка, що допоможе дітям краще запам'ятати літери, цифри й відтінки у грі!
+
+"Alphabet of Poems" is a vibrant book that invites children into the magical world of Ukrainian and English letters! In the first part, little readers will discover cheerful poems for each letter of the Ukrainian alphabet, complemented by bright illustrations. The second part introduces the English alphabet through rhymed verses, while colorful pictures make learning fun and exciting!
+
+The book also features numbers with engaging poems, colors in simple rhymes, and an interactive coloring section, helping children remember letters, numbers, and shades through play!`,
+      coverImage: "/images/book2.jpg",
+      backCoverImage: "/images/book2-back.jpg"
+    }
+  ];
+
+  return (
+    <section className="books-section">
+      <h2 className="section-title">My Books</h2>
+      <div className="books-grid">
+        {books.map((book) => (
+          <BookDisplay 
+            key={book.isbn}
+            book={book}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default BooksSection; 

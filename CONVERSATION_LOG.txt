@@ -1,0 +1,19 @@
+# AI Conversation Log
+
+Paste your conversations with the AI here after each session to keep a record for future reference.
+
+---
+
+# Instructions
+- After each session, copy the entire conversation from the chat window.
+- Paste it below this line.
+- You can add dates or session titles for easier navigation.
+
+---
+
+# Example
+
+## Session: 2024-05-10 — Project Restoration & Footer Improvements
+[Paste conversation here]
+
+--- 

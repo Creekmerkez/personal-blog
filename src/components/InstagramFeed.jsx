@@ -18,7 +18,7 @@ const InstagramFeed = () => {
       {/* Desktop Widget */}
       <div className={styles['instagram-feed-desktop']}>
         <iframe
-          src="//lightwidget.com/widgets/a210bd19b670522ab477a35a526121f8.html"
+          src="//lightwidget.com/widgets/6ecaa22609ec515eacff65c5fdc09d29.html"
           scrolling="no"
           allowTransparency="true"
           className="lightwidget-widget"
@@ -29,7 +29,7 @@ const InstagramFeed = () => {
       {/* Mobile Widget */}
       <div className={styles['instagram-feed-mobile']}>
         <iframe
-          src="//lightwidget.com/widgets/90c3b791fa7d5d9fa662003c420de0bd.html"
+          src="//lightwidget.com/widgets/bd88ebee3abe54cdabf9b3f13a32ba36.html"
           scrolling="no"
           allowTransparency="true"
           className="lightwidget-widget"

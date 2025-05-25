@@ -197,9 +197,8 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div 
-        className="video-container" 
-        onMouseEnter={handleMouseEnter} 
+      <div className="header-video-container"
+        onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseEnter}
         onMouseLeave={hideControls}
         onTouchStart={handleTouchStart}
@@ -251,7 +250,7 @@ const Header = () => {
             </div>
             <span style={{ color: '#fff', fontSize: '1.1rem', fontFamily: 'monospace', minWidth: '80px', textAlign: 'center', marginLeft: 'auto' }}>{currentTime} / {duration}</span>
           </div>
-          </div>
+        </div>
       </div>
     </header>
   );

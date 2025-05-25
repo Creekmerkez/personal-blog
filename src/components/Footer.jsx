@@ -1,6 +1,4 @@
 import React from 'react';
-import InstagramFeed from './InstagramFeed';
-import YouTubeVideo from './YouTubeVideo';
 import '../styles/Footer.css';
 
 const Footer = () => (
@@ -21,9 +19,6 @@ const Footer = () => (
       </svg>
       <span className="linkedin-text">LinkedIn</span>
     </a>
-    <InstagramFeed />
-    <div style={{ height: '2.5rem' }} />
-    <YouTubeVideo />
   </div>
 );
 

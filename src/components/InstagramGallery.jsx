@@ -1,5 +1,4 @@
 import React from 'react';
-import InstagramFeed from './InstagramFeed';
 import '../styles/InstagramGallery.css';
 
 const InstagramGallery = () => (
@@ -10,7 +9,7 @@ const InstagramGallery = () => (
       </a>
     </h2>
     <div className="instagram-gallery-feed">
-      <InstagramFeed />
+      {/* InstagramFeed /> */}
     </div>
   </section>
 );

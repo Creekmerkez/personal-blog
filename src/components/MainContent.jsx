@@ -1,5 +1,7 @@
 import React from 'react';
 import BooksSection from './BooksSection';
+import YouTubeVideos from './YouTubeVideos';
+import InstagramFeed from './InstagramFeed';
 import '../styles/MainContent.css';
 
 const MainContent = () => {
@@ -44,6 +46,8 @@ const MainContent = () => {
         </div>
       </section>
       <BooksSection />
+      <InstagramFeed />
+      <YouTubeVideos />
     </main>
   );
 };

@@ -225,4 +225,10 @@
   .social-section h2 {
     font-size: 1.5rem;
   }
+}
+
+@media (min-width: 769px) {
+  .main-content {
+    margin-top: 60vh;
+  }
 } 

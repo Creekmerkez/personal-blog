@@ -20,6 +20,8 @@ function getEmbedUrl(link) {
 
 const YouTubeVideos = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -27,22 +29,19 @@ const YouTubeVideos = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!isInitialized) setIsInitialized(true);
+  }, [isInitialized]);
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? videoLinks.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === videoLinks.length - 1 ? 0 : prev + 1));
+  };
+
   if (isMobile) {
-    // Mobile: keep the carousel as before
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isInitialized, setIsInitialized] = useState(false);
-
-    useEffect(() => {
-      if (!isInitialized) setIsInitialized(true);
-    }, [isInitialized]);
-
-    const handlePrev = () => {
-      setCurrentIndex((prev) => (prev === 0 ? videoLinks.length - 1 : prev - 1));
-    };
-    const handleNext = () => {
-      setCurrentIndex((prev) => (prev === videoLinks.length - 1 ? 0 : prev + 1));
-    };
-
     return (
       <div className="youtube-section">
         <div className="youtube-carousel">

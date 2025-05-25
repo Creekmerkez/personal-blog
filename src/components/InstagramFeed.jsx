@@ -20,7 +20,7 @@ const InstagramFeed = () => {
         <iframe
           src="//lightwidget.com/widgets/6ecaa22609ec515eacff65c5fdc09d29.html"
           scrolling="no"
-          allowTransparency="true"
+          allowtransparency="true"
           className="lightwidget-widget"
           style={{ width: '100%', border: 0, overflow: 'hidden' }}
           title="Instagram Desktop Feed"
@@ -31,7 +31,7 @@ const InstagramFeed = () => {
         <iframe
           src="//lightwidget.com/widgets/bd88ebee3abe54cdabf9b3f13a32ba36.html"
           scrolling="no"
-          allowTransparency="true"
+          allowtransparency="true"
           className="lightwidget-widget"
           style={{ width: '100%', border: 0 }}
           title="Instagram Mobile Feed"

@@ -181,8 +181,6 @@ const Header = () => {
     background: 'transparent',
     border: 'none',
     borderRadius: '50%',
-    width: '52px',
-    height: '52px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -194,6 +192,9 @@ const Header = () => {
   const ytButtonHoverStyle = {
     background: 'rgba(60,60,60,0.18)'
   };
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
+  const navWidth = isMobile ? '100%' : '60%';
 
   return (
     <header className="header">
@@ -219,7 +220,7 @@ const Header = () => {
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: '2.5rem',
+            bottom: isMobile ? 0 : '2.5rem',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -230,18 +231,20 @@ const Header = () => {
             transition: 'opacity 0.35s',
           }}
         >
-          <div className="progress-bar-container" style={{ width: '60%', height: '6px', background: 'rgba(255,255,255,0.25)', borderRadius: '3px', marginBottom: '0.7rem', cursor: 'pointer', position: 'relative' }} onClick={handleSeekBar}>
+          <div className="progress-bar-container" style={{ width: navWidth, height: '6px', background: 'rgba(255,255,255,0.25)', borderRadius: '3px', marginBottom: '0.7rem', cursor: 'pointer', position: 'relative' }} onClick={handleSeekBar}>
             <div style={{ width: `${progress}%`, height: '100%', background: '#f00', borderRadius: '3px', transition: 'width 0.2s' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '60%' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: navWidth, padding: isMobile ? '0 12px' : 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
               <button
+                className="header-control-btn"
                 onClick={togglePlay}
                 style={ytButtonStyle}
                 onMouseOver={e => e.currentTarget.style.background = ytButtonHoverStyle.background}
                 onMouseOut={e => e.currentTarget.style.background = ytButtonStyle.background}
               >{isPlaying ? PauseIcon : PlayIcon}</button>
               <button
+                className="header-control-btn"
                 onClick={toggleMute}
                 style={ytButtonStyle}
                 onMouseOver={e => e.currentTarget.style.background = ytButtonHoverStyle.background}

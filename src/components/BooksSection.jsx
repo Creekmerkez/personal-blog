@@ -1,6 +1,7 @@
 import React from 'react';
 import BookDisplay from './BookDisplay';
 import '../styles/BooksSection.css';
+import book3Cover from '../assets/images/book3.jpg';
 
 const BooksSection = () => {
   const books = [
@@ -26,7 +27,19 @@ const BooksSection = () => {
 The book also features numbers with engaging poems, colors in simple rhymes, and an interactive coloring section, helping children remember letters, numbers, and shades through play!`,
       coverImage: "/images/book2.jpg",
       backCoverImage: "/images/book2-back.jpg"
-    }
+    },
+    {
+      isbn: 'book3',
+      title: 'Чому? А як? А що?',
+      description: `Чому зебра смугаста? А бульбашка справді може в космос? І куди зникає луна вдень?
+Ця книжка — справжній скарб для маленьких Чомучок, які хочуть знати ВСЕ! Веселі, короткі відповіді на найдивніші запитання дитячого всесвіту — просто, з гумором і любов'ю до фантазії.
+А ще — вона яскрава! Дуже яскрава! Ілюстрації тут такі чарівні, що здається, ніби потрапляєш усередину казки.
+Ці відповіді не тільки викликають усмішку, а й роблять дітей обізнанішими, розумнішими та відкритішими до світу. Книжка, яка не навчає сухо, а грає, надихає й м'яко розвиває мислення.
+Читайте, дивуйтесь і питайте ще — бо цікавість — це перший крок до розуму!`,
+      coverImage: '/images/book3.jpg',
+      backCoverImage: '/images/book3_back.jpg',
+      amazonLink: 'https://a.co/d/1tXRLWG',
+    },
   ];
 
   return (

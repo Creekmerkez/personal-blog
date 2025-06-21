@@ -45,7 +45,22 @@ const QAChat = ({ onClose }) => {
   };
 
   const handleQuestionSelect = (questionId) => {
-    setSelectedQuestionId(selectedQuestionId === questionId ? null : questionId);
+    const wasSelected = selectedQuestionId === questionId;
+    setSelectedQuestionId(wasSelected ? null : questionId);
+    
+    // If we're expanding a question (not collapsing), scroll to it on mobile
+    if (!wasSelected && window.innerWidth <= 768) {
+      // Use setTimeout to ensure the DOM has updated with the expanded content
+      setTimeout(() => {
+        const questionElement = document.querySelector(`[data-question-id="${questionId}"]`);
+        if (questionElement) {
+          questionElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 100);
+    }
   };
 
   const handleClose = () => {
@@ -90,7 +105,7 @@ const QAChat = ({ onClose }) => {
               const answer = isSelected ? getAnswerById(qa.id, language)?.answer : null;
               
               return (
-                <div key={qa.id} className="qa-item">
+                <div key={qa.id} className="qa-item" data-question-id={qa.id}>
                   <button
                     className="question-button"
                     onClick={() => handleQuestionSelect(qa.id)}

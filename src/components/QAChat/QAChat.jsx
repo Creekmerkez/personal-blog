@@ -7,7 +7,7 @@ const QAChat = ({ onClose }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const [headerText, setHeaderText] = useState('');
-  const [language, setLanguage] = useState('ua');
+  const [language, setLanguage] = useState('en');
 
   const fullHeaderTexts = {
     ua: "Якби у вас був шанс взяти у мене інтерв'ю... про що б ви запитали?",

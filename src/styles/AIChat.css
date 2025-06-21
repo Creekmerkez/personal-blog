@@ -263,15 +263,17 @@
 }
 
 .lang-btn {
-  background: #faf8f4;
+  background: #f5f0e6;
   border: none;
-  color: #7a5c2e;
-  padding: 0.3rem 0.6rem;
+  color: #8B7355;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   font-family: 'EB Garamond', serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
   transition: all 0.2s ease-in-out;
+  min-width: 50px;
 }
 
 .lang-btn:hover {
@@ -280,9 +282,10 @@
 }
 
 .lang-btn.active {
-  background: #8B7355;
-  color: #F5F0E6;
+  background: #d4c4a8;
+  color: #5a4a2a;
   font-weight: bold;
+  box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
 }
 
 .chat-popup-close {
@@ -440,6 +443,16 @@
 
   .chat-popup-submit {
     padding: 0.8rem 1rem;
+  }
+
+  .chat-popup-button {
+    width: 56px;
+    height: 56px;
+  }
+
+  .chat-popup-button svg {
+    width: 24px;
+    height: 24px;
   }
 }
 

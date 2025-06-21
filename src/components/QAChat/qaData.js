@@ -41,7 +41,7 @@ export const qaData = {
     {
       id: 8,
       "question": "Який момент із дитинства ти згадуєш найчастіше?",
-      "answer": "This is not a very pleasant memory from school when there was slander against me that I said something bad about another girl in the class, although I actually wanted to be friends with her. I don't understand why I didn't refute this fight, but just accepted it. On the other hand, I'm proud of myself because I was very strong, and I can't even believe that at such an age I could be one against all (as it seemed to me then). Actually, I still keep in touch with many people, and as it turned out, it was only in my head — other children had their own wars that I didn't notice. For some reason, I remember this moment. But in general, I was a very popular girl at school: the best athlete, on the school council, in KVN, participated in various events. Besides school, there was summer — river, camps, picnics, games with ball or stick (ha-ha), winter — skates, skis, sleds — from morning to dark on the street. It was super childhood."
+      "answer": "Це не дуже приємний спогад зі школи, коли на мене звели наклеп, ніби я сказала щось погане про іншу дівчинку в класі, хоча насправді я хотіла з нею дружити. Я не розумію, чому я не спростувала цю боротьбу, а просто прийняла її. З іншого боку, я пишаюся собою, тому що я була дуже сильною, і я навіть не можу повірити, що в такому віці я могла бути одна проти всіх (як мені тоді здавалося). Насправді, я досі підтримую зв'язок з багатьма людьми, і, як виявилося, це було тільки в моїй голові — в інших дітей були свої війни, яких я не помічала. Чомусь я пам'ятаю цей момент. Але загалом я була дуже популярною дівчинкою в школі: найкраща спортсменка, в шкільній раді, в КВН, брала участь у різних заходах. Крім школи, було літо — річка, табори, пікніки, ігри з м'ячем чи палицею (ха-ха), зима — ковзани, лижі, санки — з ранку до темряви на вулиці. Це було супер дитинство."
     },
     {
       id: 9,
@@ -307,12 +307,12 @@ export const qaData = {
     },
     {
       id: 7,
-      "question": "What have you learned over the past year?",
+      "question": "Why did you learn over the last year?",
       "answer": "To enjoy every moment and be grateful for what I have."
     },
     {
       id: 8,
-      "question": "What moment from childhood do you remember most often?",
+      "question": "What childhood moment do you remember most often?",
       "answer": "This is not a very pleasant memory from school when there was slander against me that I said something bad about another girl in the class, although I actually wanted to be friends with her. I don't understand why I didn't refute this fight, but just accepted it. On the other hand, I'm proud of myself because I was very strong, and I can't even believe that at such an age I could be one against all (as it seemed to me then). Actually, I still keep in touch with many people, and as it turned out, it was only in my head — other children had their own wars that I didn't notice. For some reason, I remember this moment. But in general, I was a very popular girl at school: the best athlete, on the school council, in KVN, participated in various events. Besides school, there was summer — river, camps, picnics, games with ball or stick (ha-ha), winter — skates, skis, sleds — from morning to dark on the street. It was super childhood."
     },
     {

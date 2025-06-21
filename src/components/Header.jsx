@@ -21,7 +21,9 @@ const Header = () => {
     setControlsVisible(true);
   };
   const hideControls = () => {
-    hideTimeout.current = setTimeout(() => setControlsVisible(false), 1200);
+    if (!isMobile) {  // Only auto-hide on desktop
+      hideTimeout.current = setTimeout(() => setControlsVisible(false), 1200);
+    }
   };
 
   // Clean up timeout on unmount
@@ -43,7 +45,8 @@ const Header = () => {
     }
   };
 
-  const togglePlay = () => {
+  const togglePlay = (e) => {
+    e.preventDefault();
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
@@ -72,9 +75,17 @@ const Header = () => {
     setCaptionsEnabled(newCaptionsState);
   };
 
-  const handleMouseEnter = () => setControlsVisible(true);
-  const handleMouseLeave = () => setControlsVisible(false);
-  const handleTouchStart = () => setControlsVisible(true);
+  const handleMouseEnter = () => {
+    setControlsVisible(true);
+  };
+  const handleMouseLeave = () => {
+    if (!isMobile) {
+      setControlsVisible(false);
+    }
+  };
+  const handleTouchStart = () => {
+    setControlsVisible(true);
+  };
 
   // Hide controls after 3 seconds of inactivity on touch devices
   useEffect(() => {
@@ -199,9 +210,9 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-video-container"
-        onMouseEnter={handleMouseEnter}
+        onMouseEnter={handleMouseEnter} 
         onMouseMove={handleMouseEnter}
-        onMouseLeave={hideControls}
+        onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
       >
         <video
@@ -211,6 +222,10 @@ const Header = () => {
           autoPlay
           muted={isMuted}
           loop
+          onClick={togglePlay}
+          onError={handleVideoError}
+          onLoadedData={handleVideoLoad}
+          style={{ cursor: 'pointer' }}
         >
           <track kind="captions" src="/videos/banner.vtt" srcLang="en" label="English" default />
         </video>
@@ -253,7 +268,7 @@ const Header = () => {
             </div>
             <span style={{ color: '#fff', fontSize: '1.1rem', fontFamily: 'monospace', minWidth: '80px', textAlign: 'center', marginLeft: 'auto' }}>{currentTime} / {duration}</span>
           </div>
-        </div>
+          </div>
       </div>
     </header>
   );

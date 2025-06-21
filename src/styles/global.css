@@ -50,4 +50,9 @@ body {
     color: #fff;
     text-align: center;
     padding: 20px;
+}
+
+html.modal-open,
+body.modal-open {
+    overflow: hidden !important;
 } 

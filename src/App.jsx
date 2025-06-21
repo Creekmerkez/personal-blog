@@ -1,9 +1,6 @@
 import React from 'react';
 import Header from './components/Header';
 import MainContent from './components/MainContent';
-import BooksSection from './components/BooksSection';
-import InstagramFeed from './components/InstagramFeed';
-import YouTubeVideos from './components/YouTubeVideos';
 import Footer from './components/Footer';
 import './styles/App.css';
 

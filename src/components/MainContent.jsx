@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BooksSection from './BooksSection';
 import YouTubeVideos from './YouTubeVideos';
-import InstagramFeed from './InstagramFeed';
+import InstagramWidget from './InstagramWidget';
+import QAChat from './QAChat/QAChat';
 import '../styles/MainContent.css';
 
 const MainContent = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
   return (
     <main className="main-content">
       <section className="content-section">
-        <div className="bio-content centered-bio">
+        <div className="bio-content centered-bio" style={{ position: 'relative' }}>
+          {isChatOpen && <QAChat onClose={() => setIsChatOpen(false)} />}
+          <button 
+            className="chat-popup-button"
+            onClick={() => setIsChatOpen(true)}
+            style={{
+              position: 'fixed',
+              bottom: '20px',
+              right: '20px',
+              zIndex: 1000
+            }}
+          >
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="currentColor"/>
+            </svg>
+          </button>
           <p className="bio-narrow">
             Hi there! I'm a <span className="highlight">Test Automation Engineer</span> with over a decade of experience in IT, but my journey extends beyond technology into the realms of music, writing, and conscious living.
           </p>
@@ -46,7 +64,7 @@ const MainContent = () => {
         </div>
       </section>
       <BooksSection />
-      <InstagramFeed />
+      <InstagramWidget />
       <YouTubeVideos />
     </main>
   );

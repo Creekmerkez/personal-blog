@@ -3,13 +3,18 @@ import '../styles/BooksSection.css';
 
 const MAX_LENGTH = 320; // Adjust as needed for truncation
 
-const BookDisplay = ({ book }) => {
+const BookDisplay = ({ book = null }) => {
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [showBack, setShowBack] = useState(false);
 
-  const isLong = book.description.length > MAX_LENGTH;
-  const shortDesc = isLong ? book.description.slice(0, MAX_LENGTH) + '...' : book.description;
+  // Return null if no book data is provided
+  if (!book) {
+    return null;
+  }
+
+  const isLong = book.description?.length > MAX_LENGTH;
+  const shortDesc = isLong ? book.description?.slice(0, MAX_LENGTH) + '...' : book.description;
 
   // Modal image logic
   const mainImage = showBack ? book.backCoverImage : book.coverImage;

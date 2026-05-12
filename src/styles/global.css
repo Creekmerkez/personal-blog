@@ -1,9 +1,10 @@
 :root {
+    --background-color: #C9B7A0;
     font-family: EB Garamond, Garamond, Georgia, Times New Roman, Times, serif;
     line-height: 1.5;
     font-weight: 400;
     color: #212121;
-    background-color: #fff;
+    background-color: var(--background-color);
 }
 
 * {
@@ -13,12 +14,13 @@
 }
 
 html {
+    background-color: var(--background-color);
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
 
 body {
-    background: #fff;
+    background-color: var(--background-color);
     font-family: EB Garamond, Garamond, Georgia, Times New Roman, Times, serif;
     color: #212121;
     margin: 0;

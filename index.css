@@ -2,11 +2,12 @@
 @import './styles/custom.css';
 
 :root {
+  --background-color: #C9B7A0;
   font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
   line-height: 1.5;
   font-weight: 400;
   color: #212121;
-  background-color: #ffffff;
+  background-color: var(--background-color);
 }
 
 a {
@@ -25,7 +26,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: #fff;
+  background-color: var(--background-color);
   font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

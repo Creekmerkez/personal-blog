@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Julia Merkusheva</title>
+  <script>
+    // GitHub Pages serves this for any unknown path.
+    // Encode the path into a query param and redirect to index.html,
+    // which will decode it and call history.replaceState to restore the URL.
+    var l = window.location;
+    l.replace(
+      l.protocol + '//' + l.host + '/?p=' +
+      l.pathname.slice(1).replace(/&/g, '~and~') +
+      (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      l.hash
+    );
+  </script>
+</head>
+<body></body>
+</html>

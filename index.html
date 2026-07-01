@@ -9,7 +9,19 @@
     <link rel="preload" as="image" href="/images/book1.jpg" />
     <link rel="preload" as="image" href="/images/book2.jpg" />
     <title>MY</title>
-    <script type="module" crossorigin src="/assets/index-Dj4wdAGX.js"></script>
+  <script>
+    // Decode the path redirect from 404.html back into a real URL
+    (function () {
+      var p = window.location.search.match(/[?&]p=([^&]*)/);
+      if (p) {
+        var path = '/' + decodeURIComponent(p[1].replace(/~and~/g, '&'));
+        var q = window.location.search.match(/[?&]q=([^&]*)/);
+        var query = q ? '?' + decodeURIComponent(q[1].replace(/~and~/g, '&')) : '';
+        window.history.replaceState(null, null, path + query + window.location.hash);
+      }
+    })();
+  </script>
+    <script type="module" crossorigin src="/assets/index-C3pRaSZ7.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-DsiN8T1o.css">
   </head>
   <body>

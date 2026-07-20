@@ -1,0 +1,163 @@
+.music-page {
+  min-height: 100vh;
+  padding-top: calc(var(--site-nav-height) + 1rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Hero ── */
+.music-hero {
+  width: 100%;
+  max-width: 620px;
+  padding: 5rem 2rem 3.5rem;
+  text-align: center;
+}
+
+.music-heading {
+  font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-size: 3.6rem;
+  font-weight: 400;
+  color: #7a5c2e;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.8rem;
+}
+
+.music-divider {
+  width: 48px;
+  height: 1px;
+  background: #a3834b;
+  margin: 0 auto 1.8rem;
+  opacity: 0.6;
+}
+
+.music-intro {
+  font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.05rem;
+  color: #5a4030;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* ── Gallery ── */
+.music-gallery-section {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 3rem 3rem;
+}
+
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+/* Align the 5th card to center when it's alone in the last row */
+.mix-card:last-child:nth-child(3n - 2) {
+  grid-column: 2;
+}
+
+.mix-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(80, 50, 15, 0.09);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.mix-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(80, 50, 15, 0.15);
+}
+
+.mix-video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+}
+
+.mix-video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.mix-info {
+  padding: 0.7rem 1rem 0.8rem;
+  border-top: 1px solid #f5f0ea;
+}
+
+.mix-title {
+  font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #a3834b;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+/* ── Channel link ── */
+.music-channel-row {
+  padding: 1.5rem 2rem 5rem;
+  text-align: center;
+}
+
+.music-channel-link {
+  font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  color: #a3834b;
+  text-decoration: none;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(163, 131, 75, 0.4);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.music-channel-link:hover {
+  color: #7a5c2e;
+  border-bottom-color: #7a5c2e;
+}
+
+/* ── Tablet (2 columns) ── */
+@media (max-width: 900px) {
+  .music-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mix-card:last-child:nth-child(3n - 2) {
+    grid-column: auto;
+  }
+
+  .music-gallery-section {
+    padding: 0 2rem 3rem;
+  }
+}
+
+/* ── Mobile (1 column) ── */
+@media (max-width: 600px) {
+  .music-hero {
+    padding: 3rem 1.5rem 2.5rem;
+  }
+
+  .music-heading {
+    font-size: 2.6rem;
+  }
+
+  .music-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .music-gallery-section {
+    padding: 0 1.5rem 2.5rem;
+  }
+
+  .music-channel-row {
+    padding: 1rem 1.5rem 3.5rem;
+  }
+}

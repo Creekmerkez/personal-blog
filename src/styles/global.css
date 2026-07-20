@@ -1,6 +1,8 @@
 :root {
+    /* Fallback used only before SiteNav measures its real height on mount. */
+    --site-nav-height: 110px;
     --background-color: #C9B7A0;
-    font-family: EB Garamond, Garamond, Georgia, Times New Roman, Times, serif;
+    font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
     line-height: 1.5;
     font-weight: 400;
     color: #212121;
@@ -21,14 +23,14 @@ html {
 
 body {
     background-color: var(--background-color);
-    font-family: EB Garamond, Garamond, Georgia, Times New Roman, Times, serif;
+    font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
     color: #212121;
     margin: 0;
     padding: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 1.2rem;
+    font-size: 1rem;
     min-width: 320px;
     overflow-x: hidden;
 }

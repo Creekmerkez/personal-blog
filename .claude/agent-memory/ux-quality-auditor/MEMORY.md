@@ -1,0 +1,2 @@
+- [User Profile — Julia Merkusheva](user_profile.md) — site owner; Test Automation Engineer, DJ/producer, Ukrainian children's book author, Prague
+- [Site Architecture Constraints](project_architecture.md) — no router installed, no CMS, hardcoded content, ESLint 0-warnings, GitHub Pages 404 risk, dead YouTubeMixesGallery component

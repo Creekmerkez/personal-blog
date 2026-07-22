@@ -1,14 +1,103 @@
+@font-face {
+  font-family: 'Nathgomy';
+  src: url('/fonts/Nathgomy.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ── Two-column layout ── */
 .header {
   width: 100%;
   height: 100vh;
-  position: relative;
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
 }
 
-.video-container {
+/* ── LEFT: Bio panel ── */
+.header-bio-panel {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2rem;
+  background: #fff;
+  overflow: hidden;
+  border-right: 1px solid #f0ece6;
+}
+
+.header-bio-content {
+  max-width: 420px;
   width: 100%;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.header-bio-content p {
+  font-size: 0.8rem;
+  color: #7a5c2e;
+  margin-bottom: 0.45rem;
+  font-weight: 400;
+}
+
+.header-bio-content p:last-of-type {
+  margin-bottom: 0;
+}
+
+.header-bio-content .bio-narrow {
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.highlight {
+  color: #a3834b;
+  font-weight: 600;
+}
+
+/* ── Signature ── */
+.signature {
+  position: relative;
+  display: inline-block;
+  margin: 0.7rem auto 0 auto;
+  font-family: 'Nathgomy', cursive;
+  font-size: 2.4rem;
+  color: #7a6a53;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  transform: rotate(-3deg) skew(-2deg, 1deg);
+  text-shadow: 0.5px 1px 2px rgba(80, 60, 30, 0.07);
+  opacity: 0.92;
+  font-style: italic;
+}
+
+.signature-flourish {
+  font-size: 1.6rem;
+  color: #e5e1db;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.signature::after {
+  content: '';
+  display: block;
+  width: 180px;
+  max-width: 22vw;
+  height: 2px;
+  background: linear-gradient(90deg, #e5e1db 60%, transparent 100%);
+  position: absolute;
+  left: -180px;
+  top: 50%;
+}
+
+/* ── RIGHT: Video panel ── */
+.header-video-panel {
+  width: 50%;
   height: 100%;
   position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .header-video {
@@ -20,119 +109,46 @@
   left: 0;
 }
 
-.yt-video-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.video-container:hover .yt-video-controls {
-  opacity: 1;
-}
-
-.yt-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.yt-btn:hover {
-  transform: scale(1.1);
-}
-
-.yt-progress-bar {
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  position: relative;
-  border-radius: 2px;
-}
-
-.yt-progress {
-  height: 100%;
-  background: #ff0000;
-  border-radius: 2px;
-  position: relative;
-}
-
-.yt-time-display {
-  color: white;
-  font-size: 14px;
-  font-family: Arial, sans-serif;
-  margin-left: 10px;
-}
-
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loading-content {
-  text-align: center;
-  color: white;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.fallback-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 24px;
-  font-family: Arial, sans-serif;
-}
-
+/* ── Mobile: stack vertically ── */
 @media (max-width: 768px) {
-  .header,
-  .video-container,
-  .header-video {
-    height: 35vh !important;
-    min-height: 180px;
-    max-height: 50vw;
-    width: 100vw !important;
-    object-fit: cover;
-    overflow: hidden;
+  .header {
+    flex-direction: column;
+    height: auto;
   }
-} 
+
+  .header-video-panel {
+    width: 100%;
+    height: 45vw;
+    min-height: 200px;
+    max-height: 50vh;
+    order: 1;
+    flex-shrink: 0;
+  }
+
+  .header-bio-panel {
+    width: 100%;
+    height: auto;
+    order: 2;
+    padding: 2rem 1.5rem;
+    border-right: none;
+    border-top: 1px solid #f0ece6;
+  }
+
+  .header-bio-content p {
+    font-size: 1rem;
+  }
+
+  .signature {
+    font-size: 2.4rem;
+  }
+
+  .signature-flourish {
+    font-size: 1.6rem;
+  }
+
+  .signature::after {
+    width: 100px;
+    max-width: 22vw;
+    left: -100px;
+  }
+}

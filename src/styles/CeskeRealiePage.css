@@ -24,7 +24,7 @@
 }
 
 .ceske-title {
-  margin: 0.75rem 0 0;
+  margin: 0.85rem 0 0;
   font-size: clamp(1.8rem, 4.2vw, 3rem);
   letter-spacing: -0.03em;
   color: #111318;
@@ -32,37 +32,33 @@
   font-weight: 600;
 }
 
-.ceske-title-row {
-  margin-top: 0.75rem;
+.ceske-instagram-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-}
-
-.ceske-title-row .ceske-title {
-  margin: 0;
-}
-
-.ceske-title-instagram {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(43, 63, 102, 0.07);
+  border: 1px solid rgba(43, 63, 102, 0.16);
   color: #2b3f66;
-  opacity: 0.86;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
-.ceske-title-instagram:hover,
-.ceske-title-instagram:focus-visible {
+.ceske-instagram-badge:hover,
+.ceske-instagram-badge:focus-visible {
   opacity: 1;
   transform: translateY(-1px);
+  background: rgba(43, 63, 102, 0.12);
 }
 
-.ceske-instagram-icon {
-  width: 32px;
-  height: 32px;
+.ceske-instagram-badge-icon {
+  display: block;
+  flex-shrink: 0;
 }
 
 .ceske-description {
@@ -71,6 +67,7 @@
   font-size: 0.96rem;
   line-height: 1.55;
   color: #32394b;
+  text-align: left;
 }
 
 .ceske-options {
@@ -491,9 +488,14 @@
     font-size: clamp(2.8rem, 4.5vw, 3.8rem);
   }
 
-  .ceske-instagram-icon {
-    width: 42px;
-    height: 42px;
+  .ceske-instagram-badge {
+    padding: 0.5rem 1.05rem;
+    font-size: 0.82rem;
+  }
+
+  .ceske-instagram-badge-icon {
+    width: 18px;
+    height: 18px;
   }
 
   .ceske-description {

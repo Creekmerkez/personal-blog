@@ -2,43 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import './Header.css';
 
 const Header = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState('0:00');
   const [duration, setDuration] = useState('0:00');
-  const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const videoRef = useRef(null);
 
-  // Controls visibility logic
   const [controlsVisible, setControlsVisible] = useState(true);
-  let hideTimeout = useRef();
+  const hideTimeout = useRef();
 
-  const showControls = () => {
-    clearTimeout(hideTimeout.current);
-    setControlsVisible(true);
-  };
-  const hideControls = () => {
-    if (!isMobile) {  // Only auto-hide on desktop
-      hideTimeout.current = setTimeout(() => setControlsVisible(false), 1200);
-    }
-  };
-
-  // Clean up timeout on unmount
   useEffect(() => () => clearTimeout(hideTimeout.current), []);
 
-  const handleVideoError = (e) => {
-    console.error('Video error:', e);
-    setError(true);
-    setIsLoading(false);
-  };
-
   const handleVideoLoad = () => {
-    setIsLoading(false);
-
-    // Initialize captions as hidden
     const video = videoRef.current;
     if (video && video.textTracks.length > 0) {
       video.textTracks[0].mode = 'hidden';
@@ -65,39 +41,19 @@ const Header = () => {
     setIsMuted(video.muted);
   };
 
-  const toggleCaptions = () => {
-    const video = videoRef.current;
-    if (!video || !video.textTracks.length) return;
-
-    const track = video.textTracks[0];
-    const newCaptionsState = !captionsEnabled;
-    track.mode = newCaptionsState ? 'showing' : 'hidden';
-    setCaptionsEnabled(newCaptionsState);
-  };
-
-  const handleMouseEnter = () => {
-    setControlsVisible(true);
-  };
+  const handleMouseEnter = () => setControlsVisible(true);
   const handleMouseLeave = () => {
-    if (!isMobile) {
-      setControlsVisible(false);
-    }
+    if (!isMobile) setControlsVisible(false);
   };
-  const handleTouchStart = () => {
-    setControlsVisible(true);
-  };
+  const handleTouchStart = () => setControlsVisible(true);
 
-  // Hide controls after 3 seconds of inactivity on touch devices
   useEffect(() => {
     if (controlsVisible) {
-      const timer = setTimeout(() => {
-        setControlsVisible(false);
-      }, 3000);
+      const timer = setTimeout(() => setControlsVisible(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [controlsVisible]);
 
-  // Format time in MM:SS format
   const formatTime = (timeInSeconds) => {
     if (!isFinite(timeInSeconds)) return '0:00';
     const minutes = Math.floor(timeInSeconds / 60);
@@ -105,62 +61,6 @@ const Header = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Update time and duration
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const update = () => {
-      setCurrentTime(formatTime(video.currentTime));
-      setDuration(formatTime(video.duration));
-    };
-    video.addEventListener('timeupdate', update);
-    video.addEventListener('loadedmetadata', update);
-    return () => {
-      video.removeEventListener('timeupdate', update);
-      video.removeEventListener('loadedmetadata', update);
-    };
-  }, []);
-
-  // Captions toggle logic
-  const handleCaptions = () => {
-    const video = videoRef.current;
-    if (!video || !video.textTracks.length) return;
-    const track = video.textTracks[0];
-    const newState = !captionsEnabled;
-    track.mode = newState ? 'showing' : 'hidden';
-    setCaptionsEnabled(newState);
-  };
-
-  // SVG icons for YouTube-like controls (no black circle, YouTube style)
-  const PlayIcon = (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <polygon points="12,8 28,18 12,28" fill="#fff"/>
-    </svg>
-  );
-  const PauseIcon = (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <rect x="11" y="8" width="5" height="20" rx="2.5" fill="#fff"/>
-      <rect x="20" y="8" width="5" height="20" rx="2.5" fill="#fff"/>
-    </svg>
-  );
-  const MuteIcon = (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <path d="M10 14v8h6l7 7V7l-7 7h-6z" fill="#fff"/>
-      <line x1="10" y1="7" x2="30" y2="29" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
-    </svg>
-  );
-  const UnmuteIcon = (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <path d="M10 14v8h6l7 7V7l-7 7h-6z" fill="#fff"/>
-      <path d="M25 18c0-2.5-1.5-4.5-3.5-5.5" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-      <path d="M25 18c0 2.5-1.5 4.5-3.5 5.5" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-    </svg>
-  );
-  const CCIcon = (enabled) => (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill={enabled ? '#fff' : 'rgba(0,0,0,0.7)'} /><text x="7" y="19" fontSize="11" fontWeight="bold" fill={enabled ? '#222' : '#fff'}>CC</text></svg>
-  );
-
-  // Progress bar logic
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -187,7 +87,6 @@ const Header = () => {
     setProgress(percent * 100);
   };
 
-  // Common button style for YouTube look (no background)
   const ytButtonStyle = {
     background: 'transparent',
     border: 'none',
@@ -195,22 +94,71 @@ const Header = () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: 'none',
     cursor: 'pointer',
     padding: 0,
     transition: 'background 0.18s',
   };
-  const ytButtonHoverStyle = {
-    background: 'rgba(60,60,60,0.18)'
-  };
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 600;
-  const navWidth = isMobile ? '100%' : '60%';
+  const PlayIcon = (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <polygon points="12,8 28,18 12,28" fill="#fff"/>
+    </svg>
+  );
+  const PauseIcon = (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <rect x="11" y="8" width="5" height="20" rx="2.5" fill="#fff"/>
+      <rect x="20" y="8" width="5" height="20" rx="2.5" fill="#fff"/>
+    </svg>
+  );
+  const MuteIcon = (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M10 14v8h6l7 7V7l-7 7h-6z" fill="#fff"/>
+      <line x1="10" y1="7" x2="30" y2="29" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
+    </svg>
+  );
+  const UnmuteIcon = (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M10 14v8h6l7 7V7l-7 7h-6z" fill="#fff"/>
+      <path d="M25 18c0-2.5-1.5-4.5-3.5-5.5" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+      <path d="M25 18c0 2.5-1.5 4.5-3.5 5.5" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+    </svg>
+  );
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <header className="header">
-      <div className="header-video-container"
-        onMouseEnter={handleMouseEnter} 
+      {/* LEFT: Bio panel */}
+      <div className="header-bio-panel">
+        <div className="header-bio-content">
+          <p className="bio-narrow">
+            Hi there! I'm a <span className="highlight">Test Automation Engineer</span> with over a decade of experience in IT, but my journey extends beyond technology into the realms of music, writing, and conscious living.
+          </p>
+          <p>
+            Music has always been a vital part of my life. Through <span className="highlight">DJing</span>, I've created <span className="highlight">17 mixes</span>, each one a unique expression of creativity and emotion. While currently on pause, this passion remains an essential part of who I am.
+          </p>
+          <p>
+            <span className="highlight">Prague</span> is my home, where I live with my <span className="highlight">wonderful husband and our son</span> who constantly inspires me. Together, we embrace a lifestyle centered on freedom, flexibility, and mindful choices.
+          </p>
+          <p>
+            Writing <span className="highlight">children's books</span> brings me immense joy. Each story I write aims to spark curiosity and imagination in young minds. My books reflect my belief in the power of storytelling to shape young perspectives.
+          </p>
+          <p>
+            Living consciously guides my choices - from maintaining a <span className="highlight">meat-free diet</span> to ensuring everything I use aligns with <span className="highlight">cruelty-free</span> values. This commitment reflects my deep respect for all forms of life.
+          </p>
+          <p className="bio-narrow">
+            I also help others create meaningful digital experiences through AI-powered solutions. If you're interested in crafting something unique and beautiful, I'd love to collaborate.
+          </p>
+          <div className="signature">
+            Yulia M.<span className="signature-flourish">~</span>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT: Video panel */}
+      <div
+        className="header-video-panel"
+        onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
@@ -223,7 +171,6 @@ const Header = () => {
           muted={isMuted}
           loop
           onClick={togglePlay}
-          onError={handleVideoError}
           onLoadedData={handleVideoLoad}
           style={{ cursor: 'pointer' }}
         >
@@ -235,7 +182,7 @@ const Header = () => {
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: isMobile ? 0 : '2.5rem',
+            bottom: isMobile ? 0 : '2rem',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -246,32 +193,38 @@ const Header = () => {
             transition: 'opacity 0.35s',
           }}
         >
-          <div className="progress-bar-container" style={{ width: navWidth, height: '6px', background: 'rgba(255,255,255,0.25)', borderRadius: '3px', marginBottom: '0.7rem', cursor: 'pointer', position: 'relative' }} onClick={handleSeekBar}>
+          <div
+            className="progress-bar-container"
+            style={{ width: '88%', height: '6px', background: 'rgba(255,255,255,0.25)', borderRadius: '3px', marginBottom: '0.6rem', cursor: 'pointer' }}
+            onClick={handleSeekBar}
+          >
             <div style={{ width: `${progress}%`, height: '100%', background: '#f00', borderRadius: '3px', transition: 'width 0.2s' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: navWidth, padding: isMobile ? '0 12px' : 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '88%', padding: '0 4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <button
                 className="header-control-btn"
                 onClick={togglePlay}
                 style={ytButtonStyle}
-                onMouseOver={e => e.currentTarget.style.background = ytButtonHoverStyle.background}
-                onMouseOut={e => e.currentTarget.style.background = ytButtonStyle.background}
+                onMouseOver={e => e.currentTarget.style.background = 'rgba(60,60,60,0.18)'}
+                onMouseOut={e => e.currentTarget.style.background = 'transparent'}
               >{isPlaying ? PauseIcon : PlayIcon}</button>
               <button
                 className="header-control-btn"
                 onClick={toggleMute}
                 style={ytButtonStyle}
-                onMouseOver={e => e.currentTarget.style.background = ytButtonHoverStyle.background}
-                onMouseOut={e => e.currentTarget.style.background = ytButtonStyle.background}
+                onMouseOver={e => e.currentTarget.style.background = 'rgba(60,60,60,0.18)'}
+                onMouseOut={e => e.currentTarget.style.background = 'transparent'}
               >{isMuted ? MuteIcon : UnmuteIcon}</button>
             </div>
-            <span style={{ color: '#fff', fontSize: '1.1rem', fontFamily: 'monospace', minWidth: '80px', textAlign: 'center', marginLeft: 'auto' }}>{currentTime} / {duration}</span>
+            <span style={{ color: '#fff', fontSize: '1rem', fontFamily: 'monospace', minWidth: '80px', textAlign: 'right' }}>
+              {currentTime} / {duration}
+            </span>
           </div>
-          </div>
+        </div>
       </div>
     </header>
   );
 };
 
-export default Header; 
+export default Header;

@@ -1,18 +1,36 @@
 import React from 'react';
-import Header from './components/Header';
-import MainContent from './components/MainContent';
-import Footer from './components/Footer';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomeCarousel from './components/HomeCarousel';
+import SiteNav from './components/SiteNav';
+import MusicPage from './components/MusicPage';
+import CeskeRealiePage from './components/CeskeRealiePage';
 import './styles/App.css';
 
 const App = () => {
   return (
-    <div className="app">
-      <Header />
-      <div className="header-spacer"></div>
-      <MainContent />
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <div className="app">
+        <SiteNav />
+        <Routes>
+          <Route path="/" element={
+            <>
+              <HomeCarousel />
+            </>
+          } />
+          <Route path="/music" element={
+            <>
+              <MusicPage />
+            </>
+          } />
+          <Route path="/ceske-realie" element={
+            <>
+              <CeskeRealiePage />
+            </>
+          } />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 };
 
-export default App; 
+export default App;

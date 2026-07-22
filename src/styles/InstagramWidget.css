@@ -15,9 +15,6 @@
 
 .lightwidget-widget {
   width: 100% !important;
-  height: 300px !important;
-  min-height: 300px !important;
-  max-height: 300px !important;
   border: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -31,12 +28,6 @@
     margin: 0;
     transform: none;
   }
-  
-  .lightwidget-widget {
-    height: 500px !important;
-    min-height: 500px !important;
-    max-height: 500px !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -44,12 +35,6 @@
     width: 100%;
     margin: 0;
     transform: none;
-  }
-  
-  .lightwidget-widget {
-    height: 400px !important;
-    min-height: 400px !important;
-    max-height: 400px !important;
   }
 }
 

@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Montserrat:wght@500;600&display=swap');
+
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(18px);
+  pointer-events: auto;
+}
+
+.site-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.32rem;
+  margin-left: 0;
+}
+
+.brand-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.55rem;
+}
+
+.brand-name {
+  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.74rem;
+  color: #1b1b1b;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  opacity: 0.95;
+  transition: opacity 0.2s ease;
+}
+
+.brand-name:hover,
+.brand-name:focus-visible {
+  opacity: 1;
+}
+
+.brand-signature {
+  position: relative;
+  display: inline-block;
+  margin-left: 1.25rem;
+  font-family: 'Alex Brush', 'Pacifico', 'Whisper', 'Signature', cursive;
+  font-size: 0.68rem;
+  line-height: 1;
+  color: #968a77;
+  letter-spacing: 0;
+  font-weight: 400;
+  transform: rotate(-5deg);
+  text-shadow: 0.5px 1px 2px rgba(80, 60, 30, 0.06);
+  opacity: 0.95;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.brand-signature::before {
+  content: '';
+  position: absolute;
+  top: 52%;
+  right: calc(100% + 0.28rem);
+  width: 1.9rem;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(188, 181, 170, 0.95) 72%, rgba(188, 181, 170, 0.25) 94%, transparent 100%);
+}
+
+.brand-socials {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.02rem;
+}
+
+.brand-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1b1b1b;
+  opacity: 0.6;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brand-social-link:hover,
+.brand-social-link:focus-visible {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.brand-social-icon {
+  display: block;
+  width: 1.11rem;
+  height: 1.11rem;
+}
+
+.brand-social-linkedin {
+  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.site-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.site-subnav-link {
+  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 1.26rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1b1b1b;
+  opacity: 0.8;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 0.12rem;
+  margin-top: 0.16rem;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+
+.site-subnav-link:hover,
+.site-subnav-link:focus-visible {
+  opacity: 1;
+  border-color: rgba(27, 27, 27, 0.45);
+}
+
+@media (max-width: 720px) {
+  .site-nav {
+    padding: 1rem 1.2rem;
+  }
+
+  .brand-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+  }
+
+  .brand-signature {
+    margin-left: 0.65rem;
+    font-size: 0.54rem;
+  }
+
+  .brand-social-icon {
+    width: 0.93rem;
+    height: 0.93rem;
+  }
+
+  .brand-social-linkedin {
+    font-size: 0.62rem;
+  }
+
+  .site-actions {
+    gap: 0.3rem;
+  }
+
+  .site-subnav-link {
+    font-size: 1.08rem;
+    letter-spacing: 0.1em;
+    margin-top: 0.12rem;
+  }
+
+}

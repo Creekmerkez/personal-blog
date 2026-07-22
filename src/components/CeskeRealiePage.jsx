@@ -209,22 +209,20 @@ const CeskeRealiePage = () => {
       )}
 
       <section className="ceske-shell">
-        <div className="ceske-title-row">
-          <h1 className="ceske-title">Choose Your Edition</h1>
-          <a
-            href="https://www.instagram.com/realie_cr_zkouska/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="České Reálie Instagram"
-            className="ceske-title-instagram"
-          >
-            <svg className="ceske-instagram-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="17" cy="7" r="0.9" fill="currentColor" />
-            </svg>
-          </a>
-        </div>
+        <a
+          href="https://www.instagram.com/realie_cr_zkouska/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ceske-instagram-badge"
+        >
+          <svg className="ceske-instagram-badge-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="17" cy="7" r="0.9" fill="currentColor" />
+          </svg>
+          <span>Follow České Reálie on Instagram</span>
+        </a>
+        <h1 className="ceske-title">Choose Your Edition</h1>
         <p className="ceske-description">
           Select how you would like to purchase.
         </p>

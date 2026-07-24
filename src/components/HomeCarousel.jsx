@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import '../styles/HomeCarousel.css';
+import { getCurrentTheme, THEME_CHANGE_EVENT } from '../theme';
 import HolographicPlayer from './HolographicPlayer';
 import HolographicGallery from './HolographicGallery';
 import HolographicBooks from './HolographicBooks';
@@ -106,8 +107,13 @@ const HomeCarousel = () => {
 
   useEffect(() => {
     const previousBg = document.body.style.backgroundColor;
-    document.body.style.backgroundColor = '#ffffff';
+    const syncBg = () => {
+      document.body.style.backgroundColor = getCurrentTheme() === 'dark' ? '#14161c' : '#ffffff';
+    };
+    syncBg();
+    window.addEventListener(THEME_CHANGE_EVENT, syncBg);
     return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, syncBg);
       document.body.style.backgroundColor = previousBg;
     };
   }, []);

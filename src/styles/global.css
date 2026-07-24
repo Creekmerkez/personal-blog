@@ -9,6 +9,15 @@
     background-color: var(--background-color);
 }
 
+:root[data-theme="dark"] {
+    --background-color: #14161c;
+    color-scheme: dark;
+}
+
+:root[data-theme="dark"] body {
+    color: #f3f4f7;
+}
+
 * {
     margin: 0;
     padding: 0;

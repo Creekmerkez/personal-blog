@@ -612,3 +612,152 @@
     width: 100%;
   }
 }
+
+/* ── Dark mode ─────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] .ceske-page {
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(60, 84, 140, 0.28), rgba(20, 22, 28, 0) 58%),
+    linear-gradient(180deg, #14161c 0%, #16181f 45%, #101216 100%);
+}
+
+:root[data-theme="dark"] .ceske-shell {
+  background: rgba(24, 27, 35, 0.72);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 32px 80px -56px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .ceske-title {
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .ceske-instagram-badge {
+  background: rgba(143, 178, 255, 0.12);
+  border-color: rgba(143, 178, 255, 0.28);
+  color: #a9c2f5;
+}
+
+:root[data-theme="dark"] .ceske-instagram-badge:hover,
+:root[data-theme="dark"] .ceske-instagram-badge:focus-visible {
+  background: rgba(143, 178, 255, 0.2);
+}
+
+:root[data-theme="dark"] .ceske-description {
+  color: #c7cbd6;
+}
+
+:root[data-theme="dark"] .ceske-option-card {
+  background:
+    linear-gradient(165deg, rgba(36, 40, 52, 0.78), rgba(24, 27, 35, 0.55)),
+    radial-gradient(110% 80% at 100% 0%, rgba(90, 120, 180, 0.16), rgba(255, 255, 255, 0));
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .ceske-option-card:hover,
+:root[data-theme="dark"] .ceske-option-card:focus-visible {
+  border-color: rgba(150, 180, 240, 0.42);
+}
+
+:root[data-theme="dark"] .ceske-option-card.is-active {
+  border-color: rgba(150, 180, 240, 0.65);
+}
+
+:root[data-theme="dark"] .option-kicker,
+:root[data-theme="dark"] .ceske-form-label,
+:root[data-theme="dark"] .selected-label,
+:root[data-theme="dark"] .ceske-preview-frame figcaption {
+  color: #9aa8c9;
+}
+
+:root[data-theme="dark"] .option-title,
+:root[data-theme="dark"] .selected-price,
+:root[data-theme="dark"] .ceske-toast-title {
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .option-detail {
+  color: #b7bfd4;
+}
+
+:root[data-theme="dark"] .ceske-selection {
+  background: linear-gradient(180deg, rgba(30, 33, 43, 0.82), rgba(22, 25, 33, 0.72));
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .ceske-contact-form {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="dark"] .ceske-form-notice {
+  color: #b9c6e8;
+  background: rgba(60, 90, 160, 0.2);
+  border-left-color: rgba(120, 160, 255, 0.5);
+}
+
+:root[data-theme="dark"] .ceske-form-input {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f0f2f8;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .ceske-form-input:focus {
+  border-color: rgba(150, 180, 240, 0.5);
+  box-shadow: 0 0 0 3px rgba(150, 180, 240, 0.15);
+}
+
+:root[data-theme="dark"] .ceske-form-success {
+  color: #8fd6a8;
+  background: rgba(50, 110, 70, 0.28);
+  border-color: rgba(120, 200, 150, 0.35);
+}
+
+:root[data-theme="dark"] .selected-addon {
+  color: #9ab4f0;
+}
+
+:root[data-theme="dark"] .purchase-cta {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(150deg, #242833, #1a1d26);
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .ceske-preview-frame {
+  background: rgba(24, 27, 35, 0.78);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .ceske-author-photo-fallback {
+  background: linear-gradient(150deg, rgba(40, 44, 56, 0.9), rgba(30, 33, 42, 0.95));
+  color: #b7c3e0;
+}
+
+:root[data-theme="dark"] .ceske-form-error {
+  color: #f0a8a8;
+  background: rgba(120, 40, 40, 0.25);
+  border-left-color: rgba(220, 100, 100, 0.5);
+}
+
+:root[data-theme="dark"] .ceske-success-toast {
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(30, 33, 43, 0.98), rgba(22, 25, 33, 0.95) 60%),
+    linear-gradient(160deg, rgba(26, 29, 38, 0.96) 0%, rgba(20, 22, 28, 0.94) 100%);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .ceske-toast-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+:root[data-theme="dark"] .ceske-toast-body {
+  color: #b9c6e8;
+}
+
+:root[data-theme="dark"] .ceske-toast-close {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="dark"] .ceske-toast-close:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+}

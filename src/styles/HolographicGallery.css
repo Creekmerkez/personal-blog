@@ -789,3 +789,130 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     transition-duration: 0.01ms;
   }
 }
+
+/* ── Dark mode ─────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] .holo-gallery-panel {
+  color: #f3f4f7;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(32, 35, 45, 0.9), rgba(20, 22, 28, 0.82) 60%),
+    linear-gradient(160deg, rgba(34, 37, 48, 0.7) 0%, rgba(20, 22, 28, 0.55) 100%);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 40px 120px -60px rgba(0, 0, 0, 0.7),
+    0 0 40px -18px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .holo-ai-panel {
+  background:
+    radial-gradient(140% 120% at 50% 0%, rgba(30, 33, 43, 0.98), rgba(20, 22, 28, 0.97) 52%, rgba(16, 18, 23, 0.98) 100%),
+    linear-gradient(160deg, rgba(26, 29, 38, 0.97) 0%, rgba(18, 20, 26, 0.96) 100%);
+}
+
+:root[data-theme="dark"] .holo-gallery-title {
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .holo-gallery-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="dark"] .holo-gallery-counter {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:root[data-theme="dark"] a.holo-gallery-counter.holo-filter-link {
+  color: #8fb2ff;
+}
+
+:root[data-theme="dark"] a.holo-gallery-counter.holo-filter-link:hover,
+:root[data-theme="dark"] a.holo-gallery-counter.holo-filter-link:focus-visible {
+  color: #c1d6ff;
+  text-decoration-color: #c1d6ff;
+}
+
+:root[data-theme="dark"] .holo-filter {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+:root[data-theme="dark"] .holo-filter:hover,
+:root[data-theme="dark"] .holo-filter.active {
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+:root[data-theme="dark"] .holo-menu-icon span {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+:root[data-theme="dark"] .holo-video-tile {
+  background: rgba(28, 31, 40, 0.72);
+}
+
+:root[data-theme="dark"] .holo-nav-arrow {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .holo-nav-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:root[data-theme="dark"] .holo-dot {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+:root[data-theme="dark"] .holo-dot.active {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+:root[data-theme="dark"] .holo-lightbox {
+  background: rgba(6, 7, 10, 0.6);
+}
+
+:root[data-theme="dark"] .holo-lightbox-caption {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:root[data-theme="dark"] .holo-ai-msg--ai {
+  background: linear-gradient(150deg, rgba(42, 46, 58, 0.85), rgba(28, 31, 40, 0.75));
+  color: #f3f4f7;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .holo-ai-typing span {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="dark"] .holo-ai-input-row {
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="dark"] .holo-ai-input {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+  color: #f3f4f7;
+}
+
+:root[data-theme="dark"] .holo-ai-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .holo-ai-input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+:root[data-theme="dark"] .holo-ai-send {
+  background: #f3f4f7;
+  color: #14161c;
+}
+
+:root[data-theme="dark"] .holo-ai-send:hover:not(:disabled) {
+  background: #ffffff;
+}
+
+:root[data-theme="dark"] .holo-ai-send:disabled {
+  background: rgba(255, 255, 255, 0.16);
+}

@@ -161,3 +161,38 @@
     padding: 1rem 1.5rem 3.5rem;
   }
 }
+
+/* ── Dark mode ─────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] .music-heading {
+  color: #d1a668;
+}
+
+:root[data-theme="dark"] .music-divider {
+  background: #c9a668;
+}
+
+:root[data-theme="dark"] .music-intro {
+  color: #c9ab7d;
+}
+
+:root[data-theme="dark"] .mix-card {
+  background: rgba(32, 28, 22, 0.75);
+}
+
+:root[data-theme="dark"] .mix-info {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="dark"] .mix-title {
+  color: #d1a668;
+}
+
+:root[data-theme="dark"] .music-channel-link {
+  color: #d1a668;
+  border-bottom-color: rgba(209, 166, 104, 0.4);
+}
+
+:root[data-theme="dark"] .music-channel-link:hover {
+  color: #e6c084;
+  border-bottom-color: #e6c084;
+}

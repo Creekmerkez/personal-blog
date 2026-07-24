@@ -320,4 +320,59 @@
   .modal-thumb {
     width: 40px;
   }
-} 
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] .section-title {
+  color: #d1a668;
+}
+
+:root[data-theme="dark"] .book-display {
+  background: rgba(32, 28, 22, 0.75);
+}
+
+:root[data-theme="dark"] .books-section-popup .book-display {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="dark"] .book-cover {
+  background: rgba(44, 38, 29, 0.85);
+}
+
+:root[data-theme="dark"] .book-title,
+:root[data-theme="dark"] .book-title-link,
+:root[data-theme="dark"] .read-more-button {
+  color: #d1a668;
+}
+
+:root[data-theme="dark"] .book-title-link:hover,
+:root[data-theme="dark"] .read-more-button:hover {
+  color: #e6c084;
+}
+
+:root[data-theme="dark"] .book-subtitle,
+:root[data-theme="dark"] .book-description {
+  color: #c9ab7d;
+}
+
+:root[data-theme="dark"] .modal-image {
+  background: rgba(20, 22, 28, 0.9);
+}
+
+:root[data-theme="dark"] .modal-close,
+:root[data-theme="dark"] .modal-arrow {
+  color: #d1a668;
+}
+
+:root[data-theme="dark"] .modal-close:hover,
+:root[data-theme="dark"] .modal-arrow:hover:not(:disabled) {
+  color: #e6c084;
+}
+
+:root[data-theme="dark"] .modal-thumb {
+  background: rgba(44, 38, 29, 0.85);
+}
+
+:root[data-theme="dark"] .modal-thumb.active {
+  border-color: #d1a668;
+}

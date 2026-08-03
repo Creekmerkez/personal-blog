@@ -114,14 +114,14 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
           </a>
         </header>
 
-        <div className="holo-collage">
+        <div className="holo-collage holo-page-collage">
           {samplePages.map((page, index) => {
             const slot = SLOTS[index];
             return (
               <button
                 key={page.id}
                 type="button"
-                className="holo-photo"
+                className="holo-photo holo-page-thumb"
                 style={{
                   left: `${slot.left}%`,
                   top: `${slot.top}%`,

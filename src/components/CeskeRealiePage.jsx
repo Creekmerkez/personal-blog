@@ -17,7 +17,7 @@ const purchaseOptions = [
     id: 'physical',
     title: 'Printed Book',
     subtitle: 'Premium physical edition',
-    priceCzk: 500,
+    priceCzk: 700,
     detail: 'Tangible, gift-ready copy prepared for premium packaging flow.',
     audioNote: '+ audio MP3 for each topic included',
   },

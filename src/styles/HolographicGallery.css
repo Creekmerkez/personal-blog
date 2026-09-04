@@ -13,7 +13,7 @@
   padding: clamp(2.5rem, 5vw, 5rem);
   background: transparent;
   opacity: 0;
-  transition: opacity 0.42s ease;
+  transition: opacity 0.42s var(--ease-out);
   /* Invisible stage must not intercept touches — closing animation holds the
      element in the DOM for 520ms with opacity:0 but pointer-events:auto by
      default, which silently swallows all taps over the carousel. */
@@ -50,7 +50,7 @@
   /* Emerge transform — starts collapsed at the card, expands to centre. */
   transform: translate(var(--dx, 0), var(--dy, 0)) scale(0.16);
   opacity: 0;
-  transition: transform 0.52s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transition: transform 0.52s var(--ease-holo), opacity 0.4s ease;
   will-change: transform, opacity;
 }
 
@@ -163,6 +163,22 @@
   line-height: 1.65;
   white-space: pre-wrap;
   word-break: break-word;
+  /* Each sent/received message mounts as a genuinely new DOM node (React
+     key={i}, list only ever appended to) — a plain CSS animation plays once
+     on insertion without needing JS state, and never replays for the
+     existing messages already in the log. */
+  animation: holoMsgIn 0.22s var(--ease-out) both;
+}
+
+@keyframes holoMsgIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .holo-ai-msg--user {
@@ -259,9 +275,15 @@
   transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.holo-ai-send:hover:not(:disabled) {
-  background: #333333;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .holo-ai-send:hover:not(:disabled) {
+    background: #333333;
+    transform: translateY(-1px);
+  }
+}
+
+.holo-ai-send:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .holo-ai-send:disabled {
@@ -456,7 +478,7 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     0 0 0 1px rgba(120, 160, 255, 0.12),
     0 0 22px -2px rgba(110, 160, 255, 0.4),
     0 28px 50px -18px rgba(0, 0, 0, 0.85);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  transition: transform 0.4s var(--ease-holo), box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .holo-photo img {
@@ -465,7 +487,7 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   object-fit: cover;
   display: block;
   filter: brightness(0.82) contrast(1.06) saturate(0.92);
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  transition: transform 0.55s var(--ease-holo), filter 0.4s ease;
 }
 
 .holo-photo-sheen {
@@ -660,7 +682,7 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   align-items: center;
   gap: 0.8rem;
   transform: scale(0.92);
-  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.42s var(--ease-holo);
 }
 .holo-lightbox.visible .holo-lightbox-figure { transform: scale(1); }
 .holo-lightbox-figure img {
@@ -826,9 +848,29 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   .holo-photo,
   .holo-photo img,
   .holo-lightbox,
-  .holo-lightbox-figure {
+  .holo-lightbox-figure,
+  .holo-nav-arrow,
+  .holo-dot,
+  .holo-ai-send,
+  a.holo-gallery-counter.holo-filter-link,
+  .holo-photo-sheen {
     transition-duration: 0.01ms;
   }
+
+  .holo-ai-msg {
+    animation-duration: 0.01ms;
+  }
+
+  /* Keep the "AI is responding" cue, drop the bouncing position — three
+     dots pulsing in place still reads as "typing" without the movement. */
+  .holo-ai-typing span {
+    animation-name: holo-pulse-opacity;
+  }
+}
+
+@keyframes holo-pulse-opacity {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 /* ── Dark mode ─────────────────────────────────────────────────────────── */

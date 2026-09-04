@@ -65,9 +65,17 @@
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
-.mix-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(80, 50, 15, 0.15);
+@media (hover: hover) and (pointer: fine) {
+  .mix-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(80, 50, 15, 0.15);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .mix-card:hover {
+    transform: none;
+  }
 }
 
 .mix-video-wrapper {

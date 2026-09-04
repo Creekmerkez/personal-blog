@@ -161,6 +161,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: modalOverlayFadeIn 0.28s var(--ease-out) both;
 }
 
 .modal-content {
@@ -175,6 +176,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  animation: modalContentPopIn 0.32s var(--ease-out) 0.05s both;
 }
 
 .modal-image {
@@ -183,6 +185,39 @@
   border-radius: 10px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.18);
   background: #fff;
+  /* Front/back cover swap remounts this element with a new `key` (see
+     BookDisplay.jsx) — @starting-style crossfades each newly-inserted image
+     in rather than hot-swapping the bitmap with no transition. Browsers
+     without @starting-style just show the image at opacity 1 immediately. */
+  transition: opacity 0.28s var(--ease-out);
+}
+
+@starting-style {
+  .modal-image {
+    opacity: 0;
+  }
+}
+
+@keyframes modalOverlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalContentPopIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal-content {
+    animation-name: modalOverlayFadeIn;
+    animation-duration: 0.2s;
+  }
+
+  .modal-image {
+    transition: none;
+  }
 }
 
 .modal-close {
@@ -210,6 +245,10 @@
 .modal-close:hover {
   color: #7a5c2e;
   background: none;
+}
+
+.modal-close:active {
+  transform: scale(0.96);
 }
 
 .modal-arrow {
@@ -245,6 +284,9 @@
 .modal-arrow:hover:not(:disabled) {
   color: #7a5c2e;
   background: none;
+}
+.modal-arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.96);
 }
 
 .modal-thumbnails {

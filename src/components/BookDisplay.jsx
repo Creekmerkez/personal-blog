@@ -70,6 +70,7 @@ const BookDisplay = ({ book = null }) => {
               aria-label="Show cover"
             >&#8592;</button>
             <img
+              key={showBack ? 'back' : 'front'}
               src={mainImage}
               alt={mainAlt}
               className="modal-image"

@@ -33,6 +33,7 @@ const CeskeRealiePage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [toastClosing, setToastClosing] = useState(false);
 
   const selectedData = useMemo(
     () => purchaseOptions.find((o) => o.id === selectedOption) ?? null,
@@ -83,8 +84,18 @@ const CeskeRealiePage = () => {
 
   useEffect(() => {
     if (!showSuccessPopup) return undefined;
-    const t = setTimeout(() => setShowSuccessPopup(false), 6000);
-    return () => clearTimeout(t);
+    // Start the exit animation before the unmount, so the toast leaves the
+    // way it arrived instead of teleporting away — matches the .closing
+    // exit duration (260ms) declared in CeskeRealiePage.css.
+    const closeTimer = setTimeout(() => setToastClosing(true), 5740);
+    const unmountTimer = setTimeout(() => {
+      setShowSuccessPopup(false);
+      setToastClosing(false);
+    }, 6000);
+    return () => {
+      clearTimeout(closeTimer);
+      clearTimeout(unmountTimer);
+    };
   }, [showSuccessPopup]);
 
   useEffect(() => {
@@ -189,7 +200,11 @@ const CeskeRealiePage = () => {
     <main className="ceske-page" aria-label="České Reálie purchase selection">
 
       {showSuccessPopup && (
-        <div className="ceske-success-toast" role="alert" aria-live="assertive">
+        <div
+          className={`ceske-success-toast${toastClosing ? ' closing' : ''}`}
+          role="alert"
+          aria-live="assertive"
+        >
           <span className="ceske-toast-corner tl" aria-hidden="true" />
           <span className="ceske-toast-corner tr" aria-hidden="true" />
           <span className="ceske-toast-corner bl" aria-hidden="true" />
@@ -200,7 +215,13 @@ const CeskeRealiePage = () => {
           <button
             type="button"
             className="ceske-toast-close"
-            onClick={() => setShowSuccessPopup(false)}
+            onClick={() => {
+              setToastClosing(true);
+              setTimeout(() => {
+                setShowSuccessPopup(false);
+                setToastClosing(false);
+              }, 260);
+            }}
             aria-label="Dismiss"
           >
             ×

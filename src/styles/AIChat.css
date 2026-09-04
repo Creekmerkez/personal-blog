@@ -28,7 +28,7 @@
   max-width: 80%;
   padding: 1rem 1.5rem;
   border-radius: 16px;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-out;
   word-wrap: break-word;
   margin-bottom: 1rem;
 }
@@ -232,6 +232,21 @@
   max-height: 85vh;
 }
 
+/* Was referenced by .chat-popup-content's `animation` above with no matching
+   @keyframes anywhere in the repo — the modal has been opening with zero
+   entrance motion. Scale starts at 0.96 (never 0 — nothing in the real world
+   appears from nothing), matching the modal recipe's physicality rule. */
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .chat-popup-header {
   display: flex;
   justify-content: space-between;
@@ -272,7 +287,7 @@
   font-family: 'EB Garamond', serif;
   font-size: 1.1rem;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   min-width: 50px;
 }
 
@@ -349,7 +364,7 @@
   background: #8B7355;
   color: white;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.16s var(--ease-out);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -357,6 +372,10 @@
 
 .chat-popup-submit:hover:not(:disabled) {
   background: #A69B8D;
+}
+
+.chat-popup-submit:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .chat-popup-submit:disabled {
@@ -537,7 +556,7 @@
   padding: 12px 18px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
   font-family: 'EB Garamond', Garamond, Georgia, 'Times New Roman', Times, serif;
   font-size: 1.1rem;
   width: 100%;
@@ -561,17 +580,29 @@
   border-bottom: none;
 }
 
+/* grid-template-rows 0fr → 1fr instead of max-height: a max-height accordion
+   has to target an arbitrary large value (was 1500px) unrelated to the real
+   content height, so short answers finish moving well before the declared
+   duration elapses — the motion never actually takes 400ms. The fr-unit
+   technique animates to the content's real height, so duration is honest
+   regardless of answer length, and it's off the layout/paint hot path in
+   the same way transform/opacity are. */
 .answer-panel {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   overflow: hidden;
-  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+  transition: grid-template-rows 0.4s var(--ease-in-out);
   background-color: #fdfaf5;
   padding: 0 1.5rem;
 }
 
 .answer-panel.expanded {
-  max-height: 1500px; /* Increased max-height to fit long answers */
-  transition: max-height 0.5s ease-in-out;
+  grid-template-rows: 1fr;
+}
+
+.answer-panel > .answer-content {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .answer-content {
@@ -648,4 +679,29 @@
 .questions-container:hover::-webkit-scrollbar-thumb,
 .chat-messages:hover::-webkit-scrollbar-thumb {
   background-color: rgba(139, 115, 85, 0.4);
+}
+
+/* Fewer and gentler, not zero: keep the opacity feedback that says "a new
+   message/popup arrived", drop the position movement that causes it. */
+@media (prefers-reduced-motion: reduce) {
+  .message {
+    animation: fadeInOpacityOnly 0.3s ease-out;
+  }
+
+  .chat-popup-content {
+    animation: fadeInOpacityOnly 0.3s ease-out;
+  }
+
+  .question-button:hover {
+    transform: none;
+  }
+
+  .chat-popup-submit:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+@keyframes fadeInOpacityOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
 } 

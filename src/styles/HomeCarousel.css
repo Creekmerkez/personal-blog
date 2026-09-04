@@ -888,6 +888,12 @@
     width: min(185px, 46vw);
     aspect-ratio: 9 / 16;
     transform-style: flat;
+    /* On mobile, applyCardStyles() writes `filter` inline on this element
+       every frame (see HomeCarousel.jsx), but the base will-change above
+       only lists transform/opacity. An undeclared property change forces
+       Android's compositor to re-rasterize instead of a cheap GPU composite
+       — visible as a flash. Declare it here, scoped to the path that needs it. */
+    will-change: transform, opacity, filter;
   }
 
   /* Disable 3D side edges on mobile — they cause GPU compositing artifacts

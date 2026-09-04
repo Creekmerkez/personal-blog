@@ -2,6 +2,12 @@
     /* Fallback used only before SiteNav measures its real height on mount. */
     --site-nav-height: 110px;
     --background-color: #C9B7A0;
+    /* Shared motion tokens — strong curves for deliberate UI motion (built-in
+       CSS easings are too weak). Previously hand-typed per component with no
+       shared source; consolidated here so a future tweak has one place to live. */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-holo: cubic-bezier(0.16, 1, 0.3, 1);
     font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -28,6 +34,7 @@ html {
     background-color: var(--background-color);
     overflow-x: hidden;
     scroll-behavior: smooth;
+    transition: background-color 0.25s ease;
 }
 
 body {
@@ -42,6 +49,10 @@ body {
     font-size: 1rem;
     min-width: 320px;
     overflow-x: hidden;
+    /* The dark-mode toggle flips data-theme, instantly snapping this
+       base background/text color across the whole page. Crossfading it is
+       the one thing color-change transitions are exactly for. */
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #root {

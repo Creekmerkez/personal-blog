@@ -31,9 +31,19 @@
   position: relative;
 }
 
-.instagram-post:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+/* touch: hover gated so a tap doesn't leave the card stuck translated until
+   the next tap elsewhere (touch fires a "sticky" hover with no pointer-leave) */
+@media (hover: hover) and (pointer: fine) {
+  .instagram-post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .instagram-post:hover {
+    transform: none;
+  }
 }
 
 .instagram-content {

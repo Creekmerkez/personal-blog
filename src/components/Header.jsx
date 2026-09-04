@@ -198,7 +198,7 @@ const Header = () => {
             style={{ width: '88%', height: '6px', background: 'rgba(255,255,255,0.25)', borderRadius: '3px', marginBottom: '0.6rem', cursor: 'pointer' }}
             onClick={handleSeekBar}
           >
-            <div style={{ width: `${progress}%`, height: '100%', background: '#f00', borderRadius: '3px', transition: 'width 0.2s' }} />
+            <div style={{ width: '100%', height: '100%', background: '#f00', borderRadius: '3px', transform: `scaleX(${progress / 100})`, transformOrigin: 'left', transition: 'transform 0.2s' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '88%', padding: '0 4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

@@ -104,6 +104,13 @@ const HomeCarousel = () => {
   const selectedCardRef = useRef(null);
   const isHologramOpenRef = useRef(false);
   const frontCardIdRef = useRef(null);
+  // Last-written zIndex/front-state per card index. On mobile, transform-style
+  // is flat (see HomeCarousel.css), so zIndex is the only thing telling the
+  // browser which card is on top. Writing it unconditionally on every rAF
+  // frame — even when unchanged — forces a stacking reorder 60x/sec, which is
+  // what produced the overlapped/flashing-frame glitch on Android Chrome.
+  const lastZIndexRef = useRef([]);
+  const lastFrontRef = useRef([]);
 
   useEffect(() => {
     const previousBg = document.body.style.backgroundColor;
@@ -185,11 +192,20 @@ const HomeCarousel = () => {
       const finalContrast = contrast + (isFront ? 0.10 : 0) + (isHov ? 0.05 : 0) + (sel ? 0.05 : 0);
       const filter = `brightness(${finalBrightness}) saturate(${finalSaturate}) contrast(${finalContrast}) blur(${blur}px)`;
 
-      el.style.zIndex = zIndex;
+      // Skip the DOM write entirely when the value hasn't changed — avoids
+      // forcing a stacking/style recalc pass on every frame of the idle
+      // auto-rotation (see lastZIndexRef/lastFrontRef comment above).
+      if (lastZIndexRef.current[index] !== zIndex) {
+        el.style.zIndex = zIndex;
+        lastZIndexRef.current[index] = zIndex;
+      }
       el.style.transform = `translateX(${x}vw) translateY(${y}vh) translateZ(${z * (mob ? 90 : 176)}px) rotateY(${rotateY}deg) scale(${finalScale})`;
       if (mob) { el.style.opacity = opacity; el.style.filter = filter; }
       else { el.style.opacity = ''; el.style.filter = ''; }
-      el.classList.toggle('carousel-card-front', isFront);
+      if (lastFrontRef.current[index] !== isFront) {
+        el.classList.toggle('carousel-card-front', isFront);
+        lastFrontRef.current[index] = isFront;
+      }
       if (isFront) newFrontId = card.id;
 
       const face = el.querySelector('.card-face');
@@ -241,8 +257,27 @@ const HomeCarousel = () => {
       }
       frameRef.current = requestAnimationFrame(animate);
     };
-    frameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameRef.current);
+    // The idle auto-rotation otherwise runs this loop forever, including
+    // while the tab is in the background — pause it on visibilitychange so
+    // it isn't burning frames (and GPU compositing work) unseen.
+    const stopLoop = () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+    const startLoop = () => {
+      if (frameRef.current === null) frameRef.current = requestAnimationFrame(animate);
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) stopLoop(); else startLoop();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    startLoop();
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      stopLoop();
+    };
   }, [applyCardStyles]);
 
   // Native touch events — bypasses the Pointer Events API entirely to avoid

@@ -89,11 +89,21 @@
   transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
 }
 
-.ceske-option-card:hover,
+/* :focus-visible stays ungated — keyboard-nav affordance shouldn't depend on
+   a hover-capable pointer. :hover is gated so a tap doesn't leave the card
+   stuck translated on touch devices, which fire hover with no pointer-leave. */
 .ceske-option-card:focus-visible {
   transform: translateY(-2px);
   border-color: rgba(35, 59, 106, 0.34);
   box-shadow: 0 20px 40px -30px rgba(24, 40, 73, 0.56);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ceske-option-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(35, 59, 106, 0.34);
+    box-shadow: 0 20px 40px -30px rgba(24, 40, 73, 0.56);
+  }
 }
 
 .ceske-option-card.is-active {
@@ -267,10 +277,20 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.purchase-cta:hover,
 .purchase-cta:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 18px 34px -24px rgba(26, 43, 76, 0.66);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .purchase-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 34px -24px rgba(26, 43, 76, 0.66);
+  }
+}
+
+.purchase-cta:active {
+  transform: scale(0.97);
 }
 
 .ceske-content-preview {
@@ -408,6 +428,23 @@
   }
 }
 
+/* Exit the way it entered: entrance moves translateY(-12px) → 0, so the
+   exit reverses that same axis instead of just disappearing. */
+.ceske-success-toast.closing {
+  animation: ceske-toast-out 0.26s var(--ease-holo) forwards;
+}
+
+@keyframes ceske-toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px);
+  }
+}
+
 .ceske-toast-corner {
   position: absolute;
   width: 18px;
@@ -477,6 +514,42 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Fewer and gentler, not zero: keep the opacity arrival cue on the selection
+   panel, contact form and toast, drop the position movement. Hover-driven
+   translateY is already gated to (hover: hover) and (pointer: fine) above,
+   so it only needs dropping for reduced-motion desktop pointers here. */
+@media (prefers-reduced-motion: reduce) {
+  .ceske-selection,
+  .ceske-contact-form {
+    animation-name: fadeOpacityOnly;
+  }
+
+  .ceske-success-toast {
+    animation-name: fadeOpacityOnly;
+  }
+
+  .ceske-success-toast.closing {
+    animation-name: fadeOpacityOnlyOut;
+  }
+}
+
+@keyframes fadeOpacityOnlyOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .ceske-option-card:hover,
+  .purchase-cta:hover {
+    transform: none;
+  }
+}
+
+@keyframes fadeOpacityOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (min-width: 900px) {

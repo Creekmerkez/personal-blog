@@ -103,9 +103,17 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  // Stop any in-progress recognition the moment the panel starts closing.
+  // Stop any in-progress recognition the moment the panel starts closing —
+  // and reset the UI state directly rather than waiting on the recognition
+  // object's own onend, which isn't guaranteed to fire promptly (or at all)
+  // once the panel is gone. Without this the mic showed "listening" again
+  // the next time the panel opened even though nothing was recording.
   useEffect(() => {
-    if (!render) recognitionRef.current?.stop();
+    if (!render) {
+      recognitionRef.current?.stop();
+      recognitionRef.current = null;
+      setListening(false);
+    }
   }, [render]);
 
   // ...and on unmount, in case the panel closes mid-recognition.
@@ -141,9 +149,10 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     // live-dictation UI — the previous `false` here silently withheld all
     // text until the entire session ended, which read as "nothing happens."
     recognition.interimResults = true;
-    // Keep the session open across pauses instead of ending after the
-    // first finalized phrase, so a full sentence doesn't get cut short.
-    recognition.continuous = true;
+    // NOT continuous: on Android Chrome, continuous mode is unreliable and
+    // was producing zero results at all (regression from a prior attempt at
+    // this). Single-utterance mode — speak, it auto-finalizes on a pause —
+    // is the well-supported behavior across both Android and iOS.
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
       let finalTranscript = '';
@@ -156,11 +165,22 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       const spoken = (finalTranscript + interimTranscript).trim();
       setInput(spoken ? (baseText ? `${baseText} ${spoken}` : spoken) : baseText);
     };
-    recognition.onerror = () => setListening(false);
+    recognition.onerror = (e) => {
+      console.warn('Speech recognition error:', e.error);
+      setListening(false);
+    };
     recognition.onend = () => setListening(false);
     recognitionRef.current = recognition;
     setListening(true);
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (err) {
+      // start() can throw synchronously (e.g. already-started state) — if it
+      // does, no onerror/onend will ever fire for this attempt, so reset
+      // here or the mic would show "listening" forever.
+      console.warn('Speech recognition failed to start:', err);
+      setListening(false);
+    }
   };
 
   const send = async () => {

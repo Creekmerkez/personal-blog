@@ -41,13 +41,23 @@ function renderWithLinks(text) {
   });
 }
 
+const VOICE_LANG_KEY = 'aiVoiceLang';
+const SpeechRecognitionClass = typeof window !== 'undefined'
+  ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+  : null;
+
 const HolographicAI = ({ open, onClose, originRect }) => {
   const [render, setRender] = useState(open);
   const [visible, setVisible] = useState(false);
   const [messages, setMessages] = useState([{ role: 'ai', text: WELCOME }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [voiceLang, setVoiceLang] = useState(() => {
+    try { return localStorage.getItem(VOICE_LANG_KEY) || 'en-US'; } catch { return 'en-US'; }
+  });
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     if (open) {
@@ -80,6 +90,43 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Stop any in-progress recognition the moment the panel starts closing.
+  useEffect(() => {
+    if (!render) recognitionRef.current?.stop();
+  }, [render]);
+
+  // ...and on unmount, in case the panel closes mid-recognition.
+  useEffect(() => () => recognitionRef.current?.stop(), []);
+
+  const toggleVoiceLang = () => {
+    const next = voiceLang === 'en-US' ? 'uk-UA' : 'en-US';
+    setVoiceLang(next);
+    try { localStorage.setItem(VOICE_LANG_KEY, next); } catch { /* ignore */ }
+  };
+
+  const toggleListening = () => {
+    if (!SpeechRecognitionClass) return;
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognitionClass();
+    recognition.lang = voiceLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0]?.[0]?.transcript ?? '';
+      if (transcript) setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
+  };
 
   const send = async () => {
     const query = input.trim();
@@ -195,6 +242,16 @@ const HolographicAI = ({ open, onClose, originRect }) => {
             <h2 className="holo-gallery-title">MY AI</h2>
             <span className="holo-gallery-subtitle">ASK ME ANYTHING</span>
           </div>
+          {SpeechRecognitionClass && (
+            <button
+              type="button"
+              className="holo-ai-lang-switch"
+              onClick={toggleVoiceLang}
+              aria-label={`Voice input language: ${voiceLang === 'en-US' ? 'English' : 'Ukrainian'}. Tap to switch.`}
+            >
+              {voiceLang === 'en-US' ? 'EN' : 'UA'}
+            </button>
+          )}
         </header>
 
         <div className="holo-ai-chat">
@@ -224,6 +281,22 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               maxLength={500}
               autoFocus
             />
+            {SpeechRecognitionClass && (
+              <button
+                type="button"
+                className={`holo-ai-mic${listening ? ' listening' : ''}`}
+                onClick={toggleListening}
+                disabled={loading}
+                aria-pressed={listening}
+                aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                  <path d="M19 11a7 7 0 0 1-14 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M12 18v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
             <button
               type="button"
               className="holo-ai-send"

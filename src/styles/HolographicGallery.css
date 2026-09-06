@@ -123,6 +123,28 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  border: 1px solid rgba(126, 138, 160, 0.32);
+  background: rgba(255, 255, 255, 0.6);
+  color: rgba(74, 82, 94, 0.85);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.32rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .holo-ai-lang-switch:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(74, 82, 94, 0.5);
+  }
+}
+
+.holo-ai-lang-switch:active {
+  transform: scale(0.95);
 }
 
 /* ---- AI Chat Interface ---- */
@@ -289,6 +311,70 @@
 .holo-ai-send:disabled {
   background: rgba(74, 82, 94, 0.28);
   cursor: default;
+}
+
+.holo-ai-mic {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(126, 138, 160, 0.3);
+  background: rgba(255, 255, 255, 0.6);
+  color: rgba(74, 82, 94, 0.85);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .holo-ai-mic:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(74, 82, 94, 0.5);
+  }
+}
+
+.holo-ai-mic:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.holo-ai-mic:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.holo-ai-mic.listening {
+  background: rgba(220, 60, 60, 0.12);
+  border-color: rgba(200, 60, 60, 0.55);
+  color: #c13a3a;
+}
+
+/* Recording ring: a ripple expanding outward, transform + opacity only —
+   state indication for "listening", occasional/user-initiated so it's
+   allowed to loop for as long as recording continues. */
+.holo-ai-mic.listening::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(200, 60, 60, 0.55);
+  opacity: 0;
+  animation: holoMicRipple 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes holoMicRipple {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  70%, 100% { transform: scale(1.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-ai-mic.listening::after {
+    animation: none;
+    opacity: 0.4;
+    transform: scale(1);
+  }
 }
 
 .holo-books-scroll {
@@ -998,4 +1084,25 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
 
 :root[data-theme="dark"] .holo-ai-send:disabled {
   background: rgba(255, 255, 255, 0.16);
+}
+
+:root[data-theme="dark"] .holo-ai-lang-switch,
+:root[data-theme="dark"] .holo-ai-mic {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :root[data-theme="dark"] .holo-ai-lang-switch:hover,
+  :root[data-theme="dark"] .holo-ai-mic:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+:root[data-theme="dark"] .holo-ai-mic.listening {
+  background: rgba(255, 90, 90, 0.16);
+  border-color: rgba(255, 110, 110, 0.55);
+  color: #ff8a8a;
 }

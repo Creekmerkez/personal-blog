@@ -118,33 +118,48 @@
   z-index: 14;
 }
 
+/* Segmented EN/UA control — both options always visible, the active one
+   filled in, matching a standard toggle-group pattern rather than a single
+   button that only shows the current state. */
 .holo-ai-lang-switch {
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  border: 1px solid rgba(126, 138, 160, 0.32);
-  background: rgba(255, 255, 255, 0.6);
-  color: rgba(74, 82, 94, 0.85);
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid rgba(126, 138, 160, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.holo-ai-lang-btn {
+  border: none;
+  background: transparent;
+  color: rgba(74, 82, 94, 0.65);
   font-family: inherit;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  padding: 0.32rem 0.6rem;
+  padding: 0.3rem 0.65rem;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .holo-ai-lang-switch:hover {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(74, 82, 94, 0.5);
+  .holo-ai-lang-btn:hover:not(.active) {
+    background: rgba(126, 138, 160, 0.16);
+    color: rgba(17, 17, 17, 0.85);
   }
 }
 
-.holo-ai-lang-switch:active {
-  transform: scale(0.95);
+.holo-ai-lang-btn:active {
+  transform: scale(0.94);
+}
+
+.holo-ai-lang-btn.active {
+  background: rgba(17, 17, 17, 0.88);
+  color: #ffffff;
 }
 
 /* ---- AI Chat Interface ---- */
@@ -325,7 +340,7 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1086,7 +1101,20 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   background: rgba(255, 255, 255, 0.16);
 }
 
-:root[data-theme="dark"] .holo-ai-lang-switch,
+:root[data-theme="dark"] .holo-ai-lang-switch {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="dark"] .holo-ai-lang-btn {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+:root[data-theme="dark"] .holo-ai-lang-btn.active {
+  background: #f3f4f7;
+  color: #14161c;
+}
+
 :root[data-theme="dark"] .holo-ai-mic {
   border-color: rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.07);
@@ -1094,7 +1122,11 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  :root[data-theme="dark"] .holo-ai-lang-switch:hover,
+  :root[data-theme="dark"] .holo-ai-lang-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+  }
+
   :root[data-theme="dark"] .holo-ai-mic:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.4);

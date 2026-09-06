@@ -5,8 +5,20 @@ const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
 import '../styles/HolographicGallery.css';
 
 
-const WELCOME = "Hi! I'm Julia's AI. Ask me anything — in English or Ukrainian.";
-const PLACEHOLDER = 'Ask me anything... / Запитайте мене...';
+const WELCOME = {
+  en: "Hi! I'm Julia's AI. Ask me anything — in English or Ukrainian.",
+  ua: 'Привіт! Я AI-асистент Юлії. Запитайте мене що завгодно — англійською або українською.',
+};
+
+const PLACEHOLDER = {
+  en: 'Ask me anything...',
+  ua: 'Запитайте мене...',
+};
+
+const SUBTITLE = {
+  en: 'Ask me anything',
+  ua: 'Запитайте мене про що завгодно',
+};
 
 const NO_INFO = {
   en: "Julia hasn't shared anything about that with me — try asking something else!",
@@ -41,7 +53,7 @@ function renderWithLinks(text) {
   });
 }
 
-const VOICE_LANG_KEY = 'aiVoiceLang';
+const UI_LANG_KEY = 'aiUiLang';
 const SpeechRecognitionClass = typeof window !== 'undefined'
   ? (window.SpeechRecognition || window.webkitSpeechRecognition)
   : null;
@@ -49,13 +61,13 @@ const SpeechRecognitionClass = typeof window !== 'undefined'
 const HolographicAI = ({ open, onClose, originRect }) => {
   const [render, setRender] = useState(open);
   const [visible, setVisible] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'ai', text: WELCOME }]);
+  const [lang, setLang] = useState(() => {
+    try { return localStorage.getItem(UI_LANG_KEY) === 'ua' ? 'ua' : 'en'; } catch { return 'en'; }
+  });
+  const [messages, setMessages] = useState(() => [{ role: 'ai', text: WELCOME[lang], isWelcome: true }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
-  const [voiceLang, setVoiceLang] = useState(() => {
-    try { return localStorage.getItem(VOICE_LANG_KEY) || 'en-US'; } catch { return 'en-US'; }
-  });
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
@@ -99,11 +111,17 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   // ...and on unmount, in case the panel closes mid-recognition.
   useEffect(() => () => recognitionRef.current?.stop(), []);
 
-  const toggleVoiceLang = () => {
-    const next = voiceLang === 'en-US' ? 'uk-UA' : 'en-US';
-    setVoiceLang(next);
-    try { localStorage.setItem(VOICE_LANG_KEY, next); } catch { /* ignore */ }
-  };
+  // Persist the choice, and — as long as the conversation hasn't actually
+  // started yet — keep the welcome message in sync with it. Once a real
+  // reply exists, switching language stops rewriting history.
+  useEffect(() => {
+    try { localStorage.setItem(UI_LANG_KEY, lang); } catch { /* ignore */ }
+    setMessages((prev) => (
+      prev.length === 1 && prev[0].isWelcome
+        ? [{ role: 'ai', text: WELCOME[lang], isWelcome: true }]
+        : prev
+    ));
+  }, [lang]);
 
   const toggleListening = () => {
     if (!SpeechRecognitionClass) return;
@@ -114,7 +132,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     }
 
     const recognition = new SpeechRecognitionClass();
-    recognition.lang = voiceLang;
+    recognition.lang = lang === 'ua' ? 'uk-UA' : 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
@@ -132,7 +150,9 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     const query = input.trim();
     if (!query || loading) return;
 
-    const lang = detectLang(query);
+    // Detected from the query text itself — independent of the UI language
+    // toggle above, so a reply always matches whatever the user actually typed/said.
+    const queryLang = detectLang(query);
     setInput('');
     setMessages((prev) => [...prev, { role: 'user', text: query }]);
     setLoading(true);
@@ -140,7 +160,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     // Greetings are handled locally — no API call needed.
     if (isGreeting(query)) {
       setLoading(false);
-      const reply = lang === 'ua'
+      const reply = queryLang === 'ua'
         ? 'Привіт! Я AI-асистент Юлії. Запитайте мене що завгодно про неї!'
         : "Hi there! Ask me anything about Julia — I'm happy to help!";
       setMessages((prev) => [...prev, { role: 'ai', text: reply }]);
@@ -150,17 +170,17 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     if (WORKER_URL) {
       // Claude path — intelligent, handles any phrasing in any language.
       // Fuse matches are passed as extra context; Claude can answer even without them.
-      const matches = searchQA(query, lang, 5);
+      const matches = searchQA(query, queryLang, 5);
       try {
         const res = await fetch(WORKER_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, lang, matches }),
+          body: JSON.stringify({ query, lang: queryLang, matches }),
         });
         const data = await res.json();
         setMessages((prev) => [...prev, { role: 'ai', text: data.answer }]);
       } catch {
-        setMessages((prev) => [...prev, { role: 'ai', text: NO_INFO[lang] }]);
+        setMessages((prev) => [...prev, { role: 'ai', text: NO_INFO[queryLang] }]);
       }
       setLoading(false);
       return;
@@ -169,15 +189,15 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     // Fallback: client-side regex + Fuse (no worker configured).
     if (isGeneralQuery(query)) {
       setLoading(false);
-      setMessages((prev) => [...prev, { role: 'ai', text: JULIA_OVERVIEW[lang] }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: JULIA_OVERVIEW[queryLang] }]);
       return;
     }
 
-    const matches = searchQA(query, lang);
+    const matches = searchQA(query, queryLang);
 
     if (matches.length === 0) {
       setLoading(false);
-      setMessages((prev) => [...prev, { role: 'ai', text: isAboutAI(query) ? AI_SELF_MSG[lang] : NO_INFO[lang] }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: isAboutAI(query) ? AI_SELF_MSG[queryLang] : NO_INFO[queryLang] }]);
       return;
     }
 
@@ -189,7 +209,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
 
     if (matches[0].score !== undefined && matches[0].score > 0.20) {
       setLoading(false);
-      setMessages((prev) => [...prev, { role: 'ai', text: isAboutAI(query) ? AI_SELF_MSG[lang] : NO_INFO[lang] }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: isAboutAI(query) ? AI_SELF_MSG[queryLang] : NO_INFO[queryLang] }]);
       return;
     }
     setLoading(false);
@@ -240,18 +260,26 @@ const HolographicAI = ({ open, onClose, originRect }) => {
         <header className="holo-gallery-header holo-ai-header">
           <div className="holo-gallery-titles">
             <h2 className="holo-gallery-title">MY AI</h2>
-            <span className="holo-gallery-subtitle">ASK ME ANYTHING</span>
+            <span className="holo-gallery-subtitle">{SUBTITLE[lang]}</span>
           </div>
-          {SpeechRecognitionClass && (
+          <div className="holo-ai-lang-switch" role="group" aria-label="Chat language">
             <button
               type="button"
-              className="holo-ai-lang-switch"
-              onClick={toggleVoiceLang}
-              aria-label={`Voice input language: ${voiceLang === 'en-US' ? 'English' : 'Ukrainian'}. Tap to switch.`}
+              className={`holo-ai-lang-btn${lang === 'en' ? ' active' : ''}`}
+              onClick={() => setLang('en')}
+              aria-pressed={lang === 'en'}
             >
-              {voiceLang === 'en-US' ? 'EN' : 'UA'}
+              EN
             </button>
-          )}
+            <button
+              type="button"
+              className={`holo-ai-lang-btn${lang === 'ua' ? ' active' : ''}`}
+              onClick={() => setLang('ua')}
+              aria-pressed={lang === 'ua'}
+            >
+              UA
+            </button>
+          </div>
         </header>
 
         <div className="holo-ai-chat">
@@ -273,7 +301,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
             <input
               type="text"
               className="holo-ai-input"
-              placeholder={PLACEHOLDER}
+              placeholder={PLACEHOLDER[lang]}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
@@ -288,7 +316,11 @@ const HolographicAI = ({ open, onClose, originRect }) => {
                 onClick={toggleListening}
                 disabled={loading}
                 aria-pressed={listening}
-                aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+                aria-label={
+                  listening
+                    ? (lang === 'ua' ? 'Зупинити голосове введення' : 'Stop voice input')
+                    : (lang === 'ua' ? 'Почати голосове введення' : 'Start voice input')
+                }
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
@@ -302,7 +334,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               className="holo-ai-send"
               onClick={send}
               disabled={loading || !input.trim()}
-              aria-label="Send"
+              aria-label={lang === 'ua' ? 'Надіслати' : 'Send'}
             >
               ↑
             </button>

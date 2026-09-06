@@ -131,13 +131,30 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       return;
     }
 
+    // Whatever's already typed stays put; speech gets appended after it.
+    // Captured once here (not read live) so it doesn't shift while talking.
+    const baseText = input;
+
     const recognition = new SpeechRecognitionClass();
     recognition.lang = lang === 'ua' ? 'uk-UA' : 'en-US';
-    recognition.interimResults = false;
+    // interimResults streams words in as they're recognized, same as any
+    // live-dictation UI — the previous `false` here silently withheld all
+    // text until the entire session ended, which read as "nothing happens."
+    recognition.interimResults = true;
+    // Keep the session open across pauses instead of ending after the
+    // first finalized phrase, so a full sentence doesn't get cut short.
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
-      const transcript = e.results[0]?.[0]?.transcript ?? '';
-      if (transcript) setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      let finalTranscript = '';
+      let interimTranscript = '';
+      for (let i = 0; i < e.results.length; i++) {
+        const { transcript } = e.results[i][0];
+        if (e.results[i].isFinal) finalTranscript += transcript;
+        else interimTranscript += transcript;
+      }
+      const spoken = (finalTranscript + interimTranscript).trim();
+      setInput(spoken ? (baseText ? `${baseText} ${spoken}` : spoken) : baseText);
     };
     recognition.onerror = () => setListening(false);
     recognition.onend = () => setListening(false);

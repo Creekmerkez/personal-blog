@@ -20,6 +20,28 @@ const SUBTITLE = {
   ua: 'Запитайте мене про що завгодно',
 };
 
+// Speech-recognition failures used to be console.warn-only, invisible to
+// anyone without devtools open. Surfaced as a chat message instead, keyed by
+// the SpeechRecognitionErrorEvent.error string (+ our own "timeout" case).
+const VOICE_ERRORS = {
+  en: {
+    'not-allowed': "Microphone access was blocked. Check your browser's site settings and allow the microphone, then try again.",
+    'audio-capture': 'No microphone was found on this device.',
+    'network': 'A network error interrupted voice recognition. Please try again.',
+    'language-not-supported': "This browser doesn't support voice recognition for the selected language. Try switching to EN or UA.",
+    'no-speech': "No speech was picked up — check that the correct microphone is selected and isn't muted, then try again.",
+    timeout: "The mic never started listening. Check that microphone access is allowed for this site, then try again.",
+  },
+  ua: {
+    'not-allowed': 'Доступ до мікрофона заблоковано. Перевірте налаштування сайту в браузері, дозвольте доступ до мікрофона й спробуйте ще раз.',
+    'audio-capture': 'На цьому пристрої не знайдено мікрофон.',
+    'network': 'Помилка мережі перервала розпізнавання мовлення. Спробуйте ще раз.',
+    'language-not-supported': 'Цей браузер не підтримує розпізнавання обраної мови. Спробуйте переключитися на EN або UA.',
+    'no-speech': 'Мовлення не розпізнано — перевірте, чи обрано правильний мікрофон і чи він не вимкнений, і спробуйте ще раз.',
+    timeout: 'Мікрофон так і не почав слухати. Перевірте, чи дозволено доступ до мікрофона для цього сайту, і спробуйте ще раз.',
+  },
+};
+
 const NO_INFO = {
   en: "Julia hasn't shared anything about that with me — try asking something else!",
   ua: 'Юлія не розповідала мені про це — спробуйте запитати щось інше!',
@@ -154,6 +176,21 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     // this). Single-utterance mode — speak, it auto-finalizes on a pause —
     // is the well-supported behavior across both Android and iOS.
     recognition.maxAlternatives = 1;
+
+    // If the mic never actually starts capturing audio, the ripple/"on"
+    // state was still showing with nothing happening and no error at all —
+    // the most likely cause is a native permission prompt the user never
+    // saw or responded to. onaudiostart is the browser's own signal that
+    // capture genuinely began; if it hasn't fired shortly after start(),
+    // something upstream of recognition itself is stuck.
+    let audioStarted = false;
+    const audioStartTimer = setTimeout(() => {
+      if (audioStarted) return;
+      recognition.abort();
+      setMessages((prev) => [...prev, { role: 'ai', text: VOICE_ERRORS[lang].timeout }]);
+    }, 4000);
+    recognition.onaudiostart = () => { audioStarted = true; clearTimeout(audioStartTimer); };
+
     recognition.onresult = (e) => {
       let finalTranscript = '';
       let interimTranscript = '';
@@ -166,10 +203,13 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       setInput(spoken ? (baseText ? `${baseText} ${spoken}` : spoken) : baseText);
     };
     recognition.onerror = (e) => {
+      clearTimeout(audioStartTimer);
       console.warn('Speech recognition error:', e.error);
+      const message = VOICE_ERRORS[lang][e.error];
+      if (message) setMessages((prev) => [...prev, { role: 'ai', text: message }]);
       setListening(false);
     };
-    recognition.onend = () => setListening(false);
+    recognition.onend = () => { clearTimeout(audioStartTimer); setListening(false); };
     recognitionRef.current = recognition;
     setListening(true);
     try {
@@ -178,6 +218,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       // start() can throw synchronously (e.g. already-started state) — if it
       // does, no onerror/onend will ever fire for this attempt, so reset
       // here or the mic would show "listening" forever.
+      clearTimeout(audioStartTimer);
       console.warn('Speech recognition failed to start:', err);
       setListening(false);
     }

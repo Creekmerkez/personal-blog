@@ -92,6 +92,10 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const [listening, setListening] = useState(false);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+  // Bumped on every explicit start/stop so a pending network-error retry
+  // (see startRecognition) can tell it's stale and skip itself instead of
+  // restarting listening after the user already cancelled.
+  const voiceSessionRef = useRef(0);
 
   useEffect(() => {
     if (open) {
@@ -132,6 +136,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   // the next time the panel opened even though nothing was recording.
   useEffect(() => {
     if (!render) {
+      voiceSessionRef.current += 1;
       recognitionRef.current?.stop();
       recognitionRef.current = null;
       setListening(false);
@@ -153,18 +158,12 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     ));
   }, [lang]);
 
-  const toggleListening = () => {
-    if (!SpeechRecognitionClass) return;
-
-    if (listening) {
-      recognitionRef.current?.stop();
-      return;
-    }
-
-    // Whatever's already typed stays put; speech gets appended after it.
-    // Captured once here (not read live) so it doesn't shift while talking.
-    const baseText = input;
-
+  // Chrome's "network" error from SpeechRecognition is notoriously
+  // over-broad — it fires for several unrelated hiccups talking to the
+  // recognition backend, not just an actual connectivity loss, and in
+  // practice often clears up on an immediate retry. Give it one silent
+  // retry before showing the user anything.
+  const startRecognition = (baseText, retriesLeft, sessionId) => {
     const recognition = new SpeechRecognitionClass();
     recognition.lang = lang === 'ua' ? 'uk-UA' : 'en-US';
     // interimResults streams words in as they're recognized, same as any
@@ -204,7 +203,16 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     };
     recognition.onerror = (e) => {
       clearTimeout(audioStartTimer);
-      console.warn('Speech recognition error:', e.error);
+      console.warn('Speech recognition error:', e.error, 'retriesLeft:', retriesLeft);
+      if (e.error === 'network' && retriesLeft > 0) {
+        setTimeout(() => {
+          // The user may have tapped the mic to cancel during this window —
+          // don't resurrect a session they already stopped.
+          if (voiceSessionRef.current !== sessionId) return;
+          startRecognition(baseText, retriesLeft - 1, sessionId);
+        }, 400);
+        return;
+      }
       const message = VOICE_ERRORS[lang][e.error];
       if (message) setMessages((prev) => [...prev, { role: 'ai', text: message }]);
       setListening(false);
@@ -222,6 +230,20 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       console.warn('Speech recognition failed to start:', err);
       setListening(false);
     }
+  };
+
+  const toggleListening = () => {
+    if (!SpeechRecognitionClass) return;
+
+    if (listening) {
+      voiceSessionRef.current += 1; // invalidate any pending network-error retry
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    // Whatever's already typed stays put; speech gets appended after it.
+    // Captured once here (not read live) so it doesn't shift while talking.
+    startRecognition(input, 1, ++voiceSessionRef.current);
   };
 
   const send = async () => {

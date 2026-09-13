@@ -265,7 +265,11 @@
 .holo-ai-input-row {
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  /* flex-end, not center: as the textarea grows past one line, this keeps
+     the mic/send buttons anchored to its bottom edge (next to the last
+     line, where typing is happening) instead of drifting to its
+     vertical center as the box grows taller around them. */
+  align-items: flex-end;
   padding-top: 0.5rem;
   /* Keeps the mic/send buttons clear of a phone's gesture-nav bar, which
      sits outside the normal viewport box and would otherwise overlap them. */
@@ -282,8 +286,20 @@
      send buttons past the edge of the row entirely instead of the input
      shrinking to make room. */
   min-width: 0;
+  /* Was a fixed-height <input>; now a <textarea> that grows with its
+     content (see the useEffect driving its inline height in
+     HolographicAI.jsx). A 999px pill radius only reads as "rounded" on a
+     single short line — once it's several lines tall the same radius
+     turns the corners into odd, oversized curves, so this uses a fixed
+     corner radius that scales sensibly at any height instead. */
+  border-radius: 1.25rem;
+  resize: none;
+  /* Caps growth (INPUT_MAX_HEIGHT in the component); scrolls internally
+     past that instead of continuing to push the panel's layout. */
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
   border: 1px solid rgba(126, 138, 160, 0.3);
-  border-radius: 999px;
   padding: 0.65rem 1.1rem;
   font-size: 0.92rem;
   font-family: inherit;
@@ -943,6 +959,19 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     width: 100%;
     height: auto;
     min-height: 0;
+  }
+}
+
+/* interactive-widget=resizes-content (index.html) makes the on-screen
+   keyboard actually shrink the visual viewport rather than just overlay
+   it — which means the stage's fixed 7rem vertical padding above no
+   longer leaves much room at all once the keyboard is up: reported as the
+   whole modal "completely hiding" on a real phone. max-height (not
+   max-width) targets exactly that squeezed-viewport condition, regardless
+   of why the viewport is short. */
+@media (max-height: 500px) {
+  .holo-gallery-stage {
+    padding: 1rem 2.25rem;
   }
 }
 

@@ -75,6 +75,11 @@ function renderWithLinks(text) {
   });
 }
 
+// Caps how tall the auto-growing input can get before it scrolls instead —
+// keeps a very long pasted/dictated message from pushing the send button
+// (or the message list) off screen.
+const INPUT_MAX_HEIGHT = 120;
+
 const UI_LANG_KEY = 'aiUiLang';
 const SpeechRecognitionClass = typeof window !== 'undefined'
   ? (window.SpeechRecognition || window.webkitSpeechRecognition)
@@ -91,6 +96,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
   const recognitionRef = useRef(null);
   // Bumped on every explicit start/stop so a pending network-error retry or
   // pause-triggered restart (see startRecognition) can tell it's stale and
@@ -139,6 +145,18 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Grows the input with its content instead of staying a fixed
+  // single-line height. Runs on every `input` change regardless of source
+  // (typing, voice transcription, or clearing on send) — resetting height
+  // to 'auto' first is what lets scrollHeight shrink back down again when
+  // text is deleted, not just grow.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, INPUT_MAX_HEIGHT)}px`;
+  }, [input]);
 
   // Stop any in-progress recognition the moment the panel starts closing —
   // and reset the UI state directly rather than waiting on the recognition
@@ -459,8 +477,9 @@ const HolographicAI = ({ open, onClose, originRect }) => {
           </div>
 
           <div className="holo-ai-input-row">
-            <input
-              type="text"
+            <textarea
+              ref={textareaRef}
+              rows={1}
               className="holo-ai-input"
               placeholder={PLACEHOLDER[lang]}
               value={input}

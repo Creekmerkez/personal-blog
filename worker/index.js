@@ -33,40 +33,82 @@ Other rules:
 - If neither the bio above nor the excerpts cover the question, respond with "I don't have that information about Julia." (English) or "У мене немає цієї інформації про Юлію." (Ukrainian)
 - Respond in the same language the user writes in`;
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+// Wildcard CORS on an endpoint that calls a paid API (Anthropic) and sends
+// email (Resend) meant any website could embed a script calling this Worker
+// from a visitor's browser, running up the API bill or flooding the inbox.
+// Reflecting only an allowlisted origin is the standard fix for needing more
+// than one valid origin (prod + local dev) while still rejecting everyone else.
+const ALLOWED_ORIGINS = new Set([
+  'https://jmerkusheva.com',
+  'http://localhost:5173', // vite dev
+  'http://localhost:4173', // vite preview (Playwright e2e)
+]);
+
+function corsHeaders(origin) {
+  return {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.has(origin) ? origin : 'https://jmerkusheva.com',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    Vary: 'Origin',
+  };
+}
+
+const RATE_LIMIT = 10; // requests
+const RATE_WINDOW_SECONDS = 60;
+
+// Cloudflare Workers have no shared in-memory state across requests/edge
+// locations, so a real counter needs a KV namespace — see wrangler.toml and
+// the setup note there. Fails OPEN (allows the request) if the binding
+// isn't configured yet, so the Worker still works pre-setup; get+put isn't
+// atomic, so this is a meaningful abuse deterrent and cost cap, not a hard
+// guarantee against a determined attacker racing requests.
+async function checkRateLimit(env, ip) {
+  if (!env.RATE_LIMIT_KV || !ip) return true;
+  const key = `rl:${ip}`;
+  const current = parseInt((await env.RATE_LIMIT_KV.get(key)) || '0', 10);
+  if (current >= RATE_LIMIT) return false;
+  await env.RATE_LIMIT_KV.put(key, String(current + 1), { expirationTtl: RATE_WINDOW_SECONDS });
+  return true;
+}
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const origin = request.headers.get('Origin') || '';
+    const CORS = corsHeaders(origin);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: CORS });
     }
 
     if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
+      return new Response('Method not allowed', { status: 405, headers: CORS });
+    }
+
+    const ip = request.headers.get('CF-Connecting-IP');
+    if (!(await checkRateLimit(env, ip))) {
+      return new Response('Too many requests', { status: 429, headers: CORS });
     }
 
     let body;
     try {
       body = await request.json();
     } catch {
-      return new Response('Invalid JSON', { status: 400 });
+      return new Response('Invalid JSON', { status: 400, headers: CORS });
     }
 
     // ── Contact form ────────────────────────────────────────────────────────
     if (url.pathname === '/api/contact') {
       const { name, email, edition, price, note } = body;
       if (!name || !email || !edition) {
-        return new Response('Missing required fields', { status: 400 });
+        return new Response('Missing required fields', { status: 400, headers: CORS });
+      }
+      if ([name, email, edition, note].some((v) => typeof v === 'string' && v.length > 500)) {
+        return new Response('Field too long', { status: 400, headers: CORS });
       }
 
       if (!env.RESEND_API_KEY) {
-        return new Response('Email not configured', { status: 503 });
+        return new Response('Email not configured', { status: 503, headers: CORS });
       }
 
       const emailText = [
@@ -98,15 +140,32 @@ export default {
         if (!res.ok) throw new Error('Resend error');
         return Response.json({ ok: true }, { headers: CORS });
       } catch {
-        return new Response('Email send failed', { status: 502 });
+        return new Response('Email send failed', { status: 502, headers: CORS });
       }
     }
 
     // ── AI chat ─────────────────────────────────────────────────────────────
     const { query, lang = 'en', matches = [] } = body;
 
+    // `matches` is client-supplied and gets interpolated directly into the
+    // prompt sent to Claude as "knowledge base excerpts" — an unbounded or
+    // arbitrary array is both a cost-amplification vector (bigger prompt,
+    // same $/request cap doesn't apply per-token) and a prompt-injection
+    // surface (nothing here actually verifies these came from the real
+    // Q&A data). Capping count and per-field length doesn't eliminate
+    // injection risk, but bounds the blast radius.
+    if (!Array.isArray(matches) || matches.length > 10) {
+      return new Response('Invalid matches', { status: 400, headers: CORS });
+    }
+    if (matches.some((m) => (
+      typeof m?.question !== 'string' || typeof m?.answer !== 'string'
+      || m.question.length > 1000 || m.answer.length > 1000
+    ))) {
+      return new Response('Invalid matches', { status: 400, headers: CORS });
+    }
+
     if (!query || typeof query !== 'string' || query.length > 500) {
-      return new Response('Invalid query', { status: 400 });
+      return new Response('Invalid query', { status: 400, headers: CORS });
     }
 
     const context = Array.isArray(matches) && matches.length > 0
@@ -139,7 +198,7 @@ export default {
       const data = await res.json();
       answer = data.content?.[0]?.text ?? "I don't have information about that topic.";
     } catch {
-      return new Response('Upstream error', { status: 502 });
+      return new Response('Upstream error', { status: 502, headers: CORS });
     }
 
     // Fire-and-forget email via Resend

@@ -267,6 +267,9 @@
   gap: 0.5rem;
   align-items: center;
   padding-top: 0.5rem;
+  /* Keeps the mic/send buttons clear of a phone's gesture-nav bar, which
+     sits outside the normal viewport box and would otherwise overlap them. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   border-top: 1px solid rgba(126, 138, 160, 0.18);
   flex-shrink: 0;
 }
@@ -885,8 +888,10 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
 
   .holo-gallery-stage {
     /* Wider backdrop margin — this is the tappable area that closes the
-       popup, and it was too thin to reliably tap around the panel. */
-    padding: 3.5rem 2.25rem;
+       popup. Doubled again (3.5rem -> 7rem vertical) after real-device
+       testing showed the panel still reaching edge-to-edge with barely
+       any visible/tappable backdrop above or below it. */
+    padding: 7rem 2.25rem;
     background: rgba(0, 0, 0, 0.38);
     transition: none !important;
   }

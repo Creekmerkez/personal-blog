@@ -449,7 +449,6 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               onKeyDown={handleKey}
               disabled={loading}
               maxLength={500}
-              autoFocus
             />
             {SpeechRecognitionClass && (
               <button

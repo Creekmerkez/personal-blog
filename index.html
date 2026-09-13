@@ -3,7 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- interactive-widget=resizes-content: without it, Chrome/Android
+         leaves fixed-position elements sized against the pre-keyboard
+         viewport when the on-screen keyboard opens, so it just overlays on
+         top and covers them (e.g. the MY AI chat's mic/send buttons)
+         instead of the layout shrinking to stay above it.
+         viewport-fit=cover: required for env(safe-area-inset-*) to return
+         real values instead of 0 — used to keep content clear of a phone's
+         gesture-nav bar (see .holo-ai-input-row). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover" />
     <link rel="preload" as="image" href="/images/my-ai-card.jpg" fetchpriority="high" />
     <link rel="preload" as="image" href="/images/ceske-realie-cover.png" fetchpriority="high" />
     <link rel="preload" as="image" href="/images/book1.jpg" />

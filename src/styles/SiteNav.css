@@ -15,6 +15,21 @@
   pointer-events: auto;
 }
 
+/* position:fixed always creates its own stacking context (CSS3), and .site-nav
+   is a DOM sibling of the routed page content rather than a descendant of any
+   modal's own stack — so despite .holo-gallery-stage/.hologram-stage having a
+   far higher z-index, real Chromium/WebKit hit-testing was still routing
+   clicks in the nav's own screen region (its top ~120px) to the nav instead
+   of the modal content rendered on top of it there. Confirmed via
+   document.elementFromPoint() and reproduced by real Playwright click
+   failures on the MY AI panel's language toggle, which sits in that band.
+   The nav has no business being interactive while a modal is open regardless
+   — disable it outright rather than fight the stacking mystery further. */
+body:has(.holo-gallery-stage.visible) .site-nav,
+body:has(.hologram-stage.visible) .site-nav {
+  pointer-events: none;
+}
+
 .site-brand {
   display: flex;
   flex-direction: column;

@@ -207,6 +207,12 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     recognition.onaudiostart = () => { audioStarted = true; clearTimeout(audioStartTimer); };
 
     recognition.onresult = (e) => {
+      // .stop() asks the engine to wind down gracefully — per spec it can
+      // still deliver one more already-in-progress result afterward. Without
+      // this check, that straggler would silently repopulate the input
+      // field after the user had already stopped listening or sent the
+      // message (voiceSessionRef is bumped in both places).
+      if (voiceSessionRef.current !== sessionId) return;
       let finalTranscript = '';
       let interimTranscript = '';
       for (let i = 0; i < e.results.length; i++) {
@@ -291,6 +297,19 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const send = async () => {
     const query = input.trim();
     if (!query || loading) return;
+
+    // Sending didn't stop an active mic session — if it was still
+    // listening, its next result (or the auto-chained restart after a
+    // pause) would fire setInput(baseText + ...) shortly after this
+    // clears the field, silently repopulating it with stale text right
+    // after the message was sent. Same stop sequence as clicking the mic
+    // button: bump the session id first so any in-flight retry/restart
+    // recognizes itself as stale and skips.
+    if (listening) {
+      shouldKeepListeningRef.current = false;
+      voiceSessionRef.current += 1;
+      recognitionRef.current?.stop();
+    }
 
     // Detected from the query text itself — independent of the UI language
     // toggle above, so a reply always matches whatever the user actually typed/said.

@@ -20,13 +20,19 @@
    modal's own stack — so despite .holo-gallery-stage/.hologram-stage having a
    far higher z-index, real Chromium/WebKit hit-testing was still routing
    clicks in the nav's own screen region (its top ~120px) to the nav instead
-   of the modal content rendered on top of it there. Confirmed via
+   of the modal content rendered on top of it there (confirmed via
    document.elementFromPoint() and reproduced by real Playwright click
-   failures on the MY AI panel's language toggle, which sits in that band.
-   The nav has no business being interactive while a modal is open regardless
-   — disable it outright rather than fight the stacking mystery further. */
+   failures). On a real Android device, the same underlying stacking
+   quirk turned out to affect *paint*, not just hit-testing: opening the
+   on-screen keyboard shrinks the visual viewport (interactive-widget=
+   resizes-content), and during that resize the nav was visibly rendering
+   in front of the modal instead of behind it — pointer-events:none alone
+   doesn't stop that, since painting and hit-testing are separate. Making
+   it actually invisible removes the ambiguity entirely: nothing to paint,
+   nothing to click, regardless of whatever the stacking engine decides. */
 body:has(.holo-gallery-stage.visible) .site-nav,
 body:has(.hologram-stage.visible) .site-nav {
+  visibility: hidden;
   pointer-events: none;
 }
 

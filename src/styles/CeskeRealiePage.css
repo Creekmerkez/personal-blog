@@ -146,6 +146,15 @@
   flex-direction: column;
   gap: 1rem;
   animation: fade-in-up 220ms ease-out;
+  /* Positioned as a grid item of .ceske-options (a single render, not one
+     per breakpoint — see the comment in CeskeRealiePage.jsx). Always spans
+     the full row and sorts last on the 2-column desktop grid, since a
+     full-width item can't sit "between" two side-by-side cards without
+     breaking the row. The mobile media query below switches to the
+     JS-supplied --panel-order instead, where "between" is meaningful
+     because the grid is single-column there. */
+  grid-column: 1 / -1;
+  order: 999;
 }
 
 .ceske-selection-top {
@@ -260,6 +269,25 @@
   text-transform: uppercase;
   color: #3f5a93;
   font-weight: 600;
+}
+
+.digital-notice-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 320px;
+  /* #root sets text-align:center globally; every other block in this
+     section (.ceske-description, .ceske-option-card, .selected-price-wrap's
+     siblings) explicitly opts back to left — this one needs the same. */
+  text-align: left;
+}
+
+.digital-notice-text {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #47506b;
+  max-width: 46ch;
 }
 
 .purchase-cta {
@@ -615,6 +643,10 @@
     font-size: 0.78rem;
   }
 
+  .digital-notice-text {
+    font-size: 0.95rem;
+  }
+
   .purchase-cta {
     font-size: 0.88rem;
     padding: 1rem 2rem;
@@ -650,10 +682,6 @@
   }
 }
 
-.ceske-selection--inline {
-  display: none;
-}
-
 @media (max-width: 800px) {
   .ceske-page {
     padding-top: calc(var(--site-nav-height) + 1rem);
@@ -663,12 +691,10 @@
     grid-template-columns: 1fr;
   }
 
-  .ceske-selection--inline {
-    display: flex;
-  }
-
-  .ceske-selection--below {
-    display: none;
+  .ceske-selection {
+    /* Single column now, so grid-column:1/-1 is a no-op and `order` alone
+       decides position — right after the selected card, not always last. */
+    order: var(--panel-order, 999);
   }
 
   .purchase-cta {
@@ -787,6 +813,10 @@
 
 :root[data-theme="dark"] .selected-addon {
   color: #9ab4f0;
+}
+
+:root[data-theme="dark"] .digital-notice-text {
+  color: #b7bfd6;
 }
 
 :root[data-theme="dark"] .purchase-cta {

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/CeskeRealiePage.css';
 
 const WEB3FORMS_KEY = '59ef3f7d-05e1-49b6-9b78-bdb24517095a';
@@ -24,6 +25,7 @@ const purchaseOptions = [
 ];
 
 const CeskeRealiePage = () => {
+  const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState(null);
   const [authorImageMissing, setAuthorImageMissing] = useState(false);
   const [expandedPreview, setExpandedPreview] = useState(null);
@@ -55,16 +57,21 @@ const CeskeRealiePage = () => {
     setSubmitting(true);
     setSubmitError(false);
     try {
+      const isDigital = selectedData.id === 'pdf';
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
-          subject: `Book Order: ${selectedData.title} — from ${contactForm.name}`,
+          subject: isDigital
+            ? `Digital Copy Request: ${selectedData.title} — from ${contactForm.name}`
+            : `Book Order: ${selectedData.title} — from ${contactForm.name}`,
           from_name: contactForm.name,
           email: contactForm.email,
           message: [
-            `Edition: ${selectedData.title} (${selectedData.priceCzk} CZK)`,
+            isDigital
+              ? `Requested: digital edition (personal request, not a sale)`
+              : `Edition: ${selectedData.title} (${selectedData.priceCzk} CZK)`,
             `Name: ${contactForm.name}`,
             `Email: ${contactForm.email}`,
             contactForm.note ? `Note: ${contactForm.note}` : null,
@@ -104,19 +111,32 @@ const CeskeRealiePage = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  const isDigitalSelected = selectedData?.id === 'pdf';
+
   const renderSelectionContent = () => (
     <>
       <div className="ceske-selection-top">
-        <div className="selected-price-wrap">
-          <span className="selected-label">Selected price</span>
-          <div className="selected-price-line">
-            <strong className="selected-price">{selectedData.priceCzk} CZK</strong>
-            <span className="selected-addon">{selectedData.audioNote}</span>
+        {isDigitalSelected ? (
+          <div className="digital-notice-wrap">
+            <span className="selected-label">Digital edition</span>
+            <p className="digital-notice-text">
+              The digital edition isn't sold — to keep it from being copied and resold,
+              it's shared only with close friends and family, by personal request. If
+              that's you, just reach out below and Julia will send it to you directly.
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="selected-price-wrap">
+            <span className="selected-label">Selected price</span>
+            <div className="selected-price-line">
+              <strong className="selected-price">{selectedData.priceCzk} CZK</strong>
+              <span className="selected-addon">{selectedData.audioNote}</span>
+            </div>
+          </div>
+        )}
         {!showContactForm && !formSent && (
           <button type="button" className="purchase-cta" onClick={handleOpenForm}>
-            Continue to Purchase
+            {isDigitalSelected ? 'Request Digital Copy' : 'Continue to Purchase'}
           </button>
         )}
       </div>
@@ -124,7 +144,9 @@ const CeskeRealiePage = () => {
       {showContactForm && !formSent && (
         <form className="ceske-contact-form" onSubmit={handleFormSubmit}>
           <p className="ceske-form-notice">
-            Online payment is still being set up. Fill in your details and Julia will contact you to confirm your order.
+            {isDigitalSelected
+              ? "Let Julia know a little about yourself, and she'll be in touch about the digital copy personally."
+              : 'Online payment is still being set up. Fill in your details and Julia will contact you to confirm your order.'}
           </p>
           <label className="ceske-form-field">
             <span className="ceske-form-label">Your name</span>
@@ -197,7 +219,17 @@ const CeskeRealiePage = () => {
   };
 
   return (
-    <main className="ceske-page" aria-label="České Reálie purchase selection">
+    <main
+      className="ceske-page"
+      aria-label="České Reálie purchase selection"
+      onClick={(e) => {
+        // The content card reads like a modal even though it's a full page —
+        // clicking the margin around it goes back to the homepage, matching
+        // that expectation. e.target === e.currentTarget means the click
+        // landed on this backdrop itself, not bubbled up from the card.
+        if (e.target === e.currentTarget) navigate('/');
+      }}
+    >
 
       {showSuccessPopup && (
         <div
@@ -248,37 +280,49 @@ const CeskeRealiePage = () => {
           Select how you would like to purchase.
         </p>
 
+        {/* The price/form panel used to render TWICE (once per breakpoint,
+            toggled via CSS display:none) so it could sit inline right after
+            the selected card on mobile but always below both cards on
+            desktop. Two copies of the same form fields in the DOM at once
+            confuses screen readers, autofill, and password managers. Now
+            there's exactly one: its visual position is controlled by CSS
+            `order` instead of duplicating it. Cards get even order values
+            (0, 2, 4...) leaving odd slots between them; the panel's --panel-order
+            custom property places it right after the selected card on
+            mobile (single column, so "between" is meaningful), while on
+            desktop it's pinned to always-last via a fixed order in
+            CeskeRealiePage.css, since a 2-column grid can't have a
+            full-width item sit "between" two side-by-side cards without
+            breaking the row. */}
         <div className="ceske-options" role="radiogroup" aria-label="Purchase format selection">
-          {purchaseOptions.map((option) => {
+          {purchaseOptions.map((option, index) => {
             const isActive = selectedOption === option.id;
             return (
-              <React.Fragment key={option.id}>
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={isActive}
-                  className={`ceske-option-card ${isActive ? 'is-active' : ''}`}
-                  onClick={() => handleSelectOption(option.id)}
-                >
-                  <span className="option-kicker">{option.subtitle}</span>
-                  <span className="option-title">{option.title}</span>
-                  <span className="option-detail">{option.detail}</span>
-                </button>
-                {isActive && selectedData && (
-                  <section className="ceske-selection ceske-selection--inline" aria-live="polite">
-                    {renderSelectionContent()}
-                  </section>
-                )}
-              </React.Fragment>
+              <button
+                key={option.id}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                className={`ceske-option-card ${isActive ? 'is-active' : ''}`}
+                style={{ order: index * 2 }}
+                onClick={() => handleSelectOption(option.id)}
+              >
+                <span className="option-kicker">{option.subtitle}</span>
+                <span className="option-title">{option.title}</span>
+                <span className="option-detail">{option.detail}</span>
+              </button>
             );
           })}
+          {selectedData && (
+            <section
+              className="ceske-selection"
+              aria-live="polite"
+              style={{ '--panel-order': purchaseOptions.findIndex((o) => o.id === selectedOption) * 2 + 1 }}
+            >
+              {renderSelectionContent()}
+            </section>
+          )}
         </div>
-
-        {selectedData && (
-          <section className="ceske-selection ceske-selection--below" aria-live="polite">
-            {renderSelectionContent()}
-          </section>
-        )}
 
         <section className="ceske-content-preview" aria-label="Book cover, back page, and context page preview">
           <figure className="ceske-preview-frame">

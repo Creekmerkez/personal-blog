@@ -9,13 +9,13 @@ import { openAiChatCard } from './helpers.js';
 test.describe('MY AI chat', () => {
   test('opens with the welcome message in English by default (positive)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     await expect(page.locator('.holo-ai-msg--ai').first()).toContainText("Julia's AI");
   });
 
   test('EN/UA toggle switches the welcome message, subtitle, and placeholder language (positive)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
 
     await page.locator('.holo-ai-lang-btn', { hasText: 'UA' }).click();
     await expect(page.locator('.holo-ai-msg--ai').first()).toContainText('Юлії');
@@ -26,7 +26,7 @@ test.describe('MY AI chat', () => {
 
   test('typing and sending shows the user message immediately (positive)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
 
     await page.locator('.holo-ai-input').fill('What does Julia do for work?');
     await page.locator('.holo-ai-send').click();
@@ -37,13 +37,13 @@ test.describe('MY AI chat', () => {
 
   test('the send button is disabled on empty input (negative)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     await expect(page.locator('.holo-ai-send')).toBeDisabled();
   });
 
   test('a message longer than 500 characters is capped by maxLength (negative)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
 
     const longText = 'a'.repeat(600);
     await page.locator('.holo-ai-input').fill(longText);
@@ -53,13 +53,13 @@ test.describe('MY AI chat', () => {
 
   test('closing and reopening the panel resets the mic to "not listening" (regression guard)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     const micButton = page.locator('.holo-ai-mic');
     if (await micButton.count() === 0) test.skip(true, 'SpeechRecognition unsupported in this browser project');
 
     await page.keyboard.press('Escape');
     await expect(page.locator('.holo-ai-panel')).toBeHidden();
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     await expect(page.locator('.holo-ai-mic.listening')).toHaveCount(0);
   });
 });

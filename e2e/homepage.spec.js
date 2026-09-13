@@ -9,13 +9,13 @@ test.describe('Homepage carousel', () => {
 
   test('opens the MY AI panel from its card (positive)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     await expect(page.locator('.holo-ai-panel')).toBeVisible();
   });
 
   test('closes the MY AI panel on Escape (positive)', async ({ page }) => {
     await page.goto('/');
-    await openAiChatCard(page, test);
+    await openAiChatCard(page);
     await expect(page.locator('.holo-ai-panel')).toBeVisible();
     await page.keyboard.press('Escape');
     // The panel keeps `render` true for a 520ms exit animation before

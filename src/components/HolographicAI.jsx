@@ -92,10 +92,21 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const [listening, setListening] = useState(false);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
-  // Bumped on every explicit start/stop so a pending network-error retry
-  // (see startRecognition) can tell it's stale and skip itself instead of
-  // restarting listening after the user already cancelled.
+  // Bumped on every explicit start/stop so a pending network-error retry or
+  // pause-triggered restart (see startRecognition) can tell it's stale and
+  // skip itself instead of resurrecting a session the user already stopped.
   const voiceSessionRef = useRef(0);
+  // Single-utterance mode (continuous:true is unreliable on Android Chrome —
+  // see the comment in startRecognition) auto-ends after a short pause in
+  // speech. True while the mic should keep going despite that — only a
+  // manual click flips it back off — so onend/onerror below know to chain
+  // straight into a fresh session instead of stopping.
+  const shouldKeepListeningRef = useRef(false);
+  // Tracks the full spoken-so-far text across chained sessions; React state
+  // (`input`) can't be read live from inside these closures without going
+  // stale, since a new recognition object's handlers close over whatever
+  // `input` was at the render that started it.
+  const liveTextRef = useRef('');
 
   useEffect(() => {
     if (open) {
@@ -137,6 +148,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   useEffect(() => {
     if (!render) {
       voiceSessionRef.current += 1;
+      shouldKeepListeningRef.current = false;
       recognitionRef.current?.stop();
       recognitionRef.current = null;
       setListening(false);
@@ -164,6 +176,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   // practice often clears up on an immediate retry. Give it one silent
   // retry before showing the user anything.
   const startRecognition = (baseText, retriesLeft, sessionId) => {
+    liveTextRef.current = baseText;
     const recognition = new SpeechRecognitionClass();
     recognition.lang = lang === 'ua' ? 'uk-UA' : 'en-US';
     // interimResults streams words in as they're recognized, same as any
@@ -171,9 +184,11 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     // text until the entire session ended, which read as "nothing happens."
     recognition.interimResults = true;
     // NOT continuous: on Android Chrome, continuous mode is unreliable and
-    // was producing zero results at all (regression from a prior attempt at
-    // this). Single-utterance mode — speak, it auto-finalizes on a pause —
-    // is the well-supported behavior across both Android and iOS.
+    // was producing zero results at all. Single-utterance mode — speak, it
+    // auto-finalizes on a pause — is the well-supported behavior across
+    // both Android and iOS; onend below chains straight into the next
+    // session so the *user* still only ever controls start/stop by clicking,
+    // even though under the hood it's several short sessions back to back.
     recognition.maxAlternatives = 1;
 
     // If the mic never actually starts capturing audio, the ripple/"on"
@@ -186,6 +201,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     const audioStartTimer = setTimeout(() => {
       if (audioStarted) return;
       recognition.abort();
+      shouldKeepListeningRef.current = false;
       setMessages((prev) => [...prev, { role: 'ai', text: VOICE_ERRORS[lang].timeout }]);
     }, 4000);
     recognition.onaudiostart = () => { audioStarted = true; clearTimeout(audioStartTimer); };
@@ -199,7 +215,9 @@ const HolographicAI = ({ open, onClose, originRect }) => {
         else interimTranscript += transcript;
       }
       const spoken = (finalTranscript + interimTranscript).trim();
-      setInput(spoken ? (baseText ? `${baseText} ${spoken}` : spoken) : baseText);
+      const combined = spoken ? (baseText ? `${baseText} ${spoken}` : spoken) : baseText;
+      liveTextRef.current = combined;
+      setInput(combined);
     };
     recognition.onerror = (e) => {
       clearTimeout(audioStartTimer);
@@ -209,15 +227,37 @@ const HolographicAI = ({ open, onClose, originRect }) => {
           // The user may have tapped the mic to cancel during this window —
           // don't resurrect a session they already stopped.
           if (voiceSessionRef.current !== sessionId) return;
-          startRecognition(baseText, retriesLeft - 1, sessionId);
+          startRecognition(liveTextRef.current, retriesLeft - 1, sessionId);
         }, 400);
+        return;
+      }
+      if (e.error === 'no-speech' && shouldKeepListeningRef.current) {
+        // Just a pause, not a real failure — the mic is meant to stay on
+        // until clicked off. onend fires right after this and restarts.
         return;
       }
       const message = VOICE_ERRORS[lang][e.error];
       if (message) setMessages((prev) => [...prev, { role: 'ai', text: message }]);
+      shouldKeepListeningRef.current = false;
       setListening(false);
     };
-    recognition.onend = () => { clearTimeout(audioStartTimer); setListening(false); };
+    recognition.onend = () => {
+      clearTimeout(audioStartTimer);
+      if (shouldKeepListeningRef.current && voiceSessionRef.current === sessionId) {
+        // Ended on its own (a pause in speech) — the user hasn't clicked
+        // stop, so seamlessly start the next session. Insert a sentence
+        // boundary first: Chrome's recognizer doesn't turn a spoken "period"
+        // into an actual "." — without this, two unrelated phrases spoken
+        // across a pause (e.g. "mic check" ... "what do you know about
+        // Julia?") get glued into one run-on blob with no punctuation,
+        // which reads as gibberish to whatever answers it.
+        const priorText = liveTextRef.current.trim();
+        const nextBase = priorText && !/[.!?]$/.test(priorText) ? `${priorText}.` : priorText;
+        startRecognition(nextBase, 1, sessionId);
+      } else {
+        setListening(false);
+      }
+    };
     recognitionRef.current = recognition;
     setListening(true);
     try {
@@ -228,6 +268,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       // here or the mic would show "listening" forever.
       clearTimeout(audioStartTimer);
       console.warn('Speech recognition failed to start:', err);
+      shouldKeepListeningRef.current = false;
       setListening(false);
     }
   };
@@ -236,13 +277,14 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     if (!SpeechRecognitionClass) return;
 
     if (listening) {
-      voiceSessionRef.current += 1; // invalidate any pending network-error retry
+      shouldKeepListeningRef.current = false;
+      voiceSessionRef.current += 1; // invalidate any pending retry/restart
       recognitionRef.current?.stop();
       return;
     }
 
     // Whatever's already typed stays put; speech gets appended after it.
-    // Captured once here (not read live) so it doesn't shift while talking.
+    shouldKeepListeningRef.current = true;
     startRecognition(input, 1, ++voiceSessionRef.current);
   };
 

@@ -13,6 +13,17 @@ dist
 dist-ssr
 *.local
 
+# Environment variables — *.local above already covers .env.local, but a
+# plain .env (no .local suffix) wouldn't be, so this is explicit belt-and-suspenders.
+.env
+.env.*
+!.env.example
+
+# Test output
+playwright-report
+test-results
+coverage
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

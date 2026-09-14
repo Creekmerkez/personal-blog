@@ -10,9 +10,9 @@ npm run build      # Production build → dist/
 npm run preview    # Preview production build locally
 npm run lint       # ESLint (strict: max-warnings 0)
 npm run deploy     # Build + deploy to GitHub Pages via gh-pages
+npm test           # Vitest unit/component tests
+npm run test:e2e   # Playwright end-to-end tests
 ```
-
-No test suite is configured.
 
 ## Architecture
 
@@ -33,3 +33,32 @@ React 18 SPA built with Vite. Deployed to GitHub Pages (CNAME file sets the doma
 ## ESLint
 
 Uses ESLint 9 flat config (`eslint.config.js`). The `--max-warnings 0` flag means any warning is a build failure. Run `npm run lint` before committing.
+
+## Skill routing
+
+Many skills are installed in `.agents/skills/`. Apply them automatically when a request matches — the user should never have to name one. Use this table; do not wait to be asked.
+
+| When the request is about | Use |
+|---|---|
+| Adding/changing animation, motion, transitions, "make it feel alive" | `animate` |
+| Critiquing motion that already exists | `review-animations` |
+| Auditing motion across the whole codebase | `improve-animations` |
+| UI polish, spacing, component feel, visual detail | `emil-design-eng` |
+| Gestures, springs, sheets, drag/swipe, translucency | `apple-design` |
+| A bug, test failure, or unexplained behavior | `systematic-debugging` |
+| A small, contained bug fix | `surgical-patch` |
+| Restructuring code without changing behavior | `safe-refactor` |
+| Building a new feature or a whole new section | `lean-build` |
+| Before claiming anything is done, fixed, or ready to deploy | `verification-before-completion` |
+| Reviewing a diff for bloat / over-engineering | `ponytail-review` |
+| Choosing a library or adding a dependency | `pick-ui-library` |
+| General judgment on any coding task: keep it small, no speculative abstraction | `karpathy-guidelines` |
+
+Only on explicit request (these interview the user, so never fire them unprompted): `grill-me`, `discovery-interview`, `brainstorming`, `ponytail`, `kaizen`.
+
+Never auto-apply:
+- `caveman*` — `caveman-setup` and `caveman-discover` route this project's LLM traffic (and in BYOK mode, a real provider API key) through the third-party `gateway.caveman.so`. Do not run them against the Worker or the AI chat. `caveman` itself compresses replies into terse shorthand, which is wrong for this user.
+- `using-superpowers` — demands a skill invocation before every reply, including simple status questions.
+- `write-swift`, `animate-expo`, `ask-sonner`, `migration`, `using-git-worktrees` — wrong stack or no such workflow in this repo.
+
+When two skills overlap, pick the most specific one and use it alone. Do not stack four philosophy skills onto one small change.

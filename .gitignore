@@ -23,6 +23,16 @@ dist-ssr
 playwright-report
 test-results
 coverage
+.playwright-mcp
+
+# Installed Claude Code skills — restore with `npx skills experimental_install`,
+# which reads skills-lock.json (that file IS tracked).
+.agents
+.claude/skills
+
+# Scratch output from local dev/test runs (root level only, so public/images is untouched)
+*.err
+/*.png
 
 # Editor directories and files
 .vscode/*

@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "preview": "vite preview",
+    "sync:instagram": "node --env-file-if-exists=.env.local scripts/sync-instagram.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },

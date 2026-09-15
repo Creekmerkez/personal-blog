@@ -12,7 +12,7 @@ export default [
     // Node-context files: the server script, test/build configs, and
     // Playwright specs (which run under the Node-based test runner, not
     // in a browser) all reference Node globals like `process`.
-    files: ['api-server.js', '*.config.js', 'e2e/**/*.js'],
+    files: ['api-server.js', '*.config.js', 'e2e/**/*.js', 'scripts/**/*.js'],
     languageOptions: {
       globals: { ...globals.node },
     },

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Downloads photos from the connected Instagram Professional account into
-// public/images/instagram photos/, which the holographic gallery globs at
-// build time (see src/components/photosData.js).
+// src/assets/instagram-photos/, which the holographic gallery globs at build
+// time (see src/components/photosData.js).
 //
 // Additive only: it never deletes or overwrites. Photos you added by hand
 // stay, and a post already downloaded is skipped on later runs.
@@ -14,11 +14,18 @@
 
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import sharp from 'sharp';
 
 const API = 'https://graph.instagram.com/v25.0';
 const REFRESH_URL = 'https://graph.instagram.com/refresh_access_token';
-const DEST = join(process.cwd(), 'public', 'images', 'instagram photos');
+const DEST = join(process.cwd(), 'src', 'assets', 'instagram-photos');
 const MAX_POSTS = 50;
+
+// Instagram serves 1440px originals up to ~2.4MB each. The gallery renders
+// them in a card a few hundred pixels wide, so full resolution only costs
+// mobile visitors load time — and every synced photo lives in git forever.
+const MAX_WIDTH = 1200;
+const JPEG_QUALITY = 82;
 
 const token = process.env.IG_ACCESS_TOKEN;
 if (!token) {
@@ -103,8 +110,15 @@ async function sync() {
       console.warn(`  skipped ${filename} — download failed (${res.status})`);
       continue;
     }
-    await writeFile(join(DEST, filename), Buffer.from(await res.arrayBuffer()));
-    console.log(`  + ${filename}`);
+    const original = Buffer.from(await res.arrayBuffer());
+    const resized = await sharp(original)
+      .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+      .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
+      .toBuffer();
+
+    await writeFile(join(DEST, filename), resized);
+    const saved = Math.round((1 - resized.length / original.length) * 100);
+    console.log(`  + ${filename} (${Math.round(resized.length / 1024)}KB, -${saved}%)`);
     added += 1;
   }
 

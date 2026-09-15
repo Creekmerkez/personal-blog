@@ -4,7 +4,10 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist', '.vite'] },
+  // `.agents` / `.claude/skills` hold third-party Claude Code skill packages,
+  // not project source. They ship their own scripts written for Node and would
+  // otherwise fail the browser-globals lint pass.
+  { ignores: ['dist', '.vite', '.agents', '.claude'] },
   {
     // Node-context files: the server script, test/build configs, and
     // Playwright specs (which run under the Node-based test runner, not

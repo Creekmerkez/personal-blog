@@ -17,7 +17,9 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.js'],
     globals: true,
     css: false,
-    // e2e/ is Playwright's territory, not Vitest's.
-    exclude: ['node_modules/**', 'e2e/**', 'dist/**'],
+    // e2e/ is Playwright's territory, not Vitest's. `.agents` / `.claude` hold
+    // third-party Claude Code skill packages that ship their own tests written
+    // for Node's built-in runner — running them here fails and hides ours.
+    exclude: ['node_modules/**', 'e2e/**', 'dist/**', '.agents/**', '.claude/**'],
   },
 });

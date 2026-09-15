@@ -85,6 +85,15 @@ async function refreshToken() {
   const body = await callApi(
     `${REFRESH_URL}?grant_type=ig_refresh_token&access_token=${token}`
   );
+
+  // --quiet prints the bare token and nothing else, so CI can capture it into
+  // a masked variable. Anything extra on stdout would end up in the workflow
+  // log, which is public on this repo.
+  if (process.argv.includes('--quiet')) {
+    process.stdout.write(body.access_token);
+    return;
+  }
+
   const days = Math.round((body.expires_in ?? 0) / 86400);
   console.log(`New token (valid ~${days} days):\n\n${body.access_token}\n`);
   console.log('Update IG_ACCESS_TOKEN in .env.local with the value above.');

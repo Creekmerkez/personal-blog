@@ -1,0 +1,88 @@
+name: Sync Instagram photos
+
+# Pulls any new photos from Instagram into src/assets/instagram-photos/,
+# commits them, and republishes the site. The gallery's weekly shuffle is
+# client-side, so it keeps rotating even if this workflow never runs — this
+# only adds newly posted photos.
+
+on:
+  schedule:
+    # Mondays, 04:00 UTC.
+    - cron: '0 4 * * 1'
+  workflow_dispatch: # lets you run it by hand from the Actions tab
+
+# Two jobs would race on the same branch; one run at a time.
+concurrency:
+  group: sync-instagram
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit new photos, and push the build to gh-pages
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Download new photos
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: npm run sync:instagram
+
+      - name: Commit anything new
+        id: commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain src/assets/instagram-photos)" ]; then
+            echo "No new photos."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git add src/assets/instagram-photos
+          git commit -m "Sync new Instagram photos"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Rebuild and publish
+        if: steps.commit.outputs.changed == 'true'
+        run: npm run deploy
+
+      # Instagram tokens die after 60 days. Refreshing on every run keeps it
+      # alive indefinitely, but the new value has to be written back or the
+      # next run inherits the old one. That write needs a PAT: the built-in
+      # GITHUB_TOKEN deliberately cannot modify secrets.
+      #
+      # Runs even when no photos changed — the point is to keep the token warm.
+      - name: Refresh the Instagram token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT is not set, so the refreshed token could not be saved."
+            echo "Photos still synced. Set GH_PAT to make this self-maintaining,"
+            echo "or refresh by hand before the token's 60 days run out."
+            exit 0
+          fi
+
+          NEW_TOKEN="$(node scripts/sync-instagram.js --refresh --quiet)"
+          echo "::add-mask::$NEW_TOKEN"
+
+          if [ ${#NEW_TOKEN} -lt 50 ]; then
+            echo "Refresh returned something too short to be a token — keeping the current one."
+            exit 1
+          fi
+
+          GH_TOKEN="$GH_PAT" gh secret set IG_ACCESS_TOKEN --body "$NEW_TOKEN"
+          echo "Token refreshed for another 60 days."

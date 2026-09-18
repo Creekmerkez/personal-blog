@@ -20,6 +20,13 @@ test.describe('Homepage carousel', () => {
     await page.keyboard.press('Escape');
     // The panel keeps `render` true for a 520ms exit animation before
     // actually unmounting (HolographicAI.jsx) — give it room.
+    //
+    // KNOWN FLAKE, and it is the app's fault rather than the test's: pressing
+    // Escape while the panel is still animating open can leave it stuck
+    // mounted-but-invisible, with document.body.style.overflow pinned to
+    // 'hidden' so the page can no longer scroll. Reproduced on the deployed
+    // site too, so it predates this test. All six Holographic* panels share
+    // the open/render/visible effect responsible.
     await expect(page.locator('.holo-ai-panel')).toBeHidden({ timeout: 2000 });
   });
 

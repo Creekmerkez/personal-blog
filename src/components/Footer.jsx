@@ -4,8 +4,6 @@ import '../styles/Footer.css';
 
 const Footer = () => (
   <footer className="site-footer">
-    <span className="site-footer-name">Julia Merkusheva</span>
-    <span className="site-footer-sep" aria-hidden="true">·</span>
     <a className="site-footer-link" href="mailto:julia.merkusheva@gmail.com">
       julia.merkusheva@gmail.com
     </a>

@@ -516,6 +516,51 @@
   color: rgba(87, 95, 108, 0.72);
 }
 
+/* Deliberately tiny: the AI panel is height-constrained once a phone keyboard
+   opens, so this line must cost almost nothing vertically. Hidden entirely on
+   very short viewports — /privacy is still reachable from the site footer. */
+.holo-ai-disclosure {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.64rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: rgba(87, 95, 108, 0.66);
+}
+
+.holo-ai-disclosure a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:root[data-theme="dark"] .holo-ai-disclosure {
+  color: rgba(170, 178, 190, 0.66);
+}
+
+@media (max-height: 500px) {
+  .holo-ai-disclosure {
+    display: none;
+  }
+}
+
+/* Only rendered while the mic is live, so it costs no height the rest of the
+   time — which matters on a phone where the keyboard already squeezes this
+   panel. Kept above the input row so it sits next to the mic button. */
+.holo-ai-mic-notice {
+  margin: 0 0 0.35rem;
+  font-size: 0.62rem;
+  line-height: 1.4;
+  text-align: left;
+  color: rgba(87, 95, 108, 0.78);
+  flex-shrink: 0;
+}
+
+:root[data-theme="dark"] .holo-ai-mic-notice {
+  color: rgba(170, 178, 190, 0.78);
+}
+
 .holo-gallery-counter {
   position: absolute;
   left: 50%;

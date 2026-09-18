@@ -4,6 +4,8 @@ import HomeCarousel from './components/HomeCarousel';
 import SiteNav from './components/SiteNav';
 import MusicPage from './components/MusicPage';
 import CeskeRealiePage from './components/CeskeRealiePage';
+import PrivacyPage from './components/PrivacyPage';
+import Footer from './components/Footer';
 import './styles/App.css';
 
 // A route change otherwise swaps the entire page tree in one frame — an
@@ -30,6 +32,11 @@ const AppRoutes = () => {
             <CeskeRealiePage />
           </>
         } />
+        <Route path="/privacy" element={
+          <>
+            <PrivacyPage />
+          </>
+        } />
       </Routes>
     </div>
   );
@@ -41,6 +48,7 @@ const App = () => {
       <div className="app">
         <SiteNav />
         <AppRoutes />
+        <Footer />
       </div>
     </BrowserRouter>
   );

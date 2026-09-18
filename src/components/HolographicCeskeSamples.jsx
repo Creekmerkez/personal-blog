@@ -110,7 +110,7 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
             href="/ceske-realie"
             onClick={onClose}
           >
-            BUY HERE
+            REQUEST A COPY
           </a>
         </header>
 

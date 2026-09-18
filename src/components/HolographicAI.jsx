@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { searchQA, detectLang, isGreeting, isGeneralQuery, isAboutAI } from './QAChat/qaSearch';
 
 const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
@@ -18,6 +19,28 @@ const PLACEHOLDER = {
 const SUBTITLE = {
   en: 'Ask me anything',
   ua: 'Запитайте мене про що завгодно',
+};
+
+// Answers are AI-generated and a copy of each question is emailed to Julia.
+// Nothing in the UI said so before, which made it the least expected thing
+// the site does — see /privacy.
+const DISCLOSURE = {
+  en: 'AI-generated answers.',
+  ua: 'Відповіді генерує AI.',
+};
+
+const DISCLOSURE_LINK = {
+  en: 'How your messages are used',
+  ua: 'Як використовуються ваші повідомлення',
+};
+
+// Speech recognition is the browser's, not ours — in Chrome that means the
+// audio leaves the device for Google's servers. Nothing here could prevent
+// that, so it has to be said at the moment the mic is actually live rather
+// than buried in the privacy page alone.
+const MIC_NOTICE = {
+  en: 'Your voice is processed by your browser’s speech service (Google, in Chrome).',
+  ua: 'Ваш голос обробляє служба розпізнавання мовлення вашого браузера (у Chrome — Google).',
 };
 
 // Speech-recognition failures used to be console.warn-only, invisible to
@@ -440,6 +463,10 @@ const HolographicAI = ({ open, onClose, originRect }) => {
           <div className="holo-gallery-titles">
             <h2 className="holo-gallery-title">MY AI</h2>
             <span className="holo-gallery-subtitle">{SUBTITLE[lang]}</span>
+            <span className="holo-ai-disclosure">
+              {DISCLOSURE[lang]}{' '}
+              <Link to="/privacy">{DISCLOSURE_LINK[lang]}</Link>
+            </span>
           </div>
           <div className="holo-ai-lang-switch" role="group" aria-label="Chat language">
             <button
@@ -475,6 +502,12 @@ const HolographicAI = ({ open, onClose, originRect }) => {
             )}
             <div ref={messagesEndRef} />
           </div>
+
+          {listening && (
+            <p className="holo-ai-mic-notice" role="status">
+              {MIC_NOTICE[lang]}
+            </p>
+          )}
 
           <div className="holo-ai-input-row">
             <textarea

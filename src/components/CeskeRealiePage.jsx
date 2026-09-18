@@ -5,21 +5,23 @@ import '../styles/CeskeRealiePage.css';
 
 const WEB3FORMS_KEY = '59ef3f7d-05e1-49b6-9b78-bdb24517095a';
 
+// No prices, and nothing here is sold. Both editions are shared personally on
+// request — keep it that way: showing a price would make this a distance sale,
+// which carries consumer-law obligations (seller identity, delivery terms,
+// 14-day withdrawal right) that this page does not and should not have to meet.
 const purchaseOptions = [
   {
     id: 'pdf',
     title: 'PDF or EPUB',
-    subtitle: 'Instant digital delivery',
-    priceCzk: 350,
+    subtitle: 'Digital edition',
     detail: 'Choose either format for tablet, e-reader, desktop, or print-at-home use.',
     audioNote: '+ audio MP3 for each topic included',
   },
   {
     id: 'physical',
     title: 'Printed Book',
-    subtitle: 'Premium physical edition',
-    priceCzk: 700,
-    detail: 'Tangible, gift-ready copy prepared for premium packaging flow.',
+    subtitle: 'Physical edition',
+    detail: 'A tangible, gift-ready copy.',
     audioNote: '+ audio MP3 for each topic included',
   },
 ];
@@ -63,15 +65,11 @@ const CeskeRealiePage = () => {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
-          subject: isDigital
-            ? `Digital Copy Request: ${selectedData.title} — from ${contactForm.name}`
-            : `Book Order: ${selectedData.title} — from ${contactForm.name}`,
+          subject: `Book Request: ${selectedData.title} — from ${contactForm.name}`,
           from_name: contactForm.name,
           email: contactForm.email,
           message: [
-            isDigital
-              ? `Requested: digital edition (personal request, not a sale)`
-              : `Edition: ${selectedData.title} (${selectedData.priceCzk} CZK)`,
+            `Requested: ${isDigital ? 'digital' : 'printed'} edition (personal request, not a sale)`,
             `Name: ${contactForm.name}`,
             `Email: ${contactForm.email}`,
             contactForm.note ? `Note: ${contactForm.note}` : null,
@@ -116,27 +114,20 @@ const CeskeRealiePage = () => {
   const renderSelectionContent = () => (
     <>
       <div className="ceske-selection-top">
-        {isDigitalSelected ? (
-          <div className="digital-notice-wrap">
-            <span className="selected-label">Digital edition</span>
-            <p className="digital-notice-text">
-              The digital edition isn't sold — to keep it from being copied and resold,
-              it's shared only with close friends and family, by personal request. If
-              that's you, just reach out below and Julia will send it to you directly.
-            </p>
-          </div>
-        ) : (
-          <div className="selected-price-wrap">
-            <span className="selected-label">Selected price</span>
-            <div className="selected-price-line">
-              <strong className="selected-price">{selectedData.priceCzk} CZK</strong>
-              <span className="selected-addon">{selectedData.audioNote}</span>
-            </div>
-          </div>
-        )}
+        <div className="digital-notice-wrap">
+          <span className="selected-label">
+            {isDigitalSelected ? 'Digital edition' : 'Printed edition'}
+          </span>
+          <p className="digital-notice-text">
+            {isDigitalSelected
+              ? "The digital edition isn't sold — to keep it from being copied and resold, it's shared only with close friends and family, by personal request. If that's you, just reach out below and Julia will send it to you directly."
+              : "The printed book isn't sold through this site — Julia shares copies personally with friends, family, and readers who ask. Reach out below and she'll get back to you."}
+          </p>
+          <span className="selected-addon">{selectedData.audioNote}</span>
+        </div>
         {!showContactForm && !formSent && (
           <button type="button" className="purchase-cta" onClick={handleOpenForm}>
-            {isDigitalSelected ? 'Request Digital Copy' : 'Continue to Purchase'}
+            Request a Copy
           </button>
         )}
       </div>
@@ -144,9 +135,8 @@ const CeskeRealiePage = () => {
       {showContactForm && !formSent && (
         <form className="ceske-contact-form" onSubmit={handleFormSubmit}>
           <p className="ceske-form-notice">
-            {isDigitalSelected
-              ? "Let Julia know a little about yourself, and she'll be in touch about the digital copy personally."
-              : 'Online payment is still being set up. Fill in your details and Julia will contact you to confirm your order.'}
+            Let Julia know a little about yourself, and she&apos;ll be in touch
+            about your copy personally.
           </p>
           <label className="ceske-form-field">
             <span className="ceske-form-label">Your name</span>
@@ -221,7 +211,7 @@ const CeskeRealiePage = () => {
   return (
     <main
       className="ceske-page"
-      aria-label="České Reálie purchase selection"
+      aria-label="České Reálie copy request"
       onClick={(e) => {
         // The content card reads like a modal even though it's a full page —
         // clicking the margin around it goes back to the homepage, matching
@@ -275,9 +265,9 @@ const CeskeRealiePage = () => {
           </svg>
           <span>Follow České Reálie on Instagram</span>
         </a>
-        <h1 className="ceske-title">Choose Your Edition</h1>
+        <h1 className="ceske-title">Request a Copy</h1>
         <p className="ceske-description">
-          Select how you would like to purchase.
+          Choose which format you would like.
         </p>
 
         {/* The price/form panel used to render TWICE (once per breakpoint,
@@ -294,7 +284,7 @@ const CeskeRealiePage = () => {
             CeskeRealiePage.css, since a 2-column grid can't have a
             full-width item sit "between" two side-by-side cards without
             breaking the row. */}
-        <div className="ceske-options" role="radiogroup" aria-label="Purchase format selection">
+        <div className="ceske-options" role="radiogroup" aria-label="Format selection">
           {purchaseOptions.map((option, index) => {
             const isActive = selectedOption === option.id;
             return (

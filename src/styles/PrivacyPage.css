@@ -1,0 +1,98 @@
+.privacy-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: calc(var(--site-nav-height, 110px) + 2rem) 1.25rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+
+.privacy-shell {
+  width: min(680px, 100%);
+  /* #root sets text-align:center globally; body copy needs to opt back out. */
+  text-align: left;
+  color: #33302a;
+}
+
+.privacy-title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.9rem, 5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.privacy-lede {
+  margin: 0 0 2.25rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #4a4437;
+}
+
+.privacy-section {
+  margin-bottom: 2rem;
+}
+
+.privacy-section h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #6c6354;
+}
+
+.privacy-section p {
+  margin: 0 0 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #3d382f;
+}
+
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-section a,
+.privacy-back {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.18s var(--ease-out);
+}
+
+.privacy-section a:hover,
+.privacy-back:hover {
+  opacity: 0.66;
+}
+
+.privacy-back {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+:root[data-theme="dark"] .privacy-shell {
+  color: #e6e8ec;
+}
+
+:root[data-theme="dark"] .privacy-lede {
+  color: #b9bfca;
+}
+
+:root[data-theme="dark"] .privacy-section h2 {
+  color: #8f97a5;
+}
+
+:root[data-theme="dark"] .privacy-section p {
+  color: #c4cad4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .privacy-section a,
+  .privacy-back {
+    transition: none;
+  }
+}

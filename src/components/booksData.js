@@ -39,8 +39,8 @@ The book also features numbers with engaging poems, colors in simple rhymes, and
     amazonLink: 'https://www.amazon.pl/dp/B0FGNR5S1F',
     title: "What, Why, How? Your Kids' Question Book",
     description: `Unlock the world of wonder. This hardcover book invites curious kids into an adventure of discovery with 100 engaging questions and fascinating answers. From "Why is the sky blue?" to "What makes a rainbow?", it is designed to spark imagination, build understanding, and keep young explorers asking for more.`,
-    coverImage: 'https://m.media-amazon.com/images/I/71S9mp1uLeL._SY342_.jpg',
-    backCoverImage: 'https://m.media-amazon.com/images/I/71S9mp1uLeL._SY342_.jpg',
+    coverImage: '/images/book4.jpg',
+    backCoverImage: '/images/book4.jpg',
   },
 ];
 

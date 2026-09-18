@@ -234,32 +234,12 @@
   border: 1px solid rgba(42, 90, 60, 0.2);
 }
 
-.selected-price-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.24rem;
-}
-
 .selected-label {
   font-size: 0.63rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: #52607f;
   font-weight: 600;
-}
-
-.selected-price-line {
-  display: flex;
-  align-items: baseline;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.selected-price {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2740;
-  letter-spacing: -0.02em;
 }
 
 .selected-addon {
@@ -277,8 +257,8 @@
   gap: 0.35rem;
   flex: 1 1 320px;
   /* #root sets text-align:center globally; every other block in this
-     section (.ceske-description, .ceske-option-card, .selected-price-wrap's
-     siblings) explicitly opts back to left — this one needs the same. */
+     section (.ceske-description, .ceske-option-card) explicitly opts back
+     to left — this one needs the same. */
   text-align: left;
 }
 
@@ -635,10 +615,6 @@
     font-size: 0.72rem;
   }
 
-  .selected-price {
-    font-size: 2rem;
-  }
-
   .selected-addon {
     font-size: 0.78rem;
   }
@@ -770,7 +746,6 @@
 }
 
 :root[data-theme="dark"] .option-title,
-:root[data-theme="dark"] .selected-price,
 :root[data-theme="dark"] .ceske-toast-title {
   color: #f3f4f7;
 }

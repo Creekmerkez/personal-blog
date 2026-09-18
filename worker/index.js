@@ -73,7 +73,6 @@ async function checkRateLimit(env, ip) {
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
     const origin = request.headers.get('Origin') || '';
     const CORS = corsHeaders(origin);
 
@@ -95,53 +94,6 @@ export default {
       body = await request.json();
     } catch {
       return new Response('Invalid JSON', { status: 400, headers: CORS });
-    }
-
-    // ── Contact form ────────────────────────────────────────────────────────
-    if (url.pathname === '/api/contact') {
-      const { name, email, edition, price, note } = body;
-      if (!name || !email || !edition) {
-        return new Response('Missing required fields', { status: 400, headers: CORS });
-      }
-      if ([name, email, edition, note].some((v) => typeof v === 'string' && v.length > 500)) {
-        return new Response('Field too long', { status: 400, headers: CORS });
-      }
-
-      if (!env.RESEND_API_KEY) {
-        return new Response('Email not configured', { status: 503, headers: CORS });
-      }
-
-      const emailText = [
-        `New book order request`,
-        ``,
-        `Edition: ${edition} (${price} CZK)`,
-        `Name: ${name}`,
-        `Email: ${email}`,
-        note ? `Note: ${note}` : null,
-        ``,
-        `Time: ${new Date().toISOString()}`,
-      ].filter(Boolean).join('\n');
-
-      try {
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: 'České Reálie <onboarding@resend.dev>',
-            to: ['julia.merkusheva@gmail.com'],
-            reply_to: email,
-            subject: `Book Order: ${edition} — from ${name}`,
-            text: emailText,
-          }),
-        });
-        if (!res.ok) throw new Error('Resend error');
-        return Response.json({ ok: true }, { headers: CORS });
-      } catch {
-        return new Response('Email send failed', { status: 502, headers: CORS });
-      }
     }
 
     // ── AI chat ─────────────────────────────────────────────────────────────

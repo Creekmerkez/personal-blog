@@ -120,27 +120,31 @@
 
 /* Segmented EN/UA control — both options always visible, the active one
    filled in, matching a standard toggle-group pattern rather than a single
-   button that only shows the current state. */
+   button that only shows the current state. Deliberately prominent: at its
+   old 0.66rem it read as a decorative label rather than a control, so people
+   spoke Ukrainian without realising the speech-recognition language follows
+   this switch. */
 .holo-ai-lang-switch {
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.15rem;
-  padding: 0.2rem;
-  border: 1px solid rgba(126, 138, 160, 0.28);
+  gap: 0.2rem;
+  padding: 0.28rem;
+  border: 1.5px solid rgba(126, 138, 160, 0.45);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 1px 6px rgba(31, 39, 64, 0.1);
 }
 
 .holo-ai-lang-btn {
   border: none;
   background: transparent;
-  color: rgba(74, 82, 94, 0.65);
+  color: rgba(74, 82, 94, 0.8);
   font-family: inherit;
-  font-size: 0.66rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  padding: 0.3rem 0.65rem;
+  padding: 0.42rem 0.95rem;
   border-radius: 999px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
@@ -1197,12 +1201,13 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
 }
 
 :root[data-theme="dark"] .holo-ai-lang-switch {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
 }
 
 :root[data-theme="dark"] .holo-ai-lang-btn {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 :root[data-theme="dark"] .holo-ai-lang-btn.active {

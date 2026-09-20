@@ -136,6 +136,27 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   // stale, since a new recognition object's handlers close over whatever
   // `input` was at the render that started it.
   const liveTextRef = useRef('');
+  // Same staleness trap, and it was actively mis-transcribing: onend chains
+  // the next recognition session by calling the *same* startRecognition
+  // closure, so every session after the first reused the `lang` captured at
+  // the render that started listening. Switching EN→UA mid-session left the
+  // engine on en-US, which happily returned English-sounding nonsense for
+  // Ukrainian speech. A ref is read fresh each time instead.
+  const langRef = useRef(lang);
+  useEffect(() => { langRef.current = lang; }, [lang]);
+
+  // Switching language while the mic is live must take effect on the next
+  // word, not whenever the current utterance happens to end. Stopping the
+  // in-flight session is enough: onend sees shouldKeepListeningRef still set
+  // and chains a fresh one, which reads the locale from langRef above (this
+  // effect is declared after that one, so the ref is already updated).
+  useEffect(() => {
+    if (!listening) return;
+    recognitionRef.current?.stop();
+    // Only on a language change — adding `listening` would restart the
+    // session every time it toggles, which is exactly what it must not do.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => {
     if (open) {
@@ -228,7 +249,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const startRecognition = (baseText, retriesLeft, sessionId) => {
     liveTextRef.current = baseText;
     const recognition = new SpeechRecognitionClass();
-    recognition.lang = lang === 'ua' ? 'uk-UA' : 'en-US';
+    recognition.lang = langRef.current === 'ua' ? 'uk-UA' : 'en-US';
     // interimResults streams words in as they're recognized, same as any
     // live-dictation UI — the previous `false` here silently withheld all
     // text until the entire session ended, which read as "nothing happens."
@@ -252,7 +273,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       if (audioStarted) return;
       recognition.abort();
       shouldKeepListeningRef.current = false;
-      setMessages((prev) => [...prev, { role: 'ai', text: VOICE_ERRORS[lang].timeout }]);
+      setMessages((prev) => [...prev, { role: 'ai', text: VOICE_ERRORS[langRef.current].timeout }]);
     }, 4000);
     recognition.onaudiostart = () => { audioStarted = true; clearTimeout(audioStartTimer); };
 
@@ -292,7 +313,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
         // until clicked off. onend fires right after this and restarts.
         return;
       }
-      const message = VOICE_ERRORS[lang][e.error];
+      const message = VOICE_ERRORS[langRef.current][e.error];
       if (message) setMessages((prev) => [...prev, { role: 'ai', text: message }]);
       shouldKeepListeningRef.current = false;
       setListening(false);

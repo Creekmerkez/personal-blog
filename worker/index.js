@@ -89,6 +89,18 @@ export default {
       return new Response(null, { headers: CORS });
     }
 
+    // Reject outright, rather than relying on CORS headers alone. Those are
+    // enforced by the *browser*, and only over reading the response — the
+    // Worker had already done the work and spent the Anthropic call by then,
+    // and anything that isn't a browser (curl, a script, a server) ignored
+    // them completely and got full answers. Checking here is what actually
+    // protects the API bill and the inbox. Every real request is
+    // cross-origin (site on jmerkusheva.com, Worker on workers.dev), so a
+    // browser always sends Origin and nothing legitimate is turned away.
+    if (!ALLOWED_ORIGINS.has(origin)) {
+      return new Response('Forbidden', { status: 403, headers: CORS });
+    }
+
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405, headers: CORS });
     }

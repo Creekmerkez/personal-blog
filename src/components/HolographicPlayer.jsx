@@ -31,21 +31,23 @@ const HolographicPlayer = ({ open, videoEl, onClose, originRect }) => {
     return () => document.removeEventListener('keydown', onKey);
   }, [render, onClose]);
 
-  // Gated on `visible`, not `render`. `render` stays true through the exit
-  // animation, which is unmounted by a setTimeout that is only as punctual as
-  // the main thread allows — measured firing 2-3s late against its nominal
-  // 520ms while the carousel's rAF loop was busy. Tying the scroll lock to
-  // that left the page unscrollable long after the panel had faded out.
-  // `visible` flips the moment closing starts, so scrolling comes back with
-  // the animation rather than after it.
+  // Gated on the `open` prop rather than `render`. `render` stays true through
+  // the exit animation, unmounted by a setTimeout only as punctual as the main
+  // thread allows — measured firing 2-3s late against its nominal 520ms while
+  // the carousel's rAF loop was busy, leaving the page unscrollable long after
+  // the panel had faded out. `open` flips the instant the user opens or closes,
+  // so the lock lands on exactly the same frame it always did when opening
+  // (gating on `visible` instead moved it a frame later, into the entrance
+  // animation, and the resulting reflow made the panel's controls jitter) while
+  // still releasing the moment closing begins.
   useEffect(() => {
-    if (!visible) return undefined;
+    if (!open) return undefined;
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [visible]);
+  }, [open]);
 
   useEffect(() => {
     if (!render) return undefined;

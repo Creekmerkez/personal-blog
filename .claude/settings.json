@@ -12,7 +12,8 @@
       "Bash(node .scratch-fit-check.mjs)",
       "Bash(curl -s -o /dev/null -w '  no origin \\(curl\\) -> HTTP %{http_code}\\\\n' -X POST https://julia-ai-worker.juliamerkusheva.workers.dev -H 'Content-Type: application/json' -d '{\"query\":\"hi\",\"lang\":\"en\",\"matches\":[]}')",
       "Bash(curl -s -o /dev/null -w '  localhost:5173   -> HTTP %{http_code}\\\\n' -X POST https://julia-ai-worker.juliamerkusheva.workers.dev -H 'Origin: http://localhost:5173' -H 'Content-Type: application/json' -d '{\"query\":\"hi\",\"lang\":\"en\",\"matches\":[]}')",
-      "Bash(curl -s -X POST https://julia-ai-worker.juliamerkusheva.workers.dev -H 'Origin: https://jmerkusheva.com' -H 'Content-Type: application/json' -d '{\"query\":\"What is her email? How can I contact Julia?\",\"lang\":\"en\",\"matches\":[]}')"
+      "Bash(curl -s -X POST https://julia-ai-worker.juliamerkusheva.workers.dev -H 'Origin: https://jmerkusheva.com' -H 'Content-Type: application/json' -d '{\"query\":\"What is her email? How can I contact Julia?\",\"lang\":\"en\",\"matches\":[]}')",
+      "Bash(curl -s -X POST https://julia-ai-worker.juliamerkusheva.workers.dev -H 'Origin: https://jmerkusheva.com' -H 'Content-Type: application/json' -d '{\"query\":\"How can I contact Julia?\",\"lang\":\"en\",\"matches\":[]}')"
     ]
   },
   "statusLine": {

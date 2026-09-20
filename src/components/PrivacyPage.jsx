@@ -60,9 +60,9 @@ const PrivacyPage = () => {
           <h2>The AI chat</h2>
           <p>
             When you send a message to &quot;MY AI&quot;, it is sent to Anthropic, which
-            generates the reply. <strong>A copy of your question is also emailed to
-            Julia</strong>, so she can see what people are curious about and improve the
-            answers. Please do not type anything private or sensitive into the chat.
+            generates the reply. Your message is not saved, logged, or emailed to anyone
+            afterwards — it is used only to produce the answer you see. Even so, please
+            do not type anything private or sensitive into a chat box.
           </p>
           <p>
             Your IP address is briefly held by Cloudflare — for about a minute — purely

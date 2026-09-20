@@ -5,8 +5,7 @@
  *   1. npm install -g wrangler
  *   2. wrangler login
  *   3. wrangler secret put ANTHROPIC_API_KEY   ← your Anthropic key
- *   4. wrangler secret put RESEND_API_KEY      ← your Resend key (resend.com, free)
- *   5. wrangler deploy
+ *   4. wrangler deploy
  *
  * Copy the deployed URL into HolographicAI.jsx → WORKER_URL constant.
  */
@@ -22,7 +21,7 @@ PUBLIC CONTACT AND SITE DETAILS (all of this is already published openly on jmer
 - LinkedIn: https://www.linkedin.com/in/juliamerkusheva
 - YouTube (DJ mixes): https://www.youtube.com/@DJ.Merkuz
 - Pages on the site: the homepage https://jmerkusheva.com/ , the České Reálie request page https://jmerkusheva.com/ceske-realie , the music page https://jmerkusheva.com/music , and the privacy notice https://jmerkusheva.com/privacy
-- The site sets no cookies and uses no analytics or tracking. If someone asks what happens to their message: questions sent to this chat are answered by an AI model and a copy is emailed to Julia; the privacy page explains it in full.
+- The site sets no cookies and uses no analytics or tracking. If someone asks what happens to their message: questions sent to this chat are passed to an AI model to generate the reply and are not stored or logged afterwards; the privacy page explains it in full.
 Use real URLs exactly as written above — never invent a link or a page that is not in this list.
 
 Answer questions using the ABOUT JULIA section above AND the Q&A excerpts provided below. Do not use any other outside knowledge. Do not make anything up.
@@ -42,11 +41,12 @@ Other rules:
 - If neither the bio above nor the excerpts cover the question, respond with "I don't have that information about Julia." (English) or "У мене немає цієї інформації про Юлію." (Ukrainian)
 - Respond in the same language the user writes in`;
 
-// Wildcard CORS on an endpoint that calls a paid API (Anthropic) and sends
-// email (Resend) meant any website could embed a script calling this Worker
-// from a visitor's browser, running up the API bill or flooding the inbox.
-// Reflecting only an allowlisted origin is the standard fix for needing more
-// than one valid origin (prod + local dev) while still rejecting everyone else.
+// Wildcard CORS on an endpoint that calls a paid API (Anthropic) meant any
+// website could embed a script calling this Worker from a visitor's browser
+// and run up the API bill. Allowlisting is the standard fix for needing more
+// than one valid origin (prod + local dev) while still rejecting everyone
+// else — and see the check in fetch(), which rejects rather than merely
+// labelling, since CORS headers alone never stopped a non-browser caller.
 const ALLOWED_ORIGINS = new Set([
   'https://jmerkusheva.com',
   'http://localhost:5173', // vite dev
@@ -118,7 +118,11 @@ export default {
     }
 
     // ── AI chat ─────────────────────────────────────────────────────────────
-    const { query, lang = 'en', matches = [] } = body;
+    // The client still sends `lang`, but nothing server-side needs it — the
+    // system prompt already instructs Claude to reply in whatever language the
+    // question is written in, and the only other consumer was the notification
+    // email that has since been removed.
+    const { query, matches = [] } = body;
 
     // `matches` is client-supplied and gets interpolated directly into the
     // prompt sent to Claude as "knowledge base excerpts" — an unbounded or
@@ -174,37 +178,6 @@ export default {
       return new Response('Upstream error', { status: 502, headers: CORS });
     }
 
-    // Fire-and-forget email via Resend
-    if (env.RESEND_API_KEY) {
-      const emailText = [
-        `New question on MY AI`,
-        ``,
-        `Language: ${lang.toUpperCase()}`,
-        `Question: ${query}`,
-        ``,
-        `Matched topics:`,
-        ...matches.map((m) => `  • ${m.question}`),
-        ``,
-        `Julia's AI answered:`,
-        answer,
-        ``,
-        `Time: ${new Date().toISOString()}`,
-      ].join('\n');
-
-      fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: 'MY AI <onboarding@resend.dev>',
-          to: ['julia.merkusheva@gmail.com'],
-          subject: `MY AI — new question (${lang.toUpperCase()})`,
-          text: emailText,
-        }),
-      }).catch(() => {});
-    }
 
     return Response.json({ answer }, { headers: CORS });
   },

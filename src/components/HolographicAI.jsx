@@ -21,9 +21,8 @@ const SUBTITLE = {
   ua: 'Запитайте мене про що завгодно',
 };
 
-// Answers are AI-generated and a copy of each question is emailed to Julia.
-// Nothing in the UI said so before, which made it the least expected thing
-// the site does — see /privacy.
+// Answers are AI-generated — nothing in the UI said so before. The link goes
+// to /privacy, which covers where the message actually goes.
 const DISCLOSURE = {
   en: 'AI-generated answers.',
   ua: 'Відповіді генерує AI.',

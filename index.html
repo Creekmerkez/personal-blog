@@ -2,6 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Outbound links (Amazon, Instagram, LinkedIn, YouTube) and the YouTube
+         embeds otherwise receive the full URL of the page the visitor came
+         from. Sending only the origin is the sensible default. Note this is
+         the one security header that actually works from a meta tag on GitHub
+         Pages: frame-ancestors is ignored outside a real HTTP header, so
+         clickjacking protection would need the domain proxied through
+         Cloudflare rather than served straight from Pages. -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" type="image/svg+xml" href="/assets/vite-DcBtz0py.svg" />
     <!-- interactive-widget=resizes-content: without it, Chrome/Android
          leaves fixed-position elements sized against the pre-keyboard
@@ -41,8 +49,8 @@
       } catch (e) {}
     })();
   </script>
-    <script type="module" crossorigin src="/assets/index-B8cE2oKE.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-fqdHoHDj.css">
+    <script type="module" crossorigin src="/assets/index-ynltZsOs.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B_Vbr8jj.css">
   </head>
   <body>
     <div id="root"></div>

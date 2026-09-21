@@ -2,14 +2,13 @@ name = "julia-ai-worker"
 main = "index.js"
 compatibility_date = "2024-01-01"
 
-# Rate limiting (recommended, optional — the Worker fails OPEN without it,
-# so it still runs fine pre-setup, just without abuse protection).
-#
-# One-time setup:
-#   1. wrangler kv namespace create RATE_LIMIT_KV
-#   2. Copy the printed `id = "..."` into the [[kv_namespaces]] block below
-#   3. wrangler deploy
-#
-# [[kv_namespaces]]
-# binding = "RATE_LIMIT_KV"
-# id = "PASTE_THE_ID_FROM_STEP_1_HERE"
+# Cloudflare's native rate limiter, not KV. KV was tried first and cannot do
+# this job: it is eventually consistent, so reads lag writes by up to a minute
+# and a burst never sees its own increments. Measured — 13 rapid requests left
+# the counter reading 8 and nothing was ever blocked, while every visitor's IP
+# was still being written to storage. This binding is actually consistent, and
+# keeps no IP of ours: the key is hashed and held by Cloudflare for the window.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

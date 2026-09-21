@@ -62,22 +62,17 @@ function corsHeaders(origin) {
   };
 }
 
-const RATE_LIMIT = 10; // requests
-const RATE_WINDOW_SECONDS = 60;
-
-// Cloudflare Workers have no shared in-memory state across requests/edge
-// locations, so a real counter needs a KV namespace — see wrangler.toml and
-// the setup note there. Fails OPEN (allows the request) if the binding
-// isn't configured yet, so the Worker still works pre-setup; get+put isn't
-// atomic, so this is a meaningful abuse deterrent and cost cap, not a hard
-// guarantee against a determined attacker racing requests.
+// Cloudflare's own rate limiter (see the binding in wrangler.toml), which is
+// consistent within the window. The previous implementation counted in KV and
+// did not work: KV reads are eventually consistent, so a burst reads stale
+// values and never sees its own increments — 13 rapid requests left the
+// counter at 8 and none were refused. Fails OPEN if the binding is missing so
+// the chat keeps working, but that is now the unusual case rather than the
+// permanent one.
 async function checkRateLimit(env, ip) {
-  if (!env.RATE_LIMIT_KV || !ip) return true;
-  const key = `rl:${ip}`;
-  const current = parseInt((await env.RATE_LIMIT_KV.get(key)) || '0', 10);
-  if (current >= RATE_LIMIT) return false;
-  await env.RATE_LIMIT_KV.put(key, String(current + 1), { expirationTtl: RATE_WINDOW_SECONDS });
-  return true;
+  if (!env.RATE_LIMITER || !ip) return true;
+  const { success } = await env.RATE_LIMITER.limit({ key: ip });
+  return success;
 }
 
 export default {

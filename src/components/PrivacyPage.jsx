@@ -65,9 +65,10 @@ const PrivacyPage = () => {
             do not type anything private or sensitive into a chat box.
           </p>
           <p>
-            Your IP address is briefly held by Cloudflare — for about a minute — purely
-            to stop the chat being abused. It is not stored beyond that and is not used
-            to identify you.
+            Cloudflare, which hosts the chat, uses your IP address to count requests over
+            a one-minute window so nobody can flood the chat. It is used only for that
+            count, is never written to any database of ours, and is not used to identify
+            you.
           </p>
           <p>
             If you use the microphone button, the speech-to-text is performed by your own

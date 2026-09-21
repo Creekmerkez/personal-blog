@@ -13,6 +13,10 @@ dist
 dist-ssr
 *.local
 
+# Vite's dependency pre-bundling cache — regenerated on every dev start, and
+# 2.6MB of vendor bundles plus source maps had been committed by accident.
+.vite
+
 # Environment variables — *.local above already covers .env.local, but a
 # plain .env (no .local suffix) wouldn't be, so this is explicit belt-and-suspenders.
 .env

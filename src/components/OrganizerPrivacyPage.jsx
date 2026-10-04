@@ -49,10 +49,10 @@ const OrganizerPrivacyPage = () => {
           <h2>Export files</h2>
           <p>
             If you choose Export Data in Settings, the app creates one file with your
-            data and saves it where you pick, for example in Files or Google Drive. The
-            file is not encrypted, so keep it in a private place that you do not share.
-            From then on that copy is handled by the place you saved it to, under its own
-            terms. The app only reads a file when you choose Import Data.
+            data, encrypts it with a password you choose, and saves it where you pick, for
+            example in Files or Google Drive. Without that password the file cannot be
+            read, and a forgotten password cannot be recovered. The app only reads a file
+            when you choose Import Data.
           </p>
         </section>
 

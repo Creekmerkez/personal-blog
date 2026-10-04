@@ -28,10 +28,11 @@ const OrganizerPrivacyPage = () => {
         <section className="privacy-section">
           <h2>What the app stores</h2>
           <p>
-            The tasks, counters, records about your child, game and place ideas, and
-            vocabulary words you enter are saved only in the app&apos;s storage on your
-            device. There is no account, no sign-in, and no server. The app does not
-            connect to the internet.
+            The tasks, counters, records about your child, game and place ideas,
+            vocabulary words, and journal entries you enter are saved only in the
+            app&apos;s storage on your device, which iOS keeps encrypted while the phone
+            is locked. The journal also asks for Face ID. There is no account, no sign-in,
+            and no server. The app does not connect to the internet.
           </p>
         </section>
 
@@ -48,8 +49,9 @@ const OrganizerPrivacyPage = () => {
           <h2>Export files</h2>
           <p>
             If you choose Export Data in Settings, the app creates one file with your
-            data and saves it where you pick, for example in Files or Google Drive. From
-            then on that copy is handled by the place you saved it to, under its own
+            data and saves it where you pick, for example in Files or Google Drive. The
+            file is not encrypted, so keep it in a private place that you do not share.
+            From then on that copy is handled by the place you saved it to, under its own
             terms. The app only reads a file when you choose Import Data.
           </p>
         </section>

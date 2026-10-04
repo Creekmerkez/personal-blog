@@ -5,6 +5,7 @@ import SiteNav from './components/SiteNav';
 import MusicPage from './components/MusicPage';
 import CeskeRealiePage from './components/CeskeRealiePage';
 import PrivacyPage from './components/PrivacyPage';
+import OrganizerPrivacyPage from './components/OrganizerPrivacyPage';
 import Footer from './components/Footer';
 import './styles/App.css';
 
@@ -37,6 +38,7 @@ const AppRoutes = () => {
             <PrivacyPage />
           </>
         } />
+        <Route path="/privacy/organizer" element={<OrganizerPrivacyPage />} />
       </Routes>
     </div>
   );

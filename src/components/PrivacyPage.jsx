@@ -102,6 +102,14 @@ const PrivacyPage = () => {
           </p>
         </section>
 
+        <section className="privacy-section">
+          <h2>Organizer iPhone app</h2>
+          <p>
+            Julia&apos;s iPhone app has its own short policy:{' '}
+            <Link to="/privacy/organizer">Organizer app privacy</Link>.
+          </p>
+        </section>
+
         <Link className="privacy-back" to="/">
           ← Back to the site
         </Link>

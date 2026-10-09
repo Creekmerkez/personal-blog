@@ -226,7 +226,7 @@ export const qaData = {
     {
       id: 45,
       "question": "Яку ідею чи переконання ти хотіла б донести до людей?",
-      "answer": "Веганство."
+      "answer": "Жорстоке поводження з тваринами неприпустиме — я проти косметики, яку тестують на тваринах."
     },
     {
       id: 46,
@@ -498,7 +498,7 @@ export const qaData = {
     {
       id: 45,
       "question": "What idea or belief would you want to convey to people?",
-      "answer": "Veganism."
+      "answer": "Cruelty to animals is never acceptable — I am against cosmetics tested on animals."
     },
     {
       id: 46,

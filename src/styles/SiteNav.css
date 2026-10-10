@@ -8,7 +8,9 @@
   z-index: 220;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* The toggle is the nav's only control now, so it sits centred above the
+     carousel rather than tucked into a corner. */
+  justify-content: center;
   padding: 1.5rem 2rem;
   background: rgba(255, 255, 255, 0.26);
   backdrop-filter: blur(18px);
@@ -37,13 +39,9 @@ body:has(.hologram-stage.visible) .site-nav {
 }
 
 .site-actions {
-  /* The brand block used to sit opposite this one, and space-between held it
-     to the right edge. With the brand moved to the footer this is the nav's
-     only child, so it needs to push itself over. */
-  margin-left: auto;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.45rem;
 }
 

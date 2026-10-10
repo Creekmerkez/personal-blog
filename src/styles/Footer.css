@@ -48,3 +48,66 @@
     transition: none;
   }
 }
+
+/* Moved down from the nav. The signature keeps its script face and slight tilt,
+   and doubles as the link home now that the brand name no longer sits in the
+   header. */
+.site-footer-signature {
+  font-family: 'Alex Brush', 'Pacifico', cursive;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: #968a77;
+  text-decoration: none;
+  transform: rotate(-5deg);
+  font-style: italic;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.site-footer-signature:hover {
+  opacity: 0.7;
+}
+
+.site-footer-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-left: 0.35rem;
+}
+
+.site-footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  opacity: 0.7;
+  text-decoration: none;
+  transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+.site-footer-social:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.site-footer-social-icon {
+  display: block;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.site-footer-linkedin {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme="dark"] .site-footer-signature {
+  color: #c9bfae;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer-signature,
+  .site-footer-social {
+    transition: none;
+  }
+}

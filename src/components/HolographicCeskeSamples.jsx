@@ -85,7 +85,7 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
   return (
     <div
       className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
-      onClick={onClose}
+      onClick={() => { if (expanded) { setExpanded(null); return; } onClose(); }}
       role="presentation"
     >
       <div
@@ -148,14 +148,18 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
           })}
         </div>
 
-        <div className={`holo-lightbox ${expanded ? 'visible' : ''}`} onClick={() => setExpanded(null)}>
-          {expanded && (
-            <figure className="holo-lightbox-figure">
-              <img src={expanded.src} alt={expanded.alt} />
-              <figcaption className="holo-lightbox-caption">{expanded.alt}</figcaption>
-            </figure>
-          )}
-        </div>
+      </div>
+
+      <div
+        className={`holo-lightbox ${expanded ? 'visible' : ''}`}
+        onClick={(e) => { e.stopPropagation(); setExpanded(null); }}
+      >
+        {expanded && (
+          <figure className="holo-lightbox-figure">
+            <img src={expanded.src} alt={expanded.alt} />
+            <figcaption className="holo-lightbox-caption">{expanded.alt}</figcaption>
+          </figure>
+        )}
       </div>
     </div>
   );

@@ -852,6 +852,10 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   margin: 0;
   max-width: 100%;
   max-height: 100%;
+  /* Without this a flex item refuses to shrink below its content's intrinsic
+     height, so the image pushed past the bottom of the lightbox instead of
+     scaling down to fit. */
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -862,7 +866,13 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
 .holo-lightbox.visible .holo-lightbox-figure { transform: scale(1); }
 .holo-lightbox-figure img {
   max-width: 100%;
-  max-height: 74vh;
+  /* Was 74vh — a viewport measurement inside a container that was smaller than
+     the viewport, so a tall page image overflowed and its bottom was cut off.
+     Now it simply fits whatever space the lightbox actually has, minus the
+     caption. */
+  max-height: 100%;
+  min-height: 0;
+  flex: 0 1 auto;
   border-radius: 1rem;
   object-fit: contain;
   box-shadow:
@@ -871,6 +881,9 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     inset 0 0 0 1px rgba(180, 210, 255, 0.3);
 }
 .holo-lightbox-caption {
+  /* The image above is allowed to shrink; the caption is not, or it collapses
+     to nothing once the image wants the space. */
+  flex: 0 0 auto;
   font-size: 0.7rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;

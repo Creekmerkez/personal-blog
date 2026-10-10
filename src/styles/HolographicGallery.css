@@ -716,21 +716,6 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
   text-align: left;
 }
 
-.holo-video-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 3.6rem;
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86);
-  color: #111111;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
 .holo-video-label {
   font-size: 0.82rem;
   line-height: 1.3;

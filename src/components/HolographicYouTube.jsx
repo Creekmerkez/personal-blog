@@ -138,7 +138,6 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
                 <img src={video.thumbnail} alt={video.title} loading="lazy" />
                 <span className="holo-photo-sheen" aria-hidden="true" />
                 <span className="holo-video-overlay" aria-hidden="true">
-                  <span className="holo-video-pill">Play</span>
                   <span className="holo-video-label">{video.title}</span>
                 </span>
               </button>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/HolographicGallery.css';
 
 const samplePages = [
@@ -114,13 +115,13 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
             <span className="holo-gallery-subtitle">Sample Pages 2 to 7</span>
           </div>
 
-          <a
+          <Link
             className="holo-gallery-counter holo-filter-link"
-            href="/ceske-realie"
+            to="/ceske-realie"
             onClick={onClose}
           >
-            REQUEST A COPY
-          </a>
+            DOWNLOAD
+          </Link>
         </header>
 
         <div className="holo-collage holo-page-collage">

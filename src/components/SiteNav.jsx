@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { applyTheme, getCurrentTheme } from '../theme';
 import '../styles/SiteNav.css';
 
@@ -59,7 +58,6 @@ const SiteNav = () => {
             </svg>
           )}
         </button>
-        <Link to="/ceske-realie" className="site-subnav-link">České Reálie - Download</Link>
       </div>
     </nav>
   );

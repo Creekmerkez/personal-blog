@@ -36,105 +36,6 @@ body:has(.hologram-stage.visible) .site-nav {
   pointer-events: none;
 }
 
-.site-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.32rem;
-  margin-left: 0;
-}
-
-.brand-name-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 0.55rem;
-}
-
-/* Matches .site-subnav-link's 1.26rem — the brand used to sit at 0.74rem,
-   noticeably smaller than the link opposite it, which read as accidental
-   rather than deliberate hierarchy. */
-.brand-name {
-  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
-  font-size: 1.26rem;
-  color: #1b1b1b;
-  letter-spacing: 0.2em;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-decoration: none;
-  opacity: 0.95;
-  transition: opacity 0.2s ease;
-}
-
-.brand-name:hover,
-.brand-name:focus-visible {
-  opacity: 1;
-}
-
-.brand-signature {
-  position: relative;
-  display: inline-block;
-  margin-left: 2.1rem;
-  font-family: 'Alex Brush', 'Pacifico', 'Whisper', 'Signature', cursive;
-  font-size: 1.16rem;
-  line-height: 1;
-  color: #968a77;
-  letter-spacing: 0;
-  font-weight: 400;
-  transform: rotate(-5deg);
-  text-shadow: 0.5px 1px 2px rgba(80, 60, 30, 0.06);
-  opacity: 0.95;
-  font-style: italic;
-  white-space: nowrap;
-}
-
-.brand-signature::before {
-  content: '';
-  position: absolute;
-  top: 52%;
-  right: calc(100% + 0.28rem);
-  width: 3.2rem;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(188, 181, 170, 0.95) 72%, rgba(188, 181, 170, 0.25) 94%, transparent 100%);
-}
-
-.brand-socials {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-left: 0.02rem;
-}
-
-.brand-social-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #1b1b1b;
-  opacity: 0.6;
-  text-decoration: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.brand-social-link:hover,
-.brand-social-link:focus-visible {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.brand-social-icon {
-  display: block;
-  width: 1.9rem;
-  height: 1.9rem;
-}
-
-.brand-social-linkedin {
-  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
-  font-size: 1.26rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
 .site-actions {
   /* The brand block used to sit opposite this one, and space-between held it
      to the right edge. With the brand moved to the footer this is the nav's
@@ -173,73 +74,13 @@ body:has(.hologram-stage.visible) .site-nav {
   display: block;
 }
 
-.site-subnav-link {
-  font-family: 'Montserrat', 'Avenir Next', 'Segoe UI', sans-serif;
-  font-size: 1.26rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #1b1b1b;
-  opacity: 0.8;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  padding-bottom: 0.12rem;
-  margin-top: 0.16rem;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
-}
-
-
-.site-subnav-link:hover,
-.site-subnav-link:focus-visible {
-  opacity: 1;
-  border-color: rgba(27, 27, 27, 0.45);
-}
-
 @media (max-width: 720px) {
   .site-nav {
     padding: 1rem 1.2rem;
   }
 
-  /* The name and signature sit side by side on desktop, but at this size that
-     block grows wide enough to shove the theme toggle off a phone screen
-     entirely (measured: it landed at x=392 on a 390px viewport). Letting the
-     signature drop to its own line makes the brand only as wide as the longer
-     of the two, which fits every phone width down to 320px. */
-  .brand-name-row {
-    flex-wrap: wrap;
-    row-gap: 0.15rem;
-  }
-
-  .brand-name {
-    font-size: 0.95rem;
-    letter-spacing: 0.1em;
-  }
-
-  .brand-signature {
-    margin-left: 1.6rem;
-    font-size: 0.86rem;
-  }
-
-  .brand-signature::before {
-    width: 1.7rem;
-  }
-
-  .brand-social-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  .brand-social-linkedin {
-    font-size: 0.95rem;
-  }
-
   .site-actions {
     gap: 0.3rem;
-  }
-
-  .site-subnav-link {
-    font-size: 1.08rem;
-    letter-spacing: 0.1em;
-    margin-top: 0.12rem;
   }
 
 }
@@ -249,22 +90,7 @@ body:has(.hologram-stage.visible) .site-nav {
    this step-down fixes a pre-existing overflow as well as keeping the new
    sizes safe. */
 @media (max-width: 340px) {
-  .brand-name {
-    font-size: 0.82rem;
-  }
 
-  .brand-signature {
-    font-size: 0.74rem;
-  }
-
-  .brand-social-icon {
-    width: 1.3rem;
-    height: 1.3rem;
-  }
-
-  .brand-social-linkedin {
-    font-size: 0.82rem;
-  }
 }
 
 /* ── Dark mode ─────────────────────────────────────────────────────────── */
@@ -272,25 +98,8 @@ body:has(.hologram-stage.visible) .site-nav {
   background: rgba(18, 20, 26, 0.55);
 }
 
-:root[data-theme="dark"] .brand-name,
-:root[data-theme="dark"] .brand-social-link,
-:root[data-theme="dark"] .site-subnav-link,
 :root[data-theme="dark"] .theme-toggle {
   color: #f3f4f7;
-}
-
-:root[data-theme="dark"] .brand-signature {
-  color: #c9bfae;
-  text-shadow: 0.5px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-:root[data-theme="dark"] .brand-signature::before {
-  background: linear-gradient(90deg, rgba(201, 191, 174, 0.7) 72%, rgba(201, 191, 174, 0.2) 94%, transparent 100%);
-}
-
-:root[data-theme="dark"] .site-subnav-link:hover,
-:root[data-theme="dark"] .site-subnav-link:focus-visible {
-  border-color: rgba(243, 244, 247, 0.5);
 }
 
 :root[data-theme="dark"] .theme-toggle {

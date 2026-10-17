@@ -5,6 +5,7 @@ import { newId } from '../lib/backup';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
 import { passkeysSupported } from '../lib/passkey';
 import { photoFromFile } from '../lib/photos';
+import { useOrganizer } from '../lib/context';
 import { Empty, Screen, Section, Segmented, Sheet } from '../components/ui';
 
 const dayInput = (seconds) => {
@@ -74,7 +75,7 @@ function Setup({ journal }) {
 }
 
 /** Also locks the whole organizer when the app lock is on (Settings), with the same password and Face ID. */
-export function Locked({ journal, title = 'Journal', heading = 'Journal Locked', text = 'Your journal is private.', onReset }) {
+export function Locked({ journal, title = 'Journal', heading = 'Journal Locked', text = 'Your journal is private.', onReset, onTurnOff }) {
   const [usePassword, setUsePassword] = useState(!journal.hasFaceId);
   const [password, setPassword] = useState('');
   const { error, busy, run } = useAsync();
@@ -102,6 +103,9 @@ export function Locked({ journal, title = 'Journal', heading = 'Journal Locked',
         <button type="button" className="org-link org-wide-link" onClick={() => setUsePassword(true)}><IoKeyOutline aria-hidden="true" /> Use Password</button>
       )}
       {error && <p className="org-error org-error-center" role="alert">{error}</p>}
+      {onTurnOff && journal.hasFaceId && (
+        <button type="button" className="org-link org-wide-link" disabled={busy} onClick={() => run(onTurnOff)}>Open without Face ID from now on</button>
+      )}
       {onReset && (
         <button type="button" className="org-link org-wide-link org-muted-link" disabled={busy} onClick={() => run(onReset)}>Forgot the password? Start over</button>
       )}
@@ -190,6 +194,7 @@ function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
 }
 
 export default function JournalScreen({ journal }) {
+  const { updateSettings } = useOrganizer();
   const [search, setSearch] = useState('');
   const [reading, setReading] = useState(null);
   // The draft lives here, outside the editor, so locking never loses it.
@@ -224,7 +229,13 @@ export default function JournalScreen({ journal }) {
       await journal.reset();
       await journal.setupOpen();
     };
-    return <Locked journal={journal} onReset={startOver} />;
+    // One last Face ID, then the journal opens like the rest of the app (also in Settings → Journal Lock).
+    const turnOff = async () => {
+      await journal.unlockWithFaceId();
+      await journal.removeLock();
+      updateSettings({ appLock: false });
+    };
+    return <Locked journal={journal} onReset={startOver} onTurnOff={turnOff} />;
   }
 
   const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()), photos: [] });

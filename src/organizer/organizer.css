@@ -328,3 +328,4 @@ a.org-row { text-decoration: none; }
 .org-entry h2 { font-size: 24px; margin: 6px 0 12px; }
 .org-entry .org-prewrap { font-size: 17px; line-height: 1.55; }
 .org-journal-text { min-height: 50dvh; }
+.org-muted-link { color: var(--org-secondary); font-size: 14px; margin-top: 28px; }

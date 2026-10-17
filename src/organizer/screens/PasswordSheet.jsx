@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
 import { Section, Sheet } from '../components/ui';
 
-/** Asks for a new export password (twice) or for the password of a file being imported. */
-export default function PasswordSheet({ mode, onSubmit, onClose }) {
+/**
+ * Asks for a new export password (twice) or for the password of a file being imported.
+ * `title`, `action` and `footer` change the wording when it asks for another new password.
+ */
+export default function PasswordSheet({ mode, onSubmit, onClose, title, action, footer }) {
   const [password, setPassword] = useState('');
   const [repeated, setRepeated] = useState('');
   const [error, setError] = useState(null);
@@ -27,17 +30,17 @@ export default function PasswordSheet({ mode, onSubmit, onClose }) {
 
   return (
     <Sheet
-      title={creating ? 'Protect the File' : 'File Password'}
+      title={title ?? (creating ? 'Protect the File' : 'File Password')}
       onClose={working ? undefined : onClose}
       leading={<button type="button" className="org-link" disabled={working} onClick={onClose}>Cancel</button>}
-      trailing={<button type="button" className="org-link org-strong" disabled={!canSubmit || working} onClick={submit}>{creating ? 'Export' : 'Open'}</button>}
+      trailing={<button type="button" className="org-link org-strong" disabled={!canSubmit || working} onClick={submit}>{action ?? (creating ? 'Export' : 'Open')}</button>}
     >
       <form onSubmit={submit}>
         <Section
           footer={
-            creating
+            footer ?? (creating
               ? 'At least 8 characters. The file can only be opened with this password. If you forget it, the file cannot be opened, so keep it somewhere safe, for example in Passwords on your iPhone.'
-              : 'Enter the password chosen when this file was exported.'
+              : 'Enter the password chosen when this file was exported.')
           }
         >
           <input className="org-input" type="password" autoComplete={creating ? 'new-password' : 'current-password'} placeholder="Password" aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />

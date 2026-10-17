@@ -4,6 +4,7 @@ import { useOrganizer } from './lib/context';
 import { Empty, Screen } from './components/ui';
 import TodayScreen from './screens/TodayScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import WordsScreen from './screens/WordsScreen';
 
 const TABS = [
   { id: 'today', label: 'Today', icon: IoCheckboxOutline },
@@ -33,7 +34,7 @@ export default function App() {
       <main className="org-main">
         {tab === 'today' && <TodayScreen onOpenSettings={() => setTab('settings')} />}
         {tab === 'son' && <ComingNext title="Son" icon={<IoPeopleOutline />} />}
-        {tab === 'words' && <ComingNext title="Word of the Day" icon={<IoLanguageOutline />} />}
+        {tab === 'words' && <WordsScreen />}
         {tab === 'journal' && <ComingNext title="Journal" icon={<IoJournalOutline />} />}
         {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} />}
       </main>

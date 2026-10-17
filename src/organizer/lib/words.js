@@ -28,13 +28,17 @@ export function resetToLearning(word, today) {
   return { ...word, successfulRecalls: 0, isLearned: false, nextReviewDayKey: today, firstReviewedDayKey: word.firstReviewedDayKey ?? today };
 }
 
-/** Due review words first (oldest due first), then today's share of new words. */
+/** Due review words first (oldest due first), then today's share of new words, oldest first. */
 export function dueWords(words, today, newWordsPerDay = DEFAULT_NEW_WORDS_PER_DAY) {
   const active = words.filter((w) => !w.isLearned && w.nextReviewDayKey <= today);
   const reviews = active
     .filter((w) => !isNew(w))
     .sort((a, b) => a.nextReviewDayKey - b.nextReviewDayKey || a.createdAt - b.createdAt);
-  const fresh = active.filter(isNew).sort((a, b) => a.createdAt - b.createdAt);
+  // New words with a translation come first; ones still missing it wait at the end.
+  const hasTranslation = (w) => (w.translation ?? '').trim() !== '';
+  const fresh = active
+    .filter(isNew)
+    .sort((a, b) => Number(hasTranslation(b)) - Number(hasTranslation(a)) || a.createdAt - b.createdAt);
   const startedToday = words.filter((w) => w.firstReviewedDayKey === today).length;
   return [...reviews, ...fresh.slice(0, Math.max(0, newWordsPerDay - startedToday))];
 }

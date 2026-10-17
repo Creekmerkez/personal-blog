@@ -247,3 +247,21 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-tabbar button.is-active { color: var(--org-accent); }
 
 :focus-visible { outline: 2px solid var(--org-accent); outline-offset: 2px; }
+
+/* Word of the Day */
+.org-word-card { display: flex; flex-direction: column; min-height: calc(100dvh - 210px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+.org-word-count { text-align: center; color: var(--org-secondary); font-size: 13px; margin: 0; }
+.org-word-center { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 24px 0; }
+.org-word { font-size: 34px; font-weight: 700; margin: 0; word-break: break-word; }
+.org-word-reveal { margin-top: 14px; animation: org-fade 0.25s ease-out; }
+.org-translation { font-size: 22px; margin: 0; }
+.org-word-notes { color: var(--org-secondary); white-space: pre-wrap; margin: 10px 0 0; line-height: 1.4; }
+@keyframes org-fade { from { opacity: 0; } to { opacity: 1; } }
+.org-word-actions { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
+.org-big-button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 14px; font-weight: 600; font-size: 17px; }
+.org-big-button svg { font-size: 22px; }
+.org-primary { background: var(--org-accent); color: #fff; }
+.org-remembered { background: var(--org-green); color: #fff; }
+.org-forgotten { background: rgba(255, 59, 48, 0.14); color: var(--org-red); }
+.org-word-row .org-value { font-size: 15px; flex: none; }
+.org-search { width: 100%; border: 0; border-radius: 10px; background: var(--org-fill); color: var(--org-text); font: inherit; padding: 9px 12px; outline: none; }

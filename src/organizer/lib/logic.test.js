@@ -112,6 +112,11 @@ describe('word of the day', () => {
     expect(forgotten.nextReviewDayKey).toBe(20261002);
   });
 
+  it('new words with a translation come before ones still missing it', () => {
+    const words = [word('Captivating', { translation: '', createdAt: 0 }), word('dům', { translation: 'дім', createdAt: 5 })];
+    expect(dueWords(words, 20260929, 5).map((w) => w.word)).toEqual(['dům', 'Captivating']);
+  });
+
   it('a few new words per day, reviews always, and tomorrow when new words wait', () => {
     const words = [
       ...Array.from({ length: 8 }, (_, i) => word(`new ${i}`, { createdAt: i })),

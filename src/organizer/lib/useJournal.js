@@ -99,15 +99,15 @@ export function useJournal(storage) {
     [storage],
   );
 
-  /** Adds entries from a journal file to the unlocked journal. Returns how many were new. */
+  /** Adds entries from a journal file to the unlocked journal. Returns { added, updated }. */
   const addEntries = useCallback(
     async (incoming) => {
       if (!keyRef.current) throw new Error('The journal is locked.');
       // Read what is stored, not this render's state: the journal may have been unlocked a moment ago.
-      const { entries: next, added } = merge(await decryptEntries(keyRef.current, await storage.get('journalEntries')), incoming);
+      const { entries: next, added, updated } = merge(await decryptEntries(keyRef.current, await storage.get('journalEntries')), incoming);
       await storage.set('journalEntries', await encryptEntries(keyRef.current, next));
       setEntries(next);
-      return added;
+      return { added, updated };
     },
     [storage],
   );

@@ -23,7 +23,19 @@ describe('journal entries file', () => {
     const once = addEntries([{ id: 'old' }], [{ id: 'A' }, { id: 'B' }]);
     expect(once.added).toBe(2);
     const twice = addEntries(once.entries, [{ id: 'A' }, { id: 'B' }]);
-    expect(twice.added).toBe(0);
+    expect(twice).toMatchObject({ added: 0, updated: 0 });
     expect(twice.entries).toHaveLength(3);
+  });
+
+  it('an entry already there keeps its edited text and only gains new photo links', () => {
+    const edited = { id: 'A', text: 'My edit', photos: ['https://x/1.jpg'] };
+    const { entries, added, updated } = addEntries([edited], [{ id: 'A', text: 'Original', photos: ['https://x/1.jpg', 'https://x/2.jpg'] }]);
+    expect({ added, updated }).toEqual({ added: 0, updated: 1 });
+    expect(entries[0]).toEqual({ id: 'A', text: 'My edit', photos: ['https://x/1.jpg', 'https://x/2.jpg'] });
+  });
+
+  it('keeps only https photo links (negative)', () => {
+    const [entry] = journalEntriesFrom(file([{ text: 'x', writtenAt: '2017-10-31T22:21:00+01:00', photos: ['https://ok/1.jpg', 'http://plain/2.jpg', 'javascript:alert(1)', 7] }]));
+    expect(entry.photos).toEqual(['https://ok/1.jpg']);
   });
 });

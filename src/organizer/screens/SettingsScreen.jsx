@@ -67,10 +67,13 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
     const value = JSON.parse(text);
     if (isJournalFile(value)) {
       const entries = journalEntriesFrom(value);
-      if (!window.confirm(`Add ${entries.length} entries to your Journal?\n\nNothing else changes, and entries already in the journal are skipped.`)) return;
+      if (!window.confirm(`Add ${entries.length} entries to your Journal?\n\nNothing else changes. Entries already in the journal keep their text and only get new photo links.`)) return;
       try {
-        const added = await addJournalEntries(entries);
-        window.alert(`${added} ${added === 1 ? 'entry was' : 'entries were'} added to your Journal.${added < entries.length ? ` ${entries.length - added} were already there.` : ''}`);
+        const { added, updated } = await addJournalEntries(entries);
+        window.alert([
+          `${added} new ${added === 1 ? 'entry' : 'entries'} added to your Journal.`,
+          updated ? `${updated} ${updated === 1 ? 'entry' : 'entries'} got photo links.` : '',
+        ].join(' ').trim());
       } catch (err) {
         window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
       }

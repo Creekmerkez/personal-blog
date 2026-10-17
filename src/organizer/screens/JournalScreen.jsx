@@ -94,6 +94,17 @@ export function Locked({ journal, title = 'Journal', heading = 'Journal Locked',
   );
 }
 
+/** A photo from a link. Loading it fetches it from that site, so the link is shown too, and alone if it fails. */
+function EntryPhoto({ url }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <figure className="org-entry-photo">
+      {!failed && <img src={url} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />}
+      <figcaption><a href={url} target="_blank" rel="noopener noreferrer">{failed ? 'Photo could not be loaded. Open link' : 'Open photo'}</a></figcaption>
+    </figure>
+  );
+}
+
 function Editor({ draft, setDraft, onSave, onClose }) {
   const canSave = draft.title.trim() !== '' || draft.text.trim() !== '';
   return (
@@ -215,6 +226,7 @@ export default function JournalScreen({ journal }) {
             <p className="org-muted">{entryDate(reading)}</p>
             {reading.title && <h2>{reading.title}</h2>}
             <p className="org-prewrap">{reading.text}</p>
+            {reading.photos?.map((url) => <EntryPhoto key={url} url={url} />)}
           </article>
           <Section>
             <button type="button" className="org-row org-destructive" onClick={() => remove(reading)}>Delete Entry</button>

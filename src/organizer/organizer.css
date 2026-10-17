@@ -269,3 +269,32 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-recalls span { width: 8px; height: 8px; border-radius: 50%; background: var(--org-fill); }
 .org-recalls span.is-on { background: var(--org-green); }
 .org-center { justify-content: center; }
+
+/* Son */
+.org-nav-row { gap: 14px; }
+.org-nav-icon { font-size: 24px; color: var(--org-accent); flex: none; }
+.org-chevron { color: var(--org-tertiary); font-size: 18px; flex: none; }
+.org-strike { text-decoration: line-through; }
+.org-pill { font-size: 13px; font-weight: 600; border-radius: 999px; padding: 3px 9px; flex: none; }
+.org-pill-planned { color: #c96f00; background: rgba(255, 149, 0, 0.15); }
+.org-pill-done { color: #248a3d; background: rgba(52, 199, 89, 0.15); }
+@media (prefers-color-scheme: dark) {
+  .org-pill-planned { color: #ffb340; }
+  .org-pill-done { color: #30d158; }
+}
+
+/* Games */
+.org-game-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+.org-game-card { display: flex; align-items: center; gap: 14px; width: 100%; background: var(--org-card); border-radius: 16px; padding: 14px; text-align: left; }
+.org-game-card .org-game-emoji { font-size: 40px; width: 64px; height: 64px; border-radius: 14px; background: var(--org-fill); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.org-game-text { flex: 1; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.org-game-text strong { font-size: 17px; }
+.org-game-text .org-muted { font-size: 15px; }
+.org-tag { display: inline-block; color: #1c1c1e; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; margin-top: 2px; }
+.org-tip { margin-bottom: 26px; }
+.org-game-hero { text-align: center; margin-bottom: 22px; }
+.org-game-hero .org-game-emoji { font-size: 64px; }
+.org-game-hero h2 { margin: 6px 0 2px; font-size: 24px; }
+.org-game-hero p { margin: 0; }
+.org-game-meta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 10px !important; color: var(--org-secondary); font-size: 14px; }
+.org-game-meta span { display: inline-flex; align-items: center; gap: 4px; }

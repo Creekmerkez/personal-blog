@@ -5,6 +5,7 @@ import { Empty, Screen } from './components/ui';
 import TodayScreen from './screens/TodayScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import WordsScreen from './screens/WordsScreen';
+import SonScreen from './screens/SonScreen';
 
 const TABS = [
   { id: 'today', label: 'Today', icon: IoCheckboxOutline },
@@ -33,7 +34,7 @@ export default function App() {
     <div className="org-app">
       <main className="org-main">
         {tab === 'today' && <TodayScreen onOpenSettings={() => setTab('settings')} />}
-        {tab === 'son' && <ComingNext title="Son" icon={<IoPeopleOutline />} />}
+        {tab === 'son' && <SonScreen />}
         {tab === 'words' && <WordsScreen />}
         {tab === 'journal' && <ComingNext title="Journal" icon={<IoJournalOutline />} />}
         {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} />}

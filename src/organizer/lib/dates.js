@@ -33,6 +33,11 @@ export function formatDay(key, options = { weekday: 'long', day: 'numeric', mont
   return dateFromDayKey(key).toLocaleDateString('en-GB', options);
 }
 
+/** A stored date (seconds since 2001) for display, or "No date". */
+export function formatStoredDate(seconds) {
+  return seconds == null ? 'No date' : dateFromAppleSeconds(seconds).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 /** Milliseconds until the next local midnight, for the day-change timer. */
 export function msUntilMidnight(now = new Date()) {
   const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);

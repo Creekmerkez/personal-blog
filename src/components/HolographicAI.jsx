@@ -88,7 +88,12 @@ function renderWithLinks(text) {
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
   return parts.map((part, i) => {
     if (!/^https?:\/\//.test(part)) return part;
-    const url = part.replace(/[.,!?;:)]+$/, '');
+    // The split grabs every non-space character, so anything the model wraps
+    // the URL in comes along with it. Markdown emphasis was the live bug:
+    // "**https://jmerkusheva.com/ceske-realie**" produced an href ending in
+    // two asterisks, which 404s to a blank page. Underscores are deliberately
+    // not stripped — they occur inside real URLs.
+    const url = part.replace(/[.,!?;:)\]*`"'>]+$/, '');
     const tail = part.slice(url.length);
     return [
       <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>{url}</a>,

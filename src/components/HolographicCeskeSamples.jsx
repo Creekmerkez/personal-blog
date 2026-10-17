@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/HolographicGallery.css';
 
 const samplePages = [
@@ -85,7 +86,7 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
   return (
     <div
       className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
-      onClick={onClose}
+      onClick={() => { if (expanded) { setExpanded(null); return; } onClose(); }}
       role="presentation"
     >
       <div
@@ -114,13 +115,13 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
             <span className="holo-gallery-subtitle">Sample Pages 2 to 7</span>
           </div>
 
-          <a
+          <Link
             className="holo-gallery-counter holo-filter-link"
-            href="/ceske-realie"
+            to="/ceske-realie"
             onClick={onClose}
           >
-            REQUEST A COPY
-          </a>
+            DOWNLOAD
+          </Link>
         </header>
 
         <div className="holo-collage holo-page-collage">
@@ -148,14 +149,18 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
           })}
         </div>
 
-        <div className={`holo-lightbox ${expanded ? 'visible' : ''}`} onClick={() => setExpanded(null)}>
-          {expanded && (
-            <figure className="holo-lightbox-figure">
-              <img src={expanded.src} alt={expanded.alt} />
-              <figcaption className="holo-lightbox-caption">{expanded.alt}</figcaption>
-            </figure>
-          )}
-        </div>
+      </div>
+
+      <div
+        className={`holo-lightbox ${expanded ? 'visible' : ''}`}
+        onClick={(e) => { e.stopPropagation(); setExpanded(null); }}
+      >
+        {expanded && (
+          <figure className="holo-lightbox-figure">
+            <img src={expanded.src} alt={expanded.alt} />
+            <figcaption className="holo-lightbox-caption">{expanded.alt}</figcaption>
+          </figure>
+        )}
       </div>
     </div>
   );

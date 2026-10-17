@@ -1,13 +1,14 @@
 import { useMemo, useRef, useState } from 'react';
-import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline, IoImageOutline, IoClose } from 'react-icons/io5';
+import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline, IoImageOutline, IoClose, IoRefresh } from 'react-icons/io5';
 import { appleSeconds, dateFromAppleSeconds, dateFromDayKey, dayKeyFromDate } from '../lib/dates';
 import { newId } from '../lib/backup';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
 import { passkeysSupported } from '../lib/passkey';
 import { photoFromFile } from '../lib/photos';
 import { entryIn, LANGUAGES, TRANSLATED, textHash, translationsStale } from '../lib/journalFile';
+import { changeSite, postHash, publishState, TOKEN_KEY } from '../lib/publish';
 import { useOrganizer } from '../lib/context';
-import { Empty, Screen, Section, Segmented, Sheet } from '../components/ui';
+import { Empty, Screen, Section, Segmented, Sheet, Toggle } from '../components/ui';
 
 const dayInput = (seconds) => {
   const key = dayKeyFromDate(dateFromAppleSeconds(seconds));
@@ -207,6 +208,50 @@ function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
   );
 }
 
+/** Puts the entry on jmerkusheva.com/blog, updates it there, or takes it off. */
+function Website({ entry, onPublished }) {
+  const { storage } = useOrganizer();
+  const [busy, setBusy] = useState(false);
+  const state = publishState(entry);
+
+  const apply = async (show) => {
+    const token = await storage.get(TOKEN_KEY);
+    if (!token) return window.alert('Add your GitHub token in Settings → Website first.');
+    const title = heading(entry);
+    const question = !show
+      ? `Take “${title}” off the website?`
+      : state === 'off'
+        ? `Publish “${title}” on jmerkusheva.com/blog?\n\nEveryone will be able to read it, with its photos, in Ukrainian and in every translation it has.`
+        : null;
+    if (question && !window.confirm(question)) return;
+    setBusy(true);
+    try {
+      await changeSite(token, show ? { publish: [entry] } : { remove: [entry.id] }, `Blog: ${!show ? 'remove' : state === 'off' ? 'publish' : 'update'} “${title}”`);
+      await onPublished(show ? postHash(entry) : null);
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const footer = busy
+    ? 'Saving to the website…'
+    : state === 'off'
+      ? 'Shows this entry on jmerkusheva.com/blog, in Ukrainian and in every translation it has.'
+      : state === 'changed'
+        ? 'Changed since it was put on the website. Update to show the new version.'
+        : 'On the website. A change shows there a few minutes later.';
+  return (
+    <Section header="Website" footer={footer}>
+      <Toggle label="Show on jmerkusheva.com" checked={state !== 'off'} disabled={busy} onChange={apply} />
+      {state === 'changed' && (
+        <button type="button" className="org-row org-action" disabled={busy} onClick={() => apply(true)}><IoRefresh aria-hidden="true" /> Update on Website</button>
+      )}
+    </Section>
+  );
+}
+
 export default function JournalScreen({ journal }) {
   const { updateSettings } = useOrganizer();
   const [search, setSearch] = useState('');
@@ -291,7 +336,15 @@ export default function JournalScreen({ journal }) {
       if (reading?.id === entry.id) setReading(entry);
     });
 
+  const setPublished = async (entry, hash) => {
+    const { published: _, ...rest } = entry;
+    const next = hash ? { ...rest, published: hash } : rest;
+    await journal.saveEntries(journal.entries.map((e) => (e.id === entry.id ? next : e)));
+    setReading(next);
+  };
+
   const remove = (entry) => {
+    if (entry.published) return window.alert('This entry is on the website. Turn off “Show on jmerkusheva.com” first, then delete it.');
     if (!window.confirm(`Delete “${heading(entry)}”?`)) return;
     run(async () => {
       await journal.saveEntries(journal.entries.filter((e) => e.id !== entry.id));
@@ -336,7 +389,7 @@ export default function JournalScreen({ journal }) {
               <button key={entry.id} type="button" className="org-row" onClick={() => setReading(entry)}>
                 <span className="org-row-main">
                   <strong className="org-entry-title">{heading(entry)}</strong>
-                  <small>{shortDate(entry.writtenOn)}{entry.photos?.length ? ` · ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : ''}</small>
+                  <small>{shortDate(entry.writtenOn)}{entry.photos?.length ? ` · ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : ''}{entry.published ? ' · On website' : ''}</small>
                   {entry.title && entry.text && <small className="org-entry-preview">{entry.text}</small>}
                 </span>
               </button>
@@ -372,6 +425,7 @@ export default function JournalScreen({ journal }) {
             })()}
             {reading.photos?.map((url) => <EntryPhoto key={url} url={url} />)}
           </article>
+          <Website entry={reading} onPublished={(hash) => setPublished(reading, hash)} />
           <Section>
             <button type="button" className="org-row org-destructive" onClick={() => remove(reading)}>Delete Entry</button>
           </Section>

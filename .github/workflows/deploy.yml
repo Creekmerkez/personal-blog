@@ -1,0 +1,38 @@
+name: Deploy site
+
+# Rebuilds jmerkusheva.com whenever main changes: a merged pull request, or a
+# journal entry published from the organizer (it commits
+# public/blog/posts.json to main, see src/organizer/lib/publish.js).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # lets you run it by hand from the Actions tab
+
+# Publishing several entries in a row starts several runs; only the newest
+# waiting one needs to go out, and a deploy already pushing is never cut off.
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the build to gh-pages
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build and publish
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npm run deploy

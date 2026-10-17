@@ -2,9 +2,9 @@ import { test, expect } from '@playwright/test';
 import { openAiChatCard } from './helpers.js';
 
 test.describe('Homepage carousel', () => {
-  test('loads with all six cards present (positive)', async ({ page }) => {
+  test('loads with all seven cards present (positive)', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.carousel-card')).toHaveCount(6);
+    await expect(page.locator('.carousel-card')).toHaveCount(7);
   });
 
   test('opens the MY AI panel from its card (positive)', async ({ page }) => {

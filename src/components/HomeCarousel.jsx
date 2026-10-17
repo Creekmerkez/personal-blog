@@ -40,6 +40,14 @@ const cards = [
     actionType: 'books',
   },
   {
+    id: 'blog',
+    title: 'My Blog',
+    subtitle: 'Notes and Essays',
+    background: '/images/blog-card.jpg',
+    actionType: 'route',
+    action: '/blog',
+  },
+  {
     id: 'ceske-realie',
     title: 'České Reálie',
     subtitle: 'Czech Realities',
@@ -641,7 +649,7 @@ const HomeCarousel = () => {
                   <div className="card-overlay" />
                   <div className="card-content">
                     <h2 className="card-title">{card.title}</h2>
-                    <span className="card-action">{card.id === 'about' ? 'Watch intro' : card.id === 'ceske-realie' ? 'Download' : card.id === 'books' ? 'Buy' : card.id === 'contact' ? 'Ask Me Anything' : 'Explore'}</span>
+                    <span className="card-action">{card.id === 'about' ? 'Watch intro' : card.id === 'ceske-realie' ? 'Download' : card.id === 'books' ? 'Buy' : card.id === 'contact' ? 'Ask Me Anything' : card.id === 'blog' ? 'Read' : 'Explore'}</span>
                   </div>
                 </div>
 

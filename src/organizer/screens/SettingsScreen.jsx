@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import { IoAdd, IoRemove, IoDownloadOutline, IoCloudUploadOutline } from 'react-icons/io5';
+import { IoAdd, IoRemove, IoDownloadOutline, IoCloudUploadOutline, IoLanguageOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { appleSeconds, dateFromAppleSeconds, dayKeyFromDate } from '../lib/dates';
 import { serialize, summarize, validateBackup } from '../lib/backup';
 import { isEncrypted, open, seal } from '../lib/crypto';
 import { Screen, Section, Toggle } from '../components/ui';
 import PasswordSheet from './PasswordSheet';
-import { isJournalFile, journalEntriesFrom } from '../lib/journalFile';
+import { fileToTranslate, isJournalFile, journalEntriesFrom } from '../lib/journalFile';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
 
@@ -75,6 +75,18 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
       await saveFile(readyFile, fileName);
       updateSettings({ lastExportAt: appleSeconds() });
       setReadyFile(null);
+    } catch (err) {
+      if (err?.name !== 'AbortError') window.alert(`The file could not be saved. ${err.message}`);
+    }
+  };
+
+  // No await before sharing: iOS only opens the share sheet straight from a tap.
+  const shareToTranslate = async () => {
+    if (journal.status !== 'unlocked') return window.alert('Open the Journal tab and unlock it first.');
+    const file = fileToTranslate(journal.entries);
+    if (file.entries.length === 0) return window.alert('Every journal entry already has English and Czech.');
+    try {
+      await saveFile(JSON.stringify(file, null, 2), `Journal to translate ${dayKeyFromDate()}.json`);
     } catch (err) {
       if (err?.name !== 'AbortError') window.alert(`The file could not be saved. ${err.message}`);
     }
@@ -181,6 +193,13 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
         <button type="button" className="org-row org-action" onClick={() => fileInput.current?.click()}><IoDownloadOutline aria-hidden="true" /> Import Data</button>
         <div className="org-row org-labeled"><span>Last backup</span><span className="org-value">{lastExport}</span></div>
         <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={onPickFile} />
+      </Section>
+
+      <Section
+        header="Translations"
+        footer="Saves the journal entries that have no English or Czech yet, or whose Ukrainian changed since, to a file. The file is not encrypted: send it only to Claude to translate, then delete it. Import the translated file Claude sends back with Import Data."
+      >
+        <button type="button" className="org-row org-action" disabled={journal.status === 'setup' || journal.status === 'loading'} onClick={shareToTranslate}><IoLanguageOutline aria-hidden="true" /> Share Entries to Translate…</button>
       </Section>
 
       <Section header="On this iPhone">

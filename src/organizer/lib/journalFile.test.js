@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addEntries, entryIn, isJournalFile, journalEntriesFrom, translationsStale } from './journalFile';
+import { addEntries, entryIn, fileToTranslate, isJournalFile, journalEntriesFrom, textHash, translationsStale } from './journalFile';
 import { dateFromAppleSeconds } from './dates';
 
 const file = (entries, extra = {}) => ({ format: 'organizer-journal-entries', version: 1, entries, ...extra });
@@ -73,5 +73,28 @@ describe('translations in journal files', () => {
     expect(entries[0].translations.en.text).toBe('My own');
     expect(entries[0].translations.cs).toEqual(cs);
     expect(entryIn({ id: 'B', text: 'x' }, 'en')).toBeNull();
+  });
+
+  it('replaces outdated translations with ones made from the current Ukrainian', () => {
+    const [entry] = journalEntriesFrom(file([{ ...base, translations: { en, cs } }]));
+    const edited = { ...entry, text: 'Новий текст' };
+    const redone = { id: 'A', translatedFrom: textHash(edited.title, edited.text), translations: { en: { title: 'A Turn', text: 'New text' }, cs } };
+    const { entries } = addEntries([edited], [redone]);
+    expect(entries[0].translations.en.text).toBe('New text');
+    expect(translationsStale(entries[0])).toBe(false);
+    // A file made from an older Ukrainian still never overwrites (negative)
+    expect(addEntries([edited], [{ ...redone, translatedFrom: 'old' }]).updated).toBe(0);
+  });
+
+  it('exports only the entries still to translate, and they import back', () => {
+    const [done] = journalEntriesFrom(file([{ ...base, translations: { en, cs } }]));
+    const [plain] = journalEntriesFrom(file([{ ...base, id: 'B' }]));
+    const halfDone = { ...done, id: 'C', translations: { en } };
+    const stale = { ...done, id: 'D', text: 'Змінений' };
+    const out = fileToTranslate([done, plain, halfDone, stale]);
+    expect(out.entries.map((e) => e.id)).toEqual(['B', 'C', 'D']);
+    expect(Object.keys(out.entries[0])).toEqual(['id', 'title', 'text', 'writtenAt']);
+    expect(journalEntriesFrom(JSON.parse(JSON.stringify(out)))[0].writtenOn).toBe(plain.writtenOn);
+    expect(fileToTranslate([done]).entries).toEqual([]);
   });
 });

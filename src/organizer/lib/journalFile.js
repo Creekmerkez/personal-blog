@@ -1,4 +1,4 @@
-import { appleSeconds } from './dates';
+import { appleSeconds, dateFromAppleSeconds } from './dates';
 import { newId } from './backup';
 
 // A file of journal entries to add, e.g. old essays prepared for the owner.
@@ -13,7 +13,9 @@ import { newId } from './backup';
 //
 // An entry's own title and text are Ukrainian; translations hold the other
 // languages. translatedFrom is a hash of the Ukrainian title and text they were
-// made from, so the app can tell when the Ukrainian has changed since.
+// made from, so the app can tell when the Ukrainian has changed since. A file
+// whose translations were made from an entry's current Ukrainian replaces the
+// entry's outdated ones.
 
 export const JOURNAL_FILE_FORMAT = 'organizer-journal-entries';
 
@@ -85,7 +87,9 @@ export function addEntries(current, incoming) {
   const entries = current.map((entry) => {
     const from = byId.get(entry.id);
     const photos = (from?.photos ?? []).filter((url) => !(entry.photos ?? []).includes(url));
-    const missing = TRANSLATED.filter((lang) => from?.translations?.[lang] && !entry.translations?.[lang]);
+    const current = textHash(entry.title ?? '', entry.text ?? '');
+    const fresh = from?.translatedFrom === current && entry.translatedFrom !== current;
+    const missing = TRANSLATED.filter((lang) => from?.translations?.[lang] && (fresh || !entry.translations?.[lang]));
     if (photos.length === 0 && missing.length === 0) return entry;
     updated += 1;
     const next = { ...entry };
@@ -94,11 +98,26 @@ export function addEntries(current, incoming) {
       next.translations = { ...(entry.translations ?? {}) };
       for (const lang of missing) next.translations[lang] = from.translations[lang];
       // Made from the file's Ukrainian: if the entry was edited since, it shows as outdated.
-      next.translatedFrom = entry.translatedFrom ?? from.translatedFrom;
+      next.translatedFrom = fresh ? current : (entry.translatedFrom ?? from.translatedFrom);
     }
     return next;
   });
   const ids = new Set(current.map((e) => e.id));
   const added = incoming.filter((e) => !ids.has(e.id));
   return { entries: [...entries, ...added], added: added.length, updated };
+}
+
+/** A journal file of the entries still missing English or Czech, or whose Ukrainian changed since, to be translated and imported back. */
+export function fileToTranslate(entries) {
+  const pending = entries.filter((entry) => TRANSLATED.some((lang) => !entry.translations?.[lang]) || translationsStale(entry));
+  return {
+    format: JOURNAL_FILE_FORMAT,
+    version: 1,
+    entries: pending.map((entry) => ({
+      id: entry.id,
+      title: entry.title ?? '',
+      text: entry.text ?? '',
+      writtenAt: dateFromAppleSeconds(entry.writtenOn).toISOString(),
+    })),
+  };
 }

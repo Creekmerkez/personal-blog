@@ -40,6 +40,15 @@ describe('BlogPage', () => {
     expect(screen.getAllByRole('group', { name: 'Language' })).toHaveLength(1);
   });
 
+  it('marks the year of posts from earlier years, not this year (positive and negative)', async () => {
+    vi.useFakeTimers({ now: new Date(2026, 9, 18), toFake: ['Date'] });
+    showBlog({ posts });
+    await screen.findByRole('heading', { name: 'Уяви' });
+    const marks = document.querySelectorAll('mark.blog-year-old');
+    expect([...marks].map((m) => m.textContent)).toEqual(['2017']);
+    vi.useRealTimers();
+  });
+
   it('folds a long post and its extra photos until Read more (positive)', async () => {
     showBlog({ posts });
     const more = await screen.findByRole('button', { name: 'Читати далі' });

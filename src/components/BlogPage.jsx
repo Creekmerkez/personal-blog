@@ -27,9 +27,16 @@ function preferredLanguage() {
   return 'en';
 }
 
-const formatDate = (date, locale) => {
+// A year before the current one is marked like a highlighter, so older posts stand out as older.
+const PostDate = ({ date, locale }) => {
   const [y, m, d] = date.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  const old = y < new Date().getFullYear();
+  const parts = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(new Date(y, m - 1, d));
+  return (
+    <time className="blog-post-date" dateTime={date}>
+      {parts.map((part, i) => (part.type === 'year' && old ? <mark key={i} className="blog-year-old">{part.value}</mark> : part.value))}
+    </time>
+  );
 };
 
 const Post = ({ post, defaultLanguage }) => {
@@ -46,7 +53,7 @@ const Post = ({ post, defaultLanguage }) => {
   return (
     <article className="blog-post" lang={lang}>
       <header className="blog-post-head">
-        <time className="blog-post-date" dateTime={post.date}>{formatDate(post.date, language.locale)}</time>
+        <PostDate date={post.date} locale={language.locale} />
         {available.length > 1 && (
           <div className="blog-langs" role="group" aria-label="Language">
             {available.map((l) => (

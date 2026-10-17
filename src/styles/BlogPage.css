@@ -171,6 +171,21 @@
   color: #f3f4f7;
 }
 
+.blog-year-old {
+  padding: 0 0.3em;
+  margin: 0 -0.05em;
+  border-radius: 0.2em 0.45em 0.25em 0.5em;
+  background: linear-gradient(100deg, rgba(196, 72, 62, 0.08), rgba(196, 72, 62, 0.3) 8%, rgba(196, 72, 62, 0.24) 92%, rgba(196, 72, 62, 0.1));
+  color: #8e2f28;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+:root[data-theme='dark'] .blog-year-old {
+  background: linear-gradient(100deg, rgba(226, 104, 92, 0.12), rgba(226, 104, 92, 0.34) 8%, rgba(226, 104, 92, 0.28) 92%, rgba(226, 104, 92, 0.14));
+  color: #f0b1a9;
+}
+
 :root[data-theme='dark'] .blog-post-text p {
   color: #d3d7de;
 }

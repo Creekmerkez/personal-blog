@@ -1,12 +1,13 @@
-import { useRef, useState } from 'react';
-import { IoAdd, IoRemove, IoDownloadOutline, IoCloudUploadOutline } from 'react-icons/io5';
+import { useEffect, useRef, useState } from 'react';
+import { IoAdd, IoRemove, IoDownloadOutline, IoCloudUploadOutline, IoLanguageOutline, IoKeyOutline, IoGlobeOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { appleSeconds, dateFromAppleSeconds, dayKeyFromDate } from '../lib/dates';
 import { serialize, summarize, validateBackup } from '../lib/backup';
 import { isEncrypted, open, seal } from '../lib/crypto';
 import { Screen, Section, Toggle } from '../components/ui';
 import PasswordSheet from './PasswordSheet';
-import { isJournalFile, journalEntriesFrom } from '../lib/journalFile';
+import { fileToTranslate, isJournalFile, journalEntriesFrom } from '../lib/journalFile';
+import { BLOG_URL, checkToken, TOKEN_KEY } from '../lib/publish';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
 
@@ -24,7 +25,11 @@ async function saveFile(text, name) {
 }
 
 export default function SettingsScreen({ prepareExport, applyImport, addJournalEntries, journal }) {
-  const { data, settings, updateSettings } = useOrganizer();
+  const { data, settings, updateSettings, storage } = useOrganizer();
+  const [hasToken, setHasToken] = useState(false);
+  useEffect(() => {
+    storage.get(TOKEN_KEY).then((token) => setHasToken(Boolean(token)));
+  }, [storage]);
   const [passwordMode, setPasswordMode] = useState(null); // 'create' | 'enter'
   const [readyFile, setReadyFile] = useState(null);
   const [pendingText, setPendingText] = useState(null);
@@ -80,16 +85,47 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
     }
   };
 
+  // No await before sharing: iOS only opens the share sheet straight from a tap.
+  const shareToTranslate = async () => {
+    if (journal.status !== 'unlocked') return window.alert('Open the Journal tab and unlock it first.');
+    const file = fileToTranslate(journal.entries);
+    if (file.entries.length === 0) return window.alert('Every journal entry already has English and Czech.');
+    try {
+      await saveFile(JSON.stringify(file, null, 2), `Journal to translate ${dayKeyFromDate()}.json`);
+    } catch (err) {
+      if (err?.name !== 'AbortError') window.alert(`The file could not be saved. ${err.message}`);
+    }
+  };
+
+  // The token publishes journal entries to the website. It stays on this iPhone and is never in a backup.
+  const addToken = async () => {
+    const token = window.prompt('Paste the GitHub token for jmerkusheva.com:')?.trim();
+    if (!token) return;
+    try {
+      await checkToken(token);
+      await storage.set(TOKEN_KEY, token);
+      setHasToken(true);
+      window.alert('Token added. Open a journal entry and turn on “Show on jmerkusheva.com” to publish it.');
+    } catch (err) {
+      window.alert(err.status === 401 || err.status === 404 ? 'GitHub did not accept this token. Check it was copied whole and has access to the personal-blog repository.' : err.message);
+    }
+  };
+  const removeToken = async () => {
+    if (!window.confirm('Remove the GitHub token from this iPhone?\n\nPosts already on the website stay there.')) return;
+    await storage.set(TOKEN_KEY, null);
+    setHasToken(false);
+  };
+
   const confirmAndApply = async (text) => {
     const value = JSON.parse(text);
     if (isJournalFile(value)) {
       const entries = journalEntriesFrom(value);
-      if (!window.confirm(`Add ${entries.length} entries to your Journal?\n\nNothing else changes. Entries already in the journal keep their text and only get new photo links.`)) return;
+      if (!window.confirm(`Add ${entries.length} entries to your Journal?\n\nNothing else changes. Entries already in the journal keep their text and only get missing photos and translations.`)) return;
       try {
         const { added, updated } = await addJournalEntries(entries);
         window.alert([
           `${added} new ${added === 1 ? 'entry' : 'entries'} added to your Journal.`,
-          updated ? `${updated} ${updated === 1 ? 'entry' : 'entries'} got photo links.` : '',
+          updated ? `${updated} ${updated === 1 ? 'entry' : 'entries'} got photos or translations.` : '',
         ].join(' ').trim());
       } catch (err) {
         window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
@@ -181,6 +217,23 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
         <button type="button" className="org-row org-action" onClick={() => fileInput.current?.click()}><IoDownloadOutline aria-hidden="true" /> Import Data</button>
         <div className="org-row org-labeled"><span>Last backup</span><span className="org-value">{lastExport}</span></div>
         <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={onPickFile} />
+      </Section>
+
+      <Section
+        header="Translations"
+        footer="Saves the journal entries that have no English or Czech yet, or whose Ukrainian changed since, to a file. The file is not encrypted: send it only to Claude to translate, then delete it. Import the translated file Claude sends back with Import Data."
+      >
+        <button type="button" className="org-row org-action" disabled={journal.status === 'setup' || journal.status === 'loading'} onClick={shareToTranslate}><IoLanguageOutline aria-hidden="true" /> Share Entries to Translate…</button>
+      </Section>
+
+      <Section
+        header="Website"
+        footer="Lets the Journal publish entries to jmerkusheva.com/blog. On github.com create a fine-grained token for the personal-blog repository only, with Contents: Read and write, and paste it here. It stays on this iPhone and is not included in backups."
+      >
+        <div className="org-row org-labeled"><span>GitHub token</span><span className="org-value">{hasToken ? 'Added' : 'Not added'}</span></div>
+        <button type="button" className="org-row org-action" onClick={addToken}><IoKeyOutline aria-hidden="true" /> {hasToken ? 'Replace Token…' : 'Add GitHub Token…'}</button>
+        {hasToken && <button type="button" className="org-row org-destructive" onClick={removeToken}>Remove Token</button>}
+        <a className="org-row org-action" href={BLOG_URL} target="_blank" rel="noreferrer"><IoGlobeOutline aria-hidden="true" /> Open the Blog</a>
       </Section>
 
       <Section header="On this iPhone">

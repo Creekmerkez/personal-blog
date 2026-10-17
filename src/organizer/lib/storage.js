@@ -1,5 +1,6 @@
 // Everything is stored on this device only, in the browser's IndexedDB.
-// Nothing is ever sent to a server.
+// Nothing is sent to a server, except journal entries the owner publishes
+// to the blog (lib/publish.js).
 const DB_NAME = 'organizer';
 const STORE = 'kv';
 

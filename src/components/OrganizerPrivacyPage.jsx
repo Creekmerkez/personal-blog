@@ -52,6 +52,14 @@ const OrganizerPrivacyPage = () => {
             entries are kept with them; photos added as links (for example from an old
             blog) load from that site when you open the entry.
           </p>
+          <p>
+            The one exception is a journal entry you choose to publish on the blog at
+            jmerkusheva.com/blog. Publishing sends that entry, with its translations and
+            photos, to the site&apos;s GitHub repository using a GitHub token you add in
+            Settings, and it then becomes public. The token stays on your device and is
+            not included in export files. Turning publishing off for an entry takes it
+            off the blog.
+          </p>
         </section>
 
         <section className="privacy-section">

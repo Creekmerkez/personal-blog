@@ -9,7 +9,7 @@
  *
  * Distance is deliberately small (60px total, well under the ~75px that
  * would rotate a full extra step: rotation += delta * 0.8, one card-step is
- * 60°) so the drag itself never crosses a second card boundary — the final
+ * 360°/7 ≈ 51°) so the drag itself never crosses a second card boundary — the final
  * snap-to-nearest-step behavior (HomeCarousel.jsx's touchend handler) then
  * reliably advances exactly one card in the swipe direction, as long as
  * enough velocity accumulates to clear its 0.2 direction-aware threshold,
@@ -48,19 +48,19 @@ async function swipeCarouselOneStep(page, direction) {
 
 /**
  * Rotates the mobile carousel until the given card is front-facing, then
- * taps it. There are only 6 cards, so at most 5 one-step swipes in a single
+ * taps it. There are only 7 cards, so at most 6 one-step swipes in a single
  * direction are guaranteed to reach any target from any starting position.
  */
 async function rotateAndTapCard(page, cardId) {
   const card = page.locator(`[data-card-id="${cardId}"]`);
-  for (let attempt = 0; attempt < 6; attempt++) {
+  for (let attempt = 0; attempt < 7; attempt++) {
     if (await card.evaluate((el) => el.classList.contains('carousel-card-front'))) {
       await card.click({ force: true });
       return;
     }
     await swipeCarouselOneStep(page, -1);
   }
-  throw new Error(`Could not rotate "${cardId}" to front after 6 swipes`);
+  throw new Error(`Could not rotate "${cardId}" to front after 7 swipes`);
 }
 
 /**
@@ -76,7 +76,10 @@ export async function openAiChatCard(page) {
     await rotateAndTapCard(page, 'contact');
     return;
   }
-  await page.locator('[data-card-id="contact"]').click({ force: true });
+  // Dispatched on the card itself: depending on the carousel's starting
+  // angle, a neighbouring card can sit on top of its centre, where a
+  // coordinate click would land.
+  await page.locator('[data-card-id="contact"]').dispatchEvent('click');
 }
 
 export { swipeCarouselOneStep, rotateAndTapCard };

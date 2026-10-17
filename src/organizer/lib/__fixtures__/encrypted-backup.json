@@ -1,0 +1,8 @@
+{
+  "format": "organizer-encrypted-backup",
+  "iterations": 1000,
+  "kdf": "pbkdf2-sha256",
+  "salt": "AAECAwQFBgcICQoLDA0ODw==",
+  "sealed": "ZGVmZ2hpamtsbW5vxHKVXqu9Sn+HxZ6KV2GJnYuepV7yF241s5k4QZCnwDuxVH8VCmVqet/IgbURMNDs0eSKhiiBOyL1q7dqfqkH8KIZPHQN64XgsS94VeVNUFR6L8JnvmZ6Oi0oAQjwTVAtnNywzzDXxiARI4B7i1So8DZKUQ==",
+  "version": 1
+}

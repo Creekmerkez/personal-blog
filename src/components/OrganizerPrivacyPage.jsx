@@ -37,6 +37,18 @@ const OrganizerPrivacyPage = () => {
         </section>
 
         <section className="privacy-section">
+          <h2>Web version</h2>
+          <p>
+            Organizer can also be used as a web app at jmerkusheva.com/organizer, added
+            to the iPhone home screen from Safari. It works the same way: everything you
+            enter is kept in the browser&apos;s storage on your device and is never sent
+            to this site or anywhere else. Loading the page itself is an ordinary visit
+            to a website hosted on GitHub Pages, which sees your IP address as any web
+            host does. The page asks search engines not to list it.
+          </p>
+        </section>
+
+        <section className="privacy-section">
           <h2>What the app does not do</h2>
           <p>
             It has no analytics, no advertising, no tracking, and no third-party code

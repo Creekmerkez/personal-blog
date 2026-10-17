@@ -22,6 +22,7 @@ describe('OrganizerPrivacyPage', () => {
     expect(screen.getByText(/does not collect, send, or share any of your information/)).toBeInTheDocument();
     expect(screen.getByText(/does not connect to the internet/)).toBeInTheDocument();
     expect(screen.getByText(/encrypts it with a password you choose/)).toBeInTheDocument();
+    expect(screen.getByText(/never sent\s+to this site or anywhere else/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'julia.merkusheva@gmail.com' })).toHaveAttribute(
       'href',
       'mailto:julia.merkusheva@gmail.com'

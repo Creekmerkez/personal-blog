@@ -10,6 +10,11 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     rollupOptions: {
+      // Two pages: the site itself, and the private organizer web app at /organizer/.
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        organizer: fileURLToPath(new URL('./organizer/index.html', import.meta.url)),
+      },
       output: {
         entryFileNames: 'assets/index-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',

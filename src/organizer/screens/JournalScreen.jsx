@@ -40,10 +40,21 @@ function useAsync() {
 }
 
 function Setup({ journal }) {
+  const [withPassword, setWithPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [repeated, setRepeated] = useState('');
   const { error, busy, run } = useAsync();
   const ok = [...password].length >= MIN_PASSWORD_LENGTH && password === repeated;
+  if (!withPassword) {
+    return (
+      <Screen title="Journal">
+        <Empty icon={<IoJournalOutline />} title="Your Journal" text="Thoughts, essays and notes. They stay on this iPhone and open like the rest of the organizer." />
+        {error && <p className="org-error" role="alert">{error}</p>}
+        <button type="button" className="org-button org-wide" disabled={busy} onClick={() => run(journal.setupOpen)}>Start Journal</button>
+        <button type="button" className="org-link org-wide-link" onClick={() => setWithPassword(true)}><IoKeyOutline aria-hidden="true" /> Protect with a password instead</button>
+      </Screen>
+    );
+  }
   return (
     <Screen title="Journal">
       <Empty icon={<IoJournalOutline />} title="Your Private Journal" text="Thoughts, essays and notes, readable only by you. Entries are encrypted on this iPhone." />
@@ -63,7 +74,7 @@ function Setup({ journal }) {
 }
 
 /** Also locks the whole organizer when the app lock is on (Settings), with the same password and Face ID. */
-export function Locked({ journal, title = 'Journal', heading = 'Journal Locked', text = 'Your journal is private.' }) {
+export function Locked({ journal, title = 'Journal', heading = 'Journal Locked', text = 'Your journal is private.', onReset }) {
   const [usePassword, setUsePassword] = useState(!journal.hasFaceId);
   const [password, setPassword] = useState('');
   const { error, busy, run } = useAsync();
@@ -91,6 +102,9 @@ export function Locked({ journal, title = 'Journal', heading = 'Journal Locked',
         <button type="button" className="org-link org-wide-link" onClick={() => setUsePassword(true)}><IoKeyOutline aria-hidden="true" /> Use Password</button>
       )}
       {error && <p className="org-error org-error-center" role="alert">{error}</p>}
+      {onReset && (
+        <button type="button" className="org-link org-wide-link org-muted-link" disabled={busy} onClick={() => run(onReset)}>Forgot the password? Start over</button>
+      )}
     </Screen>
   );
 }
@@ -204,7 +218,14 @@ export default function JournalScreen({ journal }) {
 
   if (journal.status === 'loading') return null;
   if (journal.status === 'setup') return <Setup journal={journal} />;
-  if (journal.status !== 'unlocked') return <Locked journal={journal} />;
+  if (journal.status !== 'unlocked') {
+    const startOver = async () => {
+      if (!window.confirm('Delete the journal and all its entries, and start a new one without a lock?\n\nThis cannot be undone. Entries in a backup file can be imported again afterwards.')) return;
+      await journal.reset();
+      await journal.setupOpen();
+    };
+    return <Locked journal={journal} onReset={startOver} />;
+  }
 
   const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()), photos: [] });
   const startEdit = (entry) => setDraft({ id: entry.id, title: entry.title ?? '', text: entry.text ?? '', date: dayInput(entry.writtenOn), photos: entry.photos ?? [] });
@@ -240,10 +261,10 @@ export default function JournalScreen({ journal }) {
   return (
     <Screen
       title="Journal"
-      leading={<button type="button" className="org-icon-button" aria-label="Lock Journal" onClick={journal.lockNow}><IoLockClosedOutline /></button>}
+      leading={journal.isOpen ? null : <button type="button" className="org-icon-button" aria-label="Lock Journal" onClick={journal.lockNow}><IoLockClosedOutline /></button>}
       trailing={<button type="button" className="org-icon-button" aria-label="New Entry" onClick={startNew}><IoAdd /></button>}
     >
-      {!journal.hasFaceId && passkeysSupported() && (
+      {!journal.isOpen && !journal.hasFaceId && passkeysSupported() && (
         <button type="button" className="org-banner" disabled={busy} onClick={() => run(journal.enableFaceId)}>
           <IoScanOutline aria-hidden="true" />
           <span><strong>Turn On Face ID</strong><small>Open the journal with your face instead of the password.</small></span>

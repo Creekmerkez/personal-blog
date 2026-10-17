@@ -47,6 +47,23 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
     }
   };
 
+  // The Journal lock: off means no password or Face ID, like the rest of the app.
+  const journalLocked = journal.status !== 'setup' && !journal.isOpen;
+  const setJournalLock = async (on) => {
+    if (on) return setPasswordMode('journal');
+    try {
+      if (journal.status !== 'unlocked') {
+        if (!journal.hasFaceId) throw new Error('Open the Journal tab and unlock it with your password first, then turn the lock off.');
+        await journal.unlockWithFaceId();
+      }
+      if (!window.confirm('Turn off the Journal lock?\n\nThe journal will open without Face ID or a password, like the rest of the organizer.')) return;
+      await journal.removeLock();
+      updateSettings({ appLock: false });
+    } catch (err) {
+      window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
+    }
+  };
+
   const exportWithPassword = async (password) => {
     const plain = serialize(await prepareExport());
     setReadyFile(await seal(plain, password));
@@ -132,12 +149,13 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
       <Section
         header="Privacy"
         footer={
-          journal.status === 'setup'
-            ? 'Create your Journal first: the lock uses its password and Face ID.'
-            : 'Asks for Face ID or your journal password every time you open the organizer, like the Journal does.'
+          journalLocked
+            ? 'Journal Lock asks for Face ID or a password to open the Journal. Lock Organizer asks for it every time you open the organizer.'
+            : 'The Journal opens without Face ID or a password. Turn on Journal Lock to protect it, and then, if you like, the whole organizer.'
         }
       >
-        <Toggle label="Lock Organizer" checked={settings.appLock === true} disabled={journal.status === 'setup'} onChange={setAppLock} />
+        <Toggle label="Journal Lock" checked={journalLocked} disabled={journal.status === 'setup' || journal.status === 'loading'} onChange={setJournalLock} />
+        <Toggle label="Lock Organizer" checked={settings.appLock === true} disabled={!journalLocked} onChange={setAppLock} />
       </Section>
 
       <Section header="Word of the Day" footer="This many words go round and round. A word you remember three times is learned and makes room for the next one. A word you don't remember comes back after a few cards.">
@@ -171,6 +189,19 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
       </Section>
 
       {passwordMode === 'create' && <PasswordSheet mode="create" onSubmit={exportWithPassword} onClose={() => setPasswordMode(null)} />}
+      {passwordMode === 'journal' && (
+        <PasswordSheet
+          mode="create"
+          title="Journal Password"
+          action="Lock"
+          footer="At least 8 characters. The Journal will ask for this password; you can add Face ID in the Journal afterwards. Keep it in Passwords on your iPhone."
+          onSubmit={async (password) => {
+            await journal.addPassword(password);
+            setPasswordMode(null);
+          }}
+          onClose={() => setPasswordMode(null)}
+        />
+      )}
       {passwordMode === 'enter' && (
         <PasswordSheet mode="enter" onSubmit={openWithPassword} onClose={() => { setPasswordMode(null); setPendingText(null); }} />
       )}

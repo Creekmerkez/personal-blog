@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  decryptEntries, encryptEntries, newJournalKey, unwrapWithPassword, unwrapWithPrf, wrapWithPassword, wrapWithPrf,
+  decryptEntries, encryptEntries, fromBase64, newJournalKey, toBase64, unwrapWithPassword, unwrapWithPrf, wrapWithPassword, wrapWithPrf,
 } from './journalCrypto';
 import { createPasskey, passkeySecret } from './passkey';
 import { addEntries as merge } from './journalFile';
@@ -9,6 +9,10 @@ import { addEntries as merge } from './journalFile';
  * The journal's lock state. status: 'loading' | 'setup' | 'locked' | 'unlocked'.
  * The decrypted entries and the key exist only in memory while unlocked, and
  * are dropped as soon as the app leaves the screen.
+ *
+ * The owner can turn the lock off. The journal key is then stored as is
+ * (lock.openKey), so the journal opens by itself like the rest of the app and
+ * never locks; its entries stay as safe as the iPhone's own lock.
  */
 export function useJournal(storage) {
   const [status, setStatus] = useState('loading');
@@ -18,14 +22,12 @@ export function useJournal(storage) {
   const busyRef = useRef(false); // Face ID prompts must not lock the journal mid-way
   const pickerUntilRef = useRef(0); // nor must picking photos, in case the picker hides the page
 
-  useEffect(() => {
-    storage.get('journalLock').then((saved) => {
-      setLock(saved ?? null);
-      setStatus(saved ? 'locked' : 'setup');
-    });
-  }, [storage]);
+  const isOpen = Boolean(lock?.openKey);
+  const openRef = useRef(false);
+  openRef.current = isOpen;
 
   const lockNow = useCallback(() => {
+    if (openRef.current) return;
     keyRef.current = null;
     setEntries([]);
     setStatus((current) => (current === 'unlocked' ? 'locked' : current));
@@ -47,6 +49,14 @@ export function useJournal(storage) {
     },
     [storage],
   );
+
+  useEffect(() => {
+    storage.get('journalLock').then(async (saved) => {
+      setLock(saved ?? null);
+      if (saved?.openKey) await openWith(fromBase64(saved.openKey));
+      else setStatus(saved ? 'locked' : 'setup');
+    });
+  }, [storage, openWith]);
 
   const withPrompt = async (action) => {
     busyRef.current = true;
@@ -70,6 +80,47 @@ export function useJournal(storage) {
     },
     [storage],
   );
+
+  /** A new journal without a lock. */
+  const setupOpen = useCallback(async () => {
+    const key = newJournalKey();
+    const next = { version: 1, openKey: toBase64(key) };
+    await storage.set('journalEntries', await encryptEntries(key, []));
+    await storage.set('journalLock', next);
+    setLock(next);
+    keyRef.current = key;
+    setEntries([]);
+    setStatus('unlocked');
+  }, [storage]);
+
+  /** Turns the lock off: no password or Face ID from now on. The journal must be unlocked. */
+  const removeLock = useCallback(async () => {
+    if (!keyRef.current) throw new Error('Unlock the Journal first.');
+    const next = { version: 1, openKey: toBase64(keyRef.current) };
+    await storage.set('journalLock', next);
+    setLock(next);
+  }, [storage]);
+
+  /** Turns the lock back on with a new password (Face ID can be added again in the Journal). */
+  const addPassword = useCallback(
+    async (password) => {
+      if (!keyRef.current) throw new Error('Unlock the Journal first.');
+      const next = { version: 1, password: await wrapWithPassword(keyRef.current, password) };
+      await storage.set('journalLock', next);
+      setLock(next);
+    },
+    [storage],
+  );
+
+  /** Deletes the journal and its entries, for an owner who can no longer unlock it. */
+  const reset = useCallback(async () => {
+    await storage.set('journalEntries', null);
+    await storage.set('journalLock', null);
+    keyRef.current = null;
+    setLock(null);
+    setEntries([]);
+    setStatus('setup');
+  }, [storage]);
 
   const unlockWithPassword = useCallback(async (password) => openWith(await unwrapWithPassword(lock.password, password)), [lock, openWith]);
 
@@ -129,5 +180,5 @@ export function useJournal(storage) {
     return entries;
   }, [status, lock, entries, unlockWithFaceId, storage]);
 
-  return { status, hasFaceId: Boolean(lock?.passkey), entries, setup, unlockWithPassword, unlockWithFaceId, enableFaceId, lockNow, saveEntries, addEntries, holdForPicker, entriesForExport };
+  return { status, isOpen, hasFaceId: Boolean(lock?.passkey), entries, setup, setupOpen, removeLock, addPassword, reset, unlockWithPassword, unlockWithFaceId, enableFaceId, lockNow, saveEntries, addEntries, holdForPicker, entriesForExport };
 }

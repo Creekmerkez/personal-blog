@@ -5,6 +5,7 @@ import { newId } from '../lib/backup';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
 import { passkeysSupported } from '../lib/passkey';
 import { photoFromFile } from '../lib/photos';
+import { entryIn, LANGUAGES, TRANSLATED, textHash, translationsStale } from '../lib/journalFile';
 import { useOrganizer } from '../lib/context';
 import { Empty, Screen, Section, Segmented, Sheet } from '../components/ui';
 
@@ -129,8 +130,18 @@ function EntryPhoto({ url }) {
   );
 }
 
+const LANGUAGE_OPTIONS = LANGUAGES.map(({ id, label }) => ({ value: id, label }));
+
 function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
   const canSave = draft.title.trim() !== '' || draft.text.trim() !== '';
+  // The entry's own title and text are Ukrainian; EN and CZ edit its translations.
+  const current = draft.lang === 'uk' ? { title: draft.title, text: draft.text } : (draft.translations[draft.lang] ?? { title: '', text: '' });
+  const setCurrent = (patch) =>
+    setDraft((d) =>
+      d.lang === 'uk'
+        ? { ...d, ...patch }
+        : { ...d, translations: { ...d.translations, [d.lang]: { title: '', text: '', ...d.translations[d.lang], ...patch } }, translationsEdited: true },
+    );
   const fileInput = useRef(null);
   const [adding, setAdding] = useState(false);
 
@@ -165,12 +176,15 @@ function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
       leading={<button type="button" className="org-link" onClick={onClose}>Cancel</button>}
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={onSave}>Save</button>}
     >
+      <div className="org-section">
+        <Segmented label="Language" value={draft.lang} onChange={(lang) => setDraft((d) => ({ ...d, lang }))} options={LANGUAGE_OPTIONS} />
+      </div>
       <Section>
-        <input className="org-input" placeholder="Title (optional)" aria-label="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
-        <input className="org-input" type="date" aria-label="Date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value || draft.date })} />
+        <input className="org-input" placeholder="Title (optional)" aria-label="Title" value={current.title} onChange={(e) => setCurrent({ title: e.target.value })} />
+        <input className="org-input" type="date" aria-label="Date" value={draft.date} onChange={(e) => setDraft((d) => ({ ...d, date: e.target.value || d.date }))} />
       </Section>
-      <Section>
-        <textarea className="org-input org-textarea org-journal-text" aria-label="Text" placeholder="Write…" value={draft.text} onChange={(e) => setDraft({ ...draft, text: e.target.value })} />
+      <Section footer={draft.lang === 'uk' ? null : 'Translation of the Ukrainian text. Leave it empty if there is none yet.'}>
+        <textarea className="org-input org-textarea org-journal-text" aria-label="Text" placeholder={draft.lang === 'uk' ? 'Write…' : 'Translation…'} value={current.text} onChange={(e) => setCurrent({ text: e.target.value })} />
       </Section>
       <Section header="Photos" footer="Photos you add are made smaller and kept in the encrypted journal on this iPhone.">
         {draft.photos.length > 0 && (
@@ -200,6 +214,7 @@ export default function JournalScreen({ journal }) {
   // The draft lives here, outside the editor, so locking never loses it.
   const [draft, setDraft] = useState(null);
   const [order, setOrder] = useState('newest');
+  const [lang, setLang] = useState('uk'); // language entries are read in
   const { error, busy, run } = useAsync();
 
   const visible = useMemo(() => {
@@ -238,8 +253,12 @@ export default function JournalScreen({ journal }) {
     return <Locked journal={journal} onReset={startOver} onTurnOff={turnOff} />;
   }
 
-  const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()), photos: [] });
-  const startEdit = (entry) => setDraft({ id: entry.id, title: entry.title ?? '', text: entry.text ?? '', date: dayInput(entry.writtenOn), photos: entry.photos ?? [] });
+  const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()), photos: [], translations: {}, lang: 'uk' });
+  const startEdit = (entry) =>
+    setDraft({
+      id: entry.id, title: entry.title ?? '', text: entry.text ?? '', date: dayInput(entry.writtenOn), photos: entry.photos ?? [],
+      translations: entry.translations ?? {}, lang: entryIn(entry, lang) ? lang : 'uk',
+    });
 
   const saveDraft = () =>
     run(async () => {
@@ -247,10 +266,21 @@ export default function JournalScreen({ journal }) {
       const existing = journal.entries.find((e) => e.id === draft.id);
       // Keep an entry's exact time unless its day was changed.
       const sameDay = existing && draft.date === dayInput(existing.writtenOn);
+      const title = draft.title.trim();
+      const text = draft.text.trim();
+      const translations = {};
+      for (const code of TRANSLATED) {
+        const t = draft.translations[code];
+        if (t?.text?.trim()) translations[code] = { title: (t.title ?? '').trim(), text: t.text.trim() };
+      }
+      const hasTranslations = Object.keys(translations).length > 0;
       const entry = {
         ...(existing ?? { id: newId(), createdAt: now }),
-        title: draft.title.trim(),
-        text: draft.text.trim(),
+        title,
+        text,
+        translations: hasTranslations ? translations : undefined,
+        // Translations edited now match this Ukrainian; untouched ones keep what they were made from.
+        translatedFrom: hasTranslations ? (draft.translationsEdited || !existing?.translatedFrom ? textHash(title, text) : existing.translatedFrom) : undefined,
         writtenOn: sameDay ? existing.writtenOn : fromDayInput(draft.date),
         hasTime: sameDay ? existing.hasTime : false,
         photos: draft.photos,
@@ -322,10 +352,24 @@ export default function JournalScreen({ journal }) {
           leading={<button type="button" className="org-link" onClick={() => setReading(null)}>Close</button>}
           trailing={<button type="button" className="org-link" onClick={() => startEdit(reading)}>Edit</button>}
         >
+          {reading.translations && (
+            <div className="org-section">
+              <Segmented label="Language" value={lang} onChange={setLang} options={LANGUAGE_OPTIONS} />
+            </div>
+          )}
           <article className="org-entry">
             <p className="org-muted">{entryDate(reading)}</p>
-            {reading.title && <h2>{reading.title}</h2>}
-            <p className="org-prewrap">{reading.text}</p>
+            {(() => {
+              const shown = entryIn(reading, reading.translations ? lang : 'uk');
+              if (!shown) return <p className="org-muted">No translation yet. Tap Edit to add one.</p>;
+              return (
+                <>
+                  {lang !== 'uk' && translationsStale(reading) && <p className="org-muted">Translated from an earlier version of the Ukrainian text.</p>}
+                  {shown.title && <h2>{shown.title}</h2>}
+                  <p className="org-prewrap">{shown.text}</p>
+                </>
+              );
+            })()}
             {reading.photos?.map((url) => <EntryPhoto key={url} url={url} />)}
           </article>
           <Section>

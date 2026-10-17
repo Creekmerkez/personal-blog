@@ -16,6 +16,7 @@ export default function WordEditor({ word, today, onSave, onDelete, onLearnAgain
       successfulRecalls: 0,
       nextReviewDayKey: today,
       isLearned: false,
+      queuePosition: Number.MAX_SAFE_INTEGER, // joins the end of the rotation right away
       createdAt: appleSeconds(),
     };
     onSave({ ...base, word: text.trim(), translation: translation.trim(), notes: notes.trim() });

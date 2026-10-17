@@ -1,16 +1,20 @@
 import { useMemo, useState } from 'react';
-import { IoAdd, IoListOutline, IoLanguageOutline, IoCheckmarkCircleOutline, IoStarOutline, IoCheckmark, IoClose } from 'react-icons/io5';
+import { IoAdd, IoListOutline, IoLanguageOutline, IoStarOutline, IoCheckmark, IoClose } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
-import { formatDay } from '../lib/dates';
-import { answer, dueWords, isNew, nextDueDay, resetToLearning } from '../lib/words';
+import { answerCurrent, counts, RECALLS_TO_LEARN, resetToLearning, rotation } from '../lib/words';
 import { Empty, Screen, Section, Segmented } from '../components/ui';
 import WordEditor from './WordEditor';
 
-function WordCard({ word, dueCount, onAnswer }) {
+function WordCard({ word, summary, onAnswer }) {
   const [revealed, setRevealed] = useState(false);
   return (
     <div className="org-word-card">
-      <p className="org-word-count">{dueCount === 1 ? 'Last word for today' : `${dueCount} words due today`}</p>
+      <p className="org-word-count">{summary}</p>
+      <div className="org-recalls" aria-label={`Remembered ${word.successfulRecalls} of ${RECALLS_TO_LEARN} times`}>
+        {Array.from({ length: RECALLS_TO_LEARN }, (_, i) => (
+          <span key={i} className={i < word.successfulRecalls ? 'is-on' : ''} />
+        ))}
+      </div>
       <div className="org-word-center">
         <h2 className="org-word">{word.word}</h2>
         {revealed && (
@@ -34,11 +38,10 @@ function WordCard({ word, dueCount, onAnswer }) {
   );
 }
 
-function statusOf(word, today) {
+function statusOf(word, going) {
   if (word.isLearned) return 'Learned';
-  if (isNew(word)) return 'New';
-  if (word.nextReviewDayKey <= today) return 'Due today';
-  return formatDay(word.nextReviewDayKey, { day: 'numeric', month: 'short' });
+  if (going.has(word.id)) return `${word.successfulRecalls}/${RECALLS_TO_LEARN}`;
+  return 'Waiting';
 }
 
 export default function WordsScreen() {
@@ -47,9 +50,13 @@ export default function WordsScreen() {
   const [filter, setFilter] = useState('learning');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null); // word, 'new', or null
+  const [answered, setAnswered] = useState(0); // new card after every answer, even for the same word
 
   const words = data.words;
-  const due = dueWords(words, today, settings.newWordsPerDay);
+  const size = settings.rotationSize;
+  const going = rotation(words, size);
+  const goingIds = new Set(going.map((w) => w.id));
+  const tally = counts(words, size);
 
   const replaceWord = (word) =>
     update((d) => ({ ...d, words: d.words.some((w) => w.id === word.id) ? d.words.map((w) => (w.id === word.id ? word : w)) : [...d.words, word] }));
@@ -79,7 +86,7 @@ export default function WordsScreen() {
       onClose={() => setEditing(null)}
       onDelete={remove}
       onLearnAgain={(w) => {
-        replaceWord(resetToLearning(w, today));
+        replaceWord(resetToLearning(w));
         setEditing(null);
       }}
       onSave={(w) => {
@@ -108,7 +115,7 @@ export default function WordsScreen() {
                   <span>{w.word}</span>
                   <small>{w.translation || 'No translation yet'}</small>
                 </span>
-                <span className="org-value">{statusOf(w, today)}</span>
+                <span className="org-value">{statusOf(w, goingIds)}</span>
               </button>
             ))}
           </Section>
@@ -119,30 +126,34 @@ export default function WordsScreen() {
     );
   }
 
-  const next = due.length === 0 ? nextDueDay(words, today) : null;
-
   return (
     <Screen
       title="Word of the Day"
       leading={<button type="button" className="org-icon-button" aria-label="All Words" onClick={() => setShowAll(true)}><IoListOutline /></button>}
       trailing={addButton}
     >
-      {due.length > 0 ? (
-        <WordCard key={due[0].id} word={due[0]} dueCount={due.length} onAnswer={(remembered) => replaceWord(answer(due[0], remembered, today))} />
+      {going.length > 0 ? (
+        <WordCard
+          key={`${going[0].id}-${answered}`}
+          word={going[0]}
+          summary={`${tally.going} in rotation · ${tally.waiting} waiting · ${tally.learned} learned`}
+          onAnswer={(remembered) => {
+            update((d) => ({ ...d, words: answerCurrent(d.words, remembered, today, size) }));
+            setAnswered((n) => n + 1);
+          }}
+        />
       ) : words.length === 0 ? (
         <Empty
           icon={<IoLanguageOutline />}
           title="No Words Yet"
-          text="Add words you want to learn. One will be waiting here each day."
+          text="Add words you want to learn, or import your file in Settings."
           action={<button type="button" className="org-button" onClick={() => setEditing('new')}>Add Word</button>}
         />
-      ) : next ? (
-        <Empty icon={<IoCheckmarkCircleOutline />} title="Nothing Due Today" text={`Next word on ${formatDay(next)}.`} />
       ) : (
         <Empty
           icon={<IoStarOutline />}
           title="All Words Learned"
-          text="Add new words to keep going."
+          text="Add new words to keep going, or put learned ones back with Learn Again in All Words."
           action={<button type="button" className="org-button" onClick={() => setEditing('new')}>Add Word</button>}
         />
       )}

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
 import { isDone, todayList, toggleCompletion } from './tasks';
-import { answer, dueWords, nextDueDay } from './words';
+import { answerCurrent, counts, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
   it('builds day keys from local dates and adds days across month, year and leap day (positive)', () => {
@@ -97,35 +97,57 @@ describe('daily tasks', () => {
   });
 });
 
-describe('word of the day', () => {
-  const word = (name, extra = {}) => ({ word: name, translation: '-', successfulRecalls: 0, nextReviewDayKey: 20260929, isLearned: false, createdAt: 0, ...extra });
+describe('word of the day rotation', () => {
+  let n = 0;
+  const word = (name, extra = {}) => ({ id: `w${n++}`, word: name, translation: 'x', successfulRecalls: 0, nextReviewDayKey: 0, isLearned: false, createdAt: n, ...extra });
+  const names = (words, size) => rotation(words, size).map((w) => w.word);
 
-  it('2 days, then 3 days, then learned; not remembered starts over tomorrow', () => {
-    let w = answer(word('dům'), true, 20260929);
-    expect(w.nextReviewDayKey).toBe(20261001);
-    w = answer(w, true, 20261001);
-    expect(w.nextReviewDayKey).toBe(20261004);
-    w = answer(w, true, 20261004);
-    expect(w.isLearned).toBe(true);
-    const forgotten = answer(answer(word('les'), true, 20260929), false, 20261001);
-    expect(forgotten.successfulRecalls).toBe(0);
-    expect(forgotten.nextReviewDayKey).toBe(20261002);
+  it('keeps a fixed number of words going round, never "nothing today" (positive)', () => {
+    let words = Array.from({ length: 30 }, (_, i) => word(`w${i}`));
+    expect(rotation(words, 20)).toHaveLength(20);
+    for (let i = 0; i < 100; i++) words = answerCurrent(words, i % 2 === 0, 20261017, 20);
+    expect(rotation(words, 20).length).toBeGreaterThan(0);
   });
 
-  it('new words with a translation come before ones still missing it', () => {
-    const words = [word('Captivating', { translation: '', createdAt: 0 }), word('dům', { translation: 'дім', createdAt: 5 })];
-    expect(dueWords(words, 20260929, 5).map((w) => w.word)).toEqual(['dům', 'Captivating']);
+  it('remembered goes to the end of the round', () => {
+    let words = ['a', 'b', 'c'].map((x) => word(x));
+    words = answerCurrent(words, true, 20261017, 3);
+    expect(names(words, 3)).toEqual(['b', 'c', 'a']);
   });
 
-  it('a few new words per day, reviews always, and tomorrow when new words wait', () => {
-    const words = [
-      ...Array.from({ length: 8 }, (_, i) => word(`new ${i}`, { createdAt: i })),
-      word('review', { firstReviewedDayKey: 20260901, createdAt: 100 }),
-      word('learned', { isLearned: true }),
-    ];
-    expect(dueWords(words, 20260929, 5).map((w) => w.word)).toEqual(['review', 'new 0', 'new 1', 'new 2', 'new 3', 'new 4']);
-    const started = words.map((w, i) => (i < 5 ? answer(w, true, 20260929) : w));
-    expect(dueWords(started, 20260929, 5).map((w) => w.word)).toEqual(['review']);
-    expect(nextDueDay(started.filter((w) => w.word !== 'review'), 20260929)).toBe(20260930);
+  it('the third remembered learns the word and the next waiting word takes its place', () => {
+    let words = ['a', 'b', 'c'].map((x) => word(x));
+    for (let i = 0; i < 3; i++) {
+      while (rotation(words, 2)[0].word !== 'a') words = answerCurrent(words, true, 20261017, 2);
+      words = answerCurrent(words, true, 20261017, 2);
+    }
+    const a = words.find((w) => w.word === 'a');
+    expect(a.isLearned).toBe(true);
+    expect(names(words, 2)).not.toContain('a');
+    expect(names(words, 2)).toContain('c');
+    expect(counts(words, 2)).toEqual({ going: 2, learned: 1, waiting: 0 });
+  });
+
+  it('not remembered starts over and comes back after a few cards, not a whole round', () => {
+    let words = Array.from({ length: 20 }, (_, i) => word(`w${i}`));
+    words = answerCurrent(words, true, 20261017, 20);
+    const first = rotation(words, 20)[0].word;
+    words = answerCurrent(words, false, 20261017, 20);
+    expect(names(words, 20).indexOf(first)).toBe(RETRY_AFTER);
+    expect(words.find((w) => w.word === first).successfulRecalls).toBe(0);
+  });
+
+  it('waiting words with a translation come first, and learned words are kept (negative)', () => {
+    const words = [word('Captivating', { translation: '' }), word('dům', { translation: 'дім' }), word('old', { isLearned: true })];
+    expect(names(words, 1)).toEqual(['dům']);
+    expect(words).toHaveLength(3);
+    expect(names([word('only learned', { isLearned: true })], 20)).toEqual([]);
+  });
+
+  it('learn again puts a learned word back into the round', () => {
+    const learned = word('les', { isLearned: true, successfulRecalls: 3 });
+    const words = [word('a'), resetToLearning(learned)];
+    expect(rotation(words, 20).map((w) => w.word)).toContain('les');
+    expect(words[1].successfulRecalls).toBe(0);
   });
 });

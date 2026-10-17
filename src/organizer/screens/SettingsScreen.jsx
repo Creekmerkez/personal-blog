@@ -94,13 +94,13 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
         </Section>
       )}
 
-      <Section header="Word of the Day" footer="Words you are already learning always come back when due. New words start a few at a time.">
+      <Section header="Word of the Day" footer="This many words go round and round. A word you remember three times is learned and makes room for the next one. A word you don't remember comes back after a few cards.">
         <div className="org-row org-labeled">
-          <span>New words per day</span>
+          <span>Words in rotation</span>
           <span className="org-stepper">
-            <span className="org-value">{settings.newWordsPerDay}</span>
-            <button type="button" aria-label="Fewer new words" disabled={settings.newWordsPerDay <= 1} onClick={() => updateSettings({ newWordsPerDay: settings.newWordsPerDay - 1 })}><IoRemove /></button>
-            <button type="button" aria-label="More new words" disabled={settings.newWordsPerDay >= 50} onClick={() => updateSettings({ newWordsPerDay: settings.newWordsPerDay + 1 })}><IoAdd /></button>
+            <span className="org-value">{settings.rotationSize}</span>
+            <button type="button" aria-label="Fewer words in rotation" disabled={settings.rotationSize <= 5} onClick={() => updateSettings({ rotationSize: settings.rotationSize - 5 })}><IoRemove /></button>
+            <button type="button" aria-label="More words in rotation" disabled={settings.rotationSize >= 50} onClick={() => updateSettings({ rotationSize: settings.rotationSize + 5 })}><IoAdd /></button>
           </span>
         </div>
       </Section>

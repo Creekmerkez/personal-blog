@@ -265,3 +265,6 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-forgotten { background: rgba(255, 59, 48, 0.14); color: var(--org-red); }
 .org-word-row .org-value { font-size: 15px; flex: none; }
 .org-search { width: 100%; border: 0; border-radius: 10px; background: var(--org-fill); color: var(--org-text); font: inherit; padding: 9px 12px; outline: none; }
+.org-recalls { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+.org-recalls span { width: 8px; height: 8px; border-radius: 50%; background: var(--org-fill); }
+.org-recalls span.is-on { background: var(--org-green); }

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { OrganizerContext } from './context';
 import { emptyData, validateBackup } from './backup';
-import { DEFAULT_NEW_WORDS_PER_DAY } from './words';
+import { DEFAULT_ROTATION_SIZE } from './words';
 
-const DEFAULT_SETTINGS = { newWordsPerDay: DEFAULT_NEW_WORDS_PER_DAY, lastExportAt: null };
+const DEFAULT_SETTINGS = { rotationSize: DEFAULT_ROTATION_SIZE, lastExportAt: null };
 
 /** Loads the organizer from `storage` and saves every change straight back. */
 export function OrganizerProvider({ storage, today, children }) {

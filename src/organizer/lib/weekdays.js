@@ -42,7 +42,9 @@ export function draftFromMask(mask) {
 }
 
 export function maskFromDraft(draft) {
-  if (draft.mode === 'everyDay') return EVERY_DAY;
+  // Kept for the iPhone app's file format, which has no one-time or monthly tasks.
+  if (draft.mode === 'everyDay' || draft.mode === 'monthly') return EVERY_DAY;
+  if (draft.mode === 'once') return fromWeekdays([weekdayOf(draft.onceDay)]);
   if (draft.mode === 'onDays') return draft.onDays;
   return complement(draft.exceptDays);
 }

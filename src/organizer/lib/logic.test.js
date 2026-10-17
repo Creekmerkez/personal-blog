@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
-import { isDone, todayList, toggleCompletion } from './tasks';
+import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
 import { answerCurrent, counts, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
@@ -83,6 +83,46 @@ describe('daily tasks', () => {
   it('never goes below zero, and a stored day ahead of today still reads as done (negative)', () => {
     expect(toggleCompletion(task({ completionCount: 0, lastCompletedDayKey: 20260912 }), 20260912).completionCount).toBe(0);
     expect(isDone(task({ lastCompletedDayKey: 20260913 }), 20260912)).toBe(true);
+  });
+
+  it('skipping takes a task off today without counting it, until midnight', () => {
+    const shave = skipToday(task({ name: 'Face shaving', completionCount: 10 }), 20261017);
+    expect(isSkipped(shave, 20261017)).toBe(true);
+    expect(isDone(shave, 20261017)).toBe(false);
+    expect(shave.completionCount).toBe(10);
+    expect(isSkipped(shave, 20261018)).toBe(false); // back on To Do tomorrow
+    expect(isSkipped(unskip(shave), 20261017)).toBe(false);
+    const didItAfterAll = toggleCompletion(shave, 20261017);
+    expect(didItAfterAll.completionCount).toBe(11);
+    expect(isSkipped(didItAfterAll, 20261017)).toBe(false);
+    expect(isSkipped(toggleCompletion(didItAfterAll, 20261017), 20261017)).toBe(false); // unchecking returns it to To Do
+  });
+
+  it('a one-time task shows on its day only, never the next day', () => {
+    const once = task({ id: 'o', name: 'Print car documents', onceDayKey: 20261017, weekdayMask: fromWeekdays([7]) });
+    expect(todayList([once], 20261017).map((t) => t.name)).toEqual(['Print car documents']);
+    expect(todayList([once], 20261018)).toEqual([]);
+    expect(todayList([once], 20261024)).toEqual([]); // same weekday a week later: still not shown
+    expect(scheduleSummary(once, 20261017)).toBe('Once · Sat 17 Oct');
+    expect(scheduleSummary(once, 20261018)).toBe('Once · Sat 17 Oct (past)');
+    expect(maskFromDraft({ mode: 'once', onceDay: 20261017 })).toBe(fromWeekdays([7]));
+  });
+
+  it('a monthly task shows on its date each month, or on the last day of a shorter month', () => {
+    const sheets = task({ id: 'm', name: 'Wash bed linen', monthDay: 1 });
+    expect(todayList([sheets], 20261101).map((t) => t.name)).toEqual(['Wash bed linen']);
+    expect(todayList([sheets], 20270101)).toHaveLength(1);
+    expect(todayList([sheets], 20261102)).toEqual([]);
+    const late = task({ id: 'l', monthDay: 31 });
+    expect(todayList([late], 20261031)).toHaveLength(1);
+    expect(todayList([late], 20261130)).toHaveLength(1); // November has 30 days
+    expect(todayList([late], 20270228)).toHaveLength(1);
+    expect(todayList([late], 20270227)).toEqual([]);
+    expect(scheduleSummary(sheets)).toBe('Monthly · on the 1st');
+    expect(scheduleSummary(task({ monthDay: 22 }))).toBe('Monthly · on the 22nd');
+    expect(scheduleSummary(task({ monthDay: 11 }))).toBe('Monthly · on the 11th');
+    expect(scheduleSummary(late)).toBe('Monthly · on the 31st (or the last day)');
+    expect(maskFromDraft({ mode: 'monthly', monthDay: 1 })).toBe(EVERY_DAY);
   });
 
   it('shows only active tasks for today, green first, each in manual order', () => {

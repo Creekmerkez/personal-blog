@@ -1,15 +1,25 @@
 import { useState } from 'react';
-import { appleSeconds } from '../lib/dates';
+import { appleSeconds, dayKeyFromDate } from '../lib/dates';
 import { newId } from '../lib/backup';
 import { draftFromMask, EVERY_DAY, maskFromDraft, summary } from '../lib/weekdays';
+import { scheduleSummary } from '../lib/tasks';
 import WeekdayPicker from '../components/WeekdayPicker';
 import { Section, Segmented, Sheet, Toggle } from '../components/ui';
 
 /** Add (task = null) or edit a task. Works on a draft, so Cancel discards everything. */
+const toInput = (key) => `${Math.floor(key / 10000)}-${String(Math.floor(key / 100) % 100).padStart(2, '0')}-${String(key % 100).padStart(2, '0')}`;
+const fromInput = (text) => Number(text.replaceAll('-', ''));
+
 export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose }) {
   const [name, setName] = useState(task?.name ?? '');
   const [flag, setFlag] = useState(task?.flag ?? 'green');
-  const [draft, setDraft] = useState(() => draftFromMask(task?.weekdayMask ?? EVERY_DAY));
+  const [draft, setDraft] = useState(() => {
+    const today = dayKeyFromDate();
+    const monthDay = task?.monthDay ?? 1;
+    if (task?.onceDayKey != null) return { mode: 'once', onDays: 0, exceptDays: 0, onceDay: task.onceDayKey, monthDay };
+    if (task?.monthDay != null) return { mode: 'monthly', onDays: 0, exceptDays: 0, onceDay: today, monthDay };
+    return { ...draftFromMask(task?.weekdayMask ?? EVERY_DAY), onceDay: today, monthDay };
+  });
   const [details, setDetails] = useState(task?.details ?? '');
   const [isActive, setIsActive] = useState(task?.isActive ?? true);
 
@@ -24,7 +34,16 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       sortOrder,
       createdAt: appleSeconds(),
     };
-    onSave({ ...base, name: name.trim(), flag, weekdayMask: mask, details: details.trim(), isActive });
+    onSave({
+      ...base,
+      name: name.trim(),
+      flag,
+      weekdayMask: mask,
+      onceDayKey: draft.mode === 'once' ? draft.onceDay : null,
+      monthDay: draft.mode === 'monthly' ? draft.monthDay : null,
+      details: details.trim(),
+      isActive,
+    });
   };
 
   return (
@@ -42,17 +61,59 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
           <Segmented label="Type" value={flag} onChange={setFlag} options={[{ value: 'green', label: 'Green' }, { value: 'red', label: 'Red' }]} />
         </div>
       </Section>
-      <Section header="Repeats" footer={mask === 0 ? 'Choose at least one day.' : summary(mask)}>
+      <Section
+        header="Repeats"
+        footer={
+          draft.mode === 'once'
+            ? 'Shows on Today on this day only, and not again after it.'
+            : draft.mode === 'monthly'
+              ? scheduleSummary({ monthDay: draft.monthDay })
+              : mask === 0 ? 'Choose at least one day.' : summary(mask)
+        }
+      >
         <div className="org-row">
           <Segmented
             label="Repeats"
             value={draft.mode}
             onChange={(mode) => setDraft({ ...draft, mode })}
-            options={[{ value: 'everyDay', label: 'Every day' }, { value: 'onDays', label: 'On days' }, { value: 'exceptDays', label: 'Except' }]}
+            options={[
+              { value: 'everyDay', label: 'Daily' },
+              { value: 'onDays', label: 'On days' },
+              { value: 'exceptDays', label: 'Except' },
+              { value: 'monthly', label: 'Monthly' },
+              { value: 'once', label: 'Once' },
+            ]}
           />
         </div>
         {draft.mode === 'onDays' && (
           <div className="org-row"><WeekdayPicker mask={draft.onDays} onChange={(onDays) => setDraft({ ...draft, onDays })} /></div>
+        )}
+        {draft.mode === 'monthly' && (
+          <div className="org-row">
+            <div className="org-month-days" role="radiogroup" aria-label="Day of the month">
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.monthDay === day}
+                  className={draft.monthDay === day ? 'is-on' : ''}
+                  onClick={() => setDraft({ ...draft, monthDay: day })}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {draft.mode === 'once' && (
+          <input
+            className="org-input"
+            type="date"
+            aria-label="Day"
+            value={toInput(draft.onceDay)}
+            onChange={(e) => e.target.value && setDraft({ ...draft, onceDay: fromInput(e.target.value) })}
+          />
         )}
         {draft.mode === 'exceptDays' && (
           <div className="org-row"><WeekdayPicker mask={draft.exceptDays} onChange={(exceptDays) => setDraft({ ...draft, exceptDays })} /></div>

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
-import { isDone, todayList, toggleCompletion } from './tasks';
+import { isDone, scheduleSummary, todayList, toggleCompletion } from './tasks';
 import { answerCurrent, counts, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
@@ -83,6 +83,16 @@ describe('daily tasks', () => {
   it('never goes below zero, and a stored day ahead of today still reads as done (negative)', () => {
     expect(toggleCompletion(task({ completionCount: 0, lastCompletedDayKey: 20260912 }), 20260912).completionCount).toBe(0);
     expect(isDone(task({ lastCompletedDayKey: 20260913 }), 20260912)).toBe(true);
+  });
+
+  it('a one-time task shows on its day only, never the next day', () => {
+    const once = task({ id: 'o', name: 'Print car documents', onceDayKey: 20261017, weekdayMask: fromWeekdays([7]) });
+    expect(todayList([once], 20261017).map((t) => t.name)).toEqual(['Print car documents']);
+    expect(todayList([once], 20261018)).toEqual([]);
+    expect(todayList([once], 20261024)).toEqual([]); // same weekday a week later: still not shown
+    expect(scheduleSummary(once, 20261017)).toBe('Once · Sat 17 Oct');
+    expect(scheduleSummary(once, 20261018)).toBe('Once · Sat 17 Oct (past)');
+    expect(maskFromDraft({ mode: 'once', onceDay: 20261017 })).toBe(fromWeekdays([7]));
   });
 
   it('shows only active tasks for today, green first, each in manual order', () => {

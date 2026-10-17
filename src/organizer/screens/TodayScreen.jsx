@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
-import { isDone, todayList, toggleCompletion } from '../lib/tasks';
-import { summary } from '../lib/weekdays';
+import { isDone, scheduleSummary, todayList, toggleCompletion } from '../lib/tasks';
 import { Empty, FlagDot, Screen, Section, Segmented, Sheet } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
@@ -79,7 +78,7 @@ export default function TodayScreen({ onOpenSettings }) {
                 <FlagDot flag={task.flag} />
                 <button type="button" className="org-row-main" onClick={() => setEditing(task)}>
                   <span className={task.isActive ? '' : 'org-muted'}>{task.name}</span>
-                  <small>{summary(task.weekdayMask)}{task.isActive ? '' : ' · Paused'}</small>
+                  <small>{scheduleSummary(task, today)}{task.isActive ? '' : ' · Paused'}</small>
                 </button>
                 <span className="org-count">{task.completionCount}</span>
                 <span className="org-reorder">
@@ -170,7 +169,7 @@ export default function TodayScreen({ onOpenSettings }) {
         >
           <Section>
             <div className="org-row org-labeled"><span>Type</span><span className="org-value"><FlagDot flag={openTask.flag} /> {openTask.flag === 'red' ? 'Red' : 'Green'}</span></div>
-            <div className="org-row org-labeled"><span>Repeats</span><span className="org-value">{summary(openTask.weekdayMask)}</span></div>
+            <div className="org-row org-labeled"><span>Repeats</span><span className="org-value">{scheduleSummary(openTask, today)}</span></div>
             <div className="org-row org-labeled"><span>Days checked</span><span className="org-value">{openTask.completionCount}</span></div>
             {!openTask.isActive && <div className="org-row org-labeled"><span>Status</span><span className="org-value">Paused</span></div>}
           </Section>

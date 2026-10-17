@@ -1,7 +1,7 @@
 // Offline support for the organizer. Pages: network first, cached copy when
 // offline. Hashed assets: cached on first use. No data passes through here;
 // the organizer's data lives in IndexedDB on the device.
-const CACHE = 'organizer-v1';
+const CACHE = 'organizer-v2';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -34,7 +34,9 @@ self.addEventListener('fetch', (event) => {
 
   if (event.request.mode === 'navigate' && url.pathname.startsWith('/organizer')) {
     event.respondWith(
-      fetch(event.request)
+      // no-cache: always ask the server for the newest page (GitHub Pages
+      // otherwise lets the browser reuse it for 10 minutes), offline: cached copy.
+      fetch(event.request.url, { cache: 'no-cache' })
         .then((response) => {
           const copy = response.clone();
           if (response.ok) caches.open(CACHE).then((cache) => cache.put('/organizer/', copy));

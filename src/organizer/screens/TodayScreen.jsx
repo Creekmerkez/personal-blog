@@ -20,7 +20,8 @@ export default function TodayScreen({ onOpenSettings }) {
   const todo = visible.filter((task) => !isDone(task, today));
   const done = visible.filter((task) => isDone(task, today));
   const shown = view === 'todo' ? todo : done;
-  const nextSortOrder = tasks.reduce((max, t) => Math.max(max, t.sortOrder), -1) + 1;
+  // New tasks go to the top of the list.
+  const firstSortOrder = tasks.reduce((min, t) => Math.min(min, t.sortOrder), 0) - 1;
 
   const replaceTask = (task) =>
     update((d) => ({ ...d, myTasks: d.myTasks.some((t) => t.id === task.id) ? d.myTasks.map((t) => (t.id === task.id ? task : t)) : [...d.myTasks, task] }));
@@ -52,8 +53,9 @@ export default function TodayScreen({ onOpenSettings }) {
 
   const editor = editing && (
     <TaskEditor
+      key={`editor-${editing === 'new' ? 'new' : editing.id}`}
       task={editing === 'new' ? null : editing}
-      nextSortOrder={nextSortOrder}
+      sortOrder={firstSortOrder}
       onClose={() => setEditing(null)}
       onDelete={remove}
       onSave={(task) => {
@@ -160,6 +162,7 @@ export default function TodayScreen({ onOpenSettings }) {
 
       {openTask && !editing && (
         <Sheet
+          key={`details-${openTask.id}`}
           title={openTask.name}
           onClose={() => setOpenTask(null)}
           leading={<button type="button" className="org-link" onClick={() => setOpenTask(null)}>Close</button>}

@@ -6,7 +6,7 @@ import WeekdayPicker from '../components/WeekdayPicker';
 import { Section, Segmented, Sheet, Toggle } from '../components/ui';
 
 /** Add (task = null) or edit a task. Works on a draft, so Cancel discards everything. */
-export default function TaskEditor({ task, nextSortOrder, onSave, onDelete, onClose }) {
+export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose }) {
   const [name, setName] = useState(task?.name ?? '');
   const [flag, setFlag] = useState(task?.flag ?? 'green');
   const [draft, setDraft] = useState(() => draftFromMask(task?.weekdayMask ?? EVERY_DAY));
@@ -21,7 +21,7 @@ export default function TaskEditor({ task, nextSortOrder, onSave, onDelete, onCl
       id: newId(),
       completionCount: 0,
       lastCompletedDayKey: null,
-      sortOrder: nextSortOrder,
+      sortOrder,
       createdAt: appleSeconds(),
     };
     onSave({ ...base, name: name.trim(), flag, weekdayMask: mask, details: details.trim(), isActive });

@@ -11,6 +11,7 @@ import ItemEditor from './ItemEditor';
 
 const replaceIn = (list, item) => (list.some((x) => x.id === item.id) ? list.map((x) => (x.id === item.id ? item : x)) : [...list, item]);
 const nextOrder = (list) => list.reduce((max, x) => Math.max(max, x.sortOrder ?? 0), -1) + 1;
+const firstOrder = (list) => list.reduce((min, x) => Math.min(min, x.sortOrder ?? 0), 0) - 1;
 
 function useList(key) {
   const { data, update } = useOrganizer();
@@ -53,7 +54,7 @@ function SonTasks({ onBack }) {
         <ItemEditor
           title={editing === 'new' ? 'New Task' : 'Edit Task'}
           item={editing === 'new' ? null : editing}
-          defaults={{ isDone: false, completedAt: null, sortOrder: nextOrder(list) }}
+          defaults={{ isDone: false, completedAt: null, sortOrder: firstOrder(list) }}
           fields={[{ key: 'title', label: 'Task', type: 'text' }, { key: 'notes', label: 'Notes', type: 'textarea' }]}
           onClose={() => setEditing(null)}
           onSave={(item) => { save(item); setEditing(null); }}

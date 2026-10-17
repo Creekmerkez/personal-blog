@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { IoChevronBack } from 'react-icons/io5';
 
 /** A screen with an iOS-style navigation bar and large title. */
@@ -24,7 +24,32 @@ export function Screen({ title, leading, trailing, onBack, backLabel, children }
 }
 
 /** A bottom sheet with its own small navigation bar, like a SwiftUI sheet. */
+let openSheets = 0;
+let savedScrollY = 0;
+
+/** Freezes the page behind open sheets. iOS Safari ignores overflow: hidden, so pin the body instead. */
+function freezePage() {
+  if (openSheets++ > 0) return;
+  savedScrollY = window.scrollY;
+  Object.assign(document.body.style, { position: 'fixed', top: `-${savedScrollY}px`, left: '0', right: '0' });
+}
+
+function unfreezePage() {
+  if (--openSheets > 0) return;
+  Object.assign(document.body.style, { position: '', top: '', left: '', right: '' });
+  window.scrollTo(0, savedScrollY);
+}
+
 export function Sheet({ title, leading, trailing, onClose, children }) {
+  const bodyRef = useRef(null);
+
+  // Always open at the top: the title and name come first, not the details below.
+  useLayoutEffect(() => {
+    if (bodyRef.current) bodyRef.current.scrollTop = 0;
+    freezePage();
+    return unfreezePage;
+  }, []);
+
   useEffect(() => {
     const onKey = (event) => event.key === 'Escape' && onClose?.();
     document.addEventListener('keydown', onKey);
@@ -39,7 +64,7 @@ export function Sheet({ title, leading, trailing, onClose, children }) {
           <strong className="org-sheet-title">{title}</strong>
           <div className="org-navbar-side org-navbar-trailing">{trailing}</div>
         </header>
-        <div className="org-sheet-body">{children}</div>
+        <div className="org-sheet-body" ref={bodyRef}>{children}</div>
       </div>
     </div>
   );

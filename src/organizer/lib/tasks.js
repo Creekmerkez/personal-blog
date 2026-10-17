@@ -14,14 +14,27 @@ export function toggleCompletion(task, today) {
   return { ...task, completionCount: task.completionCount + 1, lastCompletedDayKey: today };
 }
 
-/** True when the task is scheduled on `day`. A one-time task (onceDayKey) appears on that day only. */
+const lastDayOfMonth = (day) => new Date(Math.floor(day / 10000), Math.floor(day / 100) % 100, 0).getDate();
+
+const ordinal = (n) => {
+  const tens = n % 100;
+  if (tens >= 11 && tens <= 13) return `${n}th`;
+  return `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th'}`;
+};
+
+/**
+ * True when the task is scheduled on `day`. A one-time task (onceDayKey) appears on that day only.
+ * A monthly task (monthDay 1–31) appears on that date each month, or on the last day of a shorter month.
+ */
 export function isScheduled(task, day) {
   if (task.onceDayKey != null) return task.onceDayKey === day;
+  if (task.monthDay != null) return day % 100 === Math.min(task.monthDay, lastDayOfMonth(day));
   return includesDay(task.weekdayMask, day);
 }
 
-/** "Every day", "Mon, Wed, Fri", or "Once · Sat 17 Oct" for a one-time task. */
+/** "Every day", "Mon, Wed, Fri", "Monthly · on the 1st", or "Once · Sat 17 Oct" for a one-time task. */
 export function scheduleSummary(task, today) {
+  if (task.monthDay != null) return `Monthly · on the ${ordinal(task.monthDay)}${task.monthDay > 28 ? ' (or the last day)' : ''}`;
   if (task.onceDayKey == null) return summary(task.weekdayMask);
   const when = formatDay(task.onceDayKey, { weekday: 'short', day: 'numeric', month: 'short' });
   return `Once · ${when}${today != null && task.onceDayKey < today ? ' (past)' : ''}`;

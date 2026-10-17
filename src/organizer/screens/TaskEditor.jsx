@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { appleSeconds, dayKeyFromDate } from '../lib/dates';
 import { newId } from '../lib/backup';
 import { draftFromMask, EVERY_DAY, maskFromDraft, summary } from '../lib/weekdays';
+import { scheduleSummary } from '../lib/tasks';
 import WeekdayPicker from '../components/WeekdayPicker';
 import { Section, Segmented, Sheet, Toggle } from '../components/ui';
 
@@ -14,8 +15,10 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
   const [flag, setFlag] = useState(task?.flag ?? 'green');
   const [draft, setDraft] = useState(() => {
     const today = dayKeyFromDate();
-    if (task?.onceDayKey != null) return { mode: 'once', onDays: 0, exceptDays: 0, onceDay: task.onceDayKey };
-    return { ...draftFromMask(task?.weekdayMask ?? EVERY_DAY), onceDay: today };
+    const monthDay = task?.monthDay ?? 1;
+    if (task?.onceDayKey != null) return { mode: 'once', onDays: 0, exceptDays: 0, onceDay: task.onceDayKey, monthDay };
+    if (task?.monthDay != null) return { mode: 'monthly', onDays: 0, exceptDays: 0, onceDay: today, monthDay };
+    return { ...draftFromMask(task?.weekdayMask ?? EVERY_DAY), onceDay: today, monthDay };
   });
   const [details, setDetails] = useState(task?.details ?? '');
   const [isActive, setIsActive] = useState(task?.isActive ?? true);
@@ -37,6 +40,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       flag,
       weekdayMask: mask,
       onceDayKey: draft.mode === 'once' ? draft.onceDay : null,
+      monthDay: draft.mode === 'monthly' ? draft.monthDay : null,
       details: details.trim(),
       isActive,
     });
@@ -62,7 +66,9 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
         footer={
           draft.mode === 'once'
             ? 'Shows on Today on this day only, and not again after it.'
-            : mask === 0 ? 'Choose at least one day.' : summary(mask)
+            : draft.mode === 'monthly'
+              ? scheduleSummary({ monthDay: draft.monthDay })
+              : mask === 0 ? 'Choose at least one day.' : summary(mask)
         }
       >
         <div className="org-row">
@@ -71,15 +77,34 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
             value={draft.mode}
             onChange={(mode) => setDraft({ ...draft, mode })}
             options={[
-              { value: 'everyDay', label: 'Every day' },
+              { value: 'everyDay', label: 'Daily' },
               { value: 'onDays', label: 'On days' },
               { value: 'exceptDays', label: 'Except' },
+              { value: 'monthly', label: 'Monthly' },
               { value: 'once', label: 'Once' },
             ]}
           />
         </div>
         {draft.mode === 'onDays' && (
           <div className="org-row"><WeekdayPicker mask={draft.onDays} onChange={(onDays) => setDraft({ ...draft, onDays })} /></div>
+        )}
+        {draft.mode === 'monthly' && (
+          <div className="org-row">
+            <div className="org-month-days" role="radiogroup" aria-label="Day of the month">
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.monthDay === day}
+                  className={draft.monthDay === day ? 'is-on' : ''}
+                  onClick={() => setDraft({ ...draft, monthDay: day })}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
         {draft.mode === 'once' && (
           <input

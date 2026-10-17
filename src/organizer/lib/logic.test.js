@@ -95,6 +95,23 @@ describe('daily tasks', () => {
     expect(maskFromDraft({ mode: 'once', onceDay: 20261017 })).toBe(fromWeekdays([7]));
   });
 
+  it('a monthly task shows on its date each month, or on the last day of a shorter month', () => {
+    const sheets = task({ id: 'm', name: 'Wash bed linen', monthDay: 1 });
+    expect(todayList([sheets], 20261101).map((t) => t.name)).toEqual(['Wash bed linen']);
+    expect(todayList([sheets], 20270101)).toHaveLength(1);
+    expect(todayList([sheets], 20261102)).toEqual([]);
+    const late = task({ id: 'l', monthDay: 31 });
+    expect(todayList([late], 20261031)).toHaveLength(1);
+    expect(todayList([late], 20261130)).toHaveLength(1); // November has 30 days
+    expect(todayList([late], 20270228)).toHaveLength(1);
+    expect(todayList([late], 20270227)).toEqual([]);
+    expect(scheduleSummary(sheets)).toBe('Monthly · on the 1st');
+    expect(scheduleSummary(task({ monthDay: 22 }))).toBe('Monthly · on the 22nd');
+    expect(scheduleSummary(task({ monthDay: 11 }))).toBe('Monthly · on the 11th');
+    expect(scheduleSummary(late)).toBe('Monthly · on the 31st (or the last day)');
+    expect(maskFromDraft({ mode: 'monthly', monthDay: 1 })).toBe(EVERY_DAY);
+  });
+
   it('shows only active tasks for today, green first, each in manual order', () => {
     const tasks = [
       task({ id: '1', name: 'Alcohol', flag: 'red', sortOrder: 0 }),

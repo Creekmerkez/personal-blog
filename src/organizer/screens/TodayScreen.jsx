@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { isDone, todayList, toggleCompletion } from '../lib/tasks';
 import { summary } from '../lib/weekdays';
-import { Empty, FlagDot, Screen, Section, Sheet } from '../components/ui';
+import { Empty, FlagDot, Screen, Section, Segmented, Sheet } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
 
@@ -13,9 +13,13 @@ export default function TodayScreen({ onOpenSettings }) {
   const [showAll, setShowAll] = useState(false);
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [openTask, setOpenTask] = useState(null);
+  const [view, setView] = useState('todo'); // 'todo' | 'done'
 
   const tasks = data.myTasks;
   const visible = todayList(tasks, today);
+  const todo = visible.filter((task) => !isDone(task, today));
+  const done = visible.filter((task) => isDone(task, today));
+  const shown = view === 'todo' ? todo : done;
   const nextSortOrder = tasks.reduce((max, t) => Math.max(max, t.sortOrder), -1) + 1;
 
   const replaceTask = (task) =>
@@ -110,30 +114,48 @@ export default function TodayScreen({ onOpenSettings }) {
       ) : visible.length === 0 ? (
         <Empty icon={<IoSunnyOutline />} title="Nothing for Today" text="No tasks are scheduled for today." />
       ) : (
-        <Section header={formatDay(today)}>
-          {visible.map((task) => {
-            const done = isDone(task, today);
-            return (
-              <div key={task.id} className="org-row org-task">
-                <FlagDot flag={task.flag} />
-                <button
-                  type="button"
-                  className={`org-check ${done ? 'is-done' : ''}`}
-                  aria-label={task.name}
-                  aria-pressed={done}
-                  onClick={() => toggle(task)}
-                >
-                  {done ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
-                </button>
-                <button type="button" className="org-row-main" onClick={() => setOpenTask(task)}>
-                  <span>{task.name}</span>
-                </button>
-                {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
-                <span className="org-count" aria-label={`${task.completionCount} days`}>{task.completionCount}</span>
-              </div>
-            );
-          })}
-        </Section>
+        <>
+          <div className="org-section">
+            <Segmented
+              label="Show"
+              value={view}
+              onChange={setView}
+              options={[{ value: 'todo', label: `To Do (${todo.length})` }, { value: 'done', label: `Done (${done.length})` }]}
+            />
+          </div>
+          {shown.length === 0 ? (
+            view === 'todo' ? (
+              <Empty icon={<IoCheckmarkDoneOutline />} title="Everything Done" text="All of today's tasks are checked. Tomorrow the list starts again." />
+            ) : (
+              <Empty icon={<IoEllipseOutline />} title="Nothing Checked Yet" text="Tasks you check today move here." />
+            )
+          ) : (
+            <Section header={formatDay(today)}>
+              {shown.map((task) => {
+                const checked = isDone(task, today);
+                return (
+                  <div key={task.id} className="org-row org-task">
+                    <FlagDot flag={task.flag} />
+                    <button
+                      type="button"
+                      className={`org-check ${checked ? 'is-done' : ''}`}
+                      aria-label={task.name}
+                      aria-pressed={checked}
+                      onClick={() => toggle(task)}
+                    >
+                      {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
+                    </button>
+                    <button type="button" className="org-row-main" onClick={() => setOpenTask(task)}>
+                      <span className={checked ? 'org-muted' : ''}>{task.name}</span>
+                    </button>
+                    {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
+                    <span className="org-count" aria-label={`${task.completionCount} days`}>{task.completionCount}</span>
+                  </div>
+                );
+              })}
+            </Section>
+          )}
+        </>
       )}
 
       {openTask && !editing && (
@@ -153,6 +175,7 @@ export default function TodayScreen({ onOpenSettings }) {
             <p className="org-row org-prewrap">{openTask.details || <span className="org-muted">No details</span>}</p>
           </Section>
           <Section>
+            <button type="button" className="org-row org-action org-center" onClick={() => setEditing(openTask)}>Edit Task</button>
             <button type="button" className="org-row org-destructive" onClick={() => remove(openTask)}>Delete Task</button>
           </Section>
         </Sheet>

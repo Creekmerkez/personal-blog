@@ -268,3 +268,4 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-recalls { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
 .org-recalls span { width: 8px; height: 8px; border-radius: 50%; background: var(--org-fill); }
 .org-recalls span.is-on { background: var(--org-green); }
+.org-center { justify-content: center; }

@@ -11,7 +11,8 @@ const dayInput = (seconds) => {
   return `${Math.floor(key / 10000)}-${String(Math.floor(key / 100) % 100).padStart(2, '0')}-${String(key % 100).padStart(2, '0')}`;
 };
 const fromDayInput = (text) => appleSeconds(dateFromDayKey(Number(text.replaceAll('-', ''))));
-const longDate = (seconds) => dateFromAppleSeconds(seconds).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const entryDate = (entry) =>
+  dateFromAppleSeconds(entry.writtenOn).toLocaleString('en-GB', entry.hasTime ? { dateStyle: 'full', timeStyle: 'short' } : { dateStyle: 'full' });
 const shortDate = (seconds) => dateFromAppleSeconds(seconds).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 function heading(entry) {
@@ -139,11 +140,14 @@ export default function JournalScreen({ journal }) {
     run(async () => {
       const now = appleSeconds();
       const existing = journal.entries.find((e) => e.id === draft.id);
+      // Keep an entry's exact time unless its day was changed.
+      const sameDay = existing && draft.date === dayInput(existing.writtenOn);
       const entry = {
         ...(existing ?? { id: newId(), createdAt: now }),
         title: draft.title.trim(),
         text: draft.text.trim(),
-        writtenOn: fromDayInput(draft.date),
+        writtenOn: sameDay ? existing.writtenOn : fromDayInput(draft.date),
+        hasTime: sameDay ? existing.hasTime : false,
         updatedAt: now,
       };
       await journal.saveEntries(existing ? journal.entries.map((e) => (e.id === entry.id ? entry : e)) : [...journal.entries, entry]);
@@ -208,7 +212,7 @@ export default function JournalScreen({ journal }) {
           trailing={<button type="button" className="org-link" onClick={() => startEdit(reading)}>Edit</button>}
         >
           <article className="org-entry">
-            <p className="org-muted">{longDate(reading.writtenOn)}</p>
+            <p className="org-muted">{entryDate(reading)}</p>
             {reading.title && <h2>{reading.title}</h2>}
             <p className="org-prewrap">{reading.text}</p>
           </article>

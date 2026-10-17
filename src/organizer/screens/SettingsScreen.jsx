@@ -6,6 +6,7 @@ import { serialize, summarize, validateBackup } from '../lib/backup';
 import { isEncrypted, open, seal } from '../lib/crypto';
 import { Screen, Section, Toggle } from '../components/ui';
 import PasswordSheet from './PasswordSheet';
+import { isJournalFile, journalEntriesFrom } from '../lib/journalFile';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
 
@@ -22,7 +23,7 @@ async function saveFile(text, name) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export default function SettingsScreen({ prepareExport, applyImport, journal }) {
+export default function SettingsScreen({ prepareExport, applyImport, addJournalEntries, journal }) {
   const { data, settings, updateSettings } = useOrganizer();
   const [passwordMode, setPasswordMode] = useState(null); // 'create' | 'enter'
   const [readyFile, setReadyFile] = useState(null);
@@ -63,7 +64,19 @@ export default function SettingsScreen({ prepareExport, applyImport, journal }) 
   };
 
   const confirmAndApply = async (text) => {
-    const backup = validateBackup(JSON.parse(text));
+    const value = JSON.parse(text);
+    if (isJournalFile(value)) {
+      const entries = journalEntriesFrom(value);
+      if (!window.confirm(`Add ${entries.length} entries to your Journal?\n\nNothing else changes, and entries already in the journal are skipped.`)) return;
+      try {
+        const added = await addJournalEntries(entries);
+        window.alert(`${added} ${added === 1 ? 'entry was' : 'entries were'} added to your Journal.${added < entries.length ? ` ${entries.length - added} were already there.` : ''}`);
+      } catch (err) {
+        window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
+      }
+      return;
+    }
+    const backup = validateBackup(value);
     const when = dateFromAppleSeconds(backup.exportedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' });
     if (window.confirm(`Replace all data?\n\nThe file from ${when} has ${summarize(backup)}. Your tasks, Son and words in the app will be replaced${backup.journal.length ? ', and so will the journal' : '; your journal stays as it is'}.`)) {
       try {
@@ -137,7 +150,7 @@ export default function SettingsScreen({ prepareExport, applyImport, journal }) 
 
       <Section
         header="Backup"
-        footer="Your data is stored only on this iPhone, never on a server. Export saves all of it to one file protected by a password you choose. Keep the file in a private place, such as a Google Drive folder you never share. Import replaces everything in the app with the contents of such a file."
+        footer="Your data is stored only on this iPhone, never on a server. Export saves all of it to one file protected by a password you choose. Keep the file in a private place, such as a Google Drive folder you never share. Import replaces everything in the app with the contents of such a file. A journal file (entries prepared for you) only adds entries to the Journal."
       >
         {readyFile ? (
           <button type="button" className="org-row org-action" onClick={share}><IoCloudUploadOutline aria-hidden="true" /> Save Encrypted File…</button>

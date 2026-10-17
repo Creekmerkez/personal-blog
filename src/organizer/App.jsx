@@ -46,6 +46,19 @@ export default function App() {
     [update, journal],
   );
 
+  // A journal file only adds entries; it never touches anything else.
+  const addJournalEntries = useCallback(
+    async (entries) => {
+      if (journal.status === 'setup') throw new Error('Open the Journal tab and create your journal first, then import again.');
+      if (journal.status !== 'unlocked') {
+        if (!journal.hasFaceId) throw new Error('Unlock the Journal first, then import again.');
+        await journal.unlockWithFaceId();
+      }
+      return journal.addEntries(entries);
+    },
+    [journal],
+  );
+
   return (
     <div className="org-app">
       {appLocked && journal.status === 'locked' && (
@@ -59,7 +72,7 @@ export default function App() {
           {tab === 'son' && <SonScreen />}
           {tab === 'words' && <WordsScreen />}
           {tab === 'journal' && <JournalScreen journal={journal} />}
-          {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} journal={journal} />}
+          {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} addJournalEntries={addJournalEntries} journal={journal} />}
         </main>
         <nav className="org-tabbar" aria-label="Sections">
           {TABS.map((item) => {

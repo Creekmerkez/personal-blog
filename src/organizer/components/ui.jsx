@@ -110,11 +110,11 @@ export function Segmented({ value, options, onChange, label }) {
   );
 }
 
-export function Toggle({ checked, onChange, label }) {
+export function Toggle({ checked, onChange, label, disabled = false }) {
   return (
     <label className="org-row org-toggle-row">
-      <span>{label}</span>
-      <input type="checkbox" role="switch" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <span className={disabled ? 'org-muted' : ''}>{label}</span>
+      <input type="checkbox" role="switch" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
     </label>
   );
 }

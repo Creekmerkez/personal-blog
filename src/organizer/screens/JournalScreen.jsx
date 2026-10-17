@@ -60,13 +60,14 @@ function Setup({ journal }) {
   );
 }
 
-function Locked({ journal }) {
+/** Also locks the whole organizer when the app lock is on (Settings), with the same password and Face ID. */
+export function Locked({ journal, title = 'Journal', heading = 'Journal Locked', text = 'Your journal is private.' }) {
   const [usePassword, setUsePassword] = useState(!journal.hasFaceId);
   const [password, setPassword] = useState('');
   const { error, busy, run } = useAsync();
   return (
-    <Screen title="Journal">
-      <Empty icon={<IoLockClosed />} title="Journal Locked" text="Your journal is private." />
+    <Screen title={title}>
+      <Empty icon={<IoLockClosed />} title={heading} text={text} />
       {journal.hasFaceId && (
         <button type="button" className="org-button org-wide" disabled={busy} onClick={() => run(journal.unlockWithFaceId)}>
           <IoScanOutline aria-hidden="true" /> Unlock with Face ID

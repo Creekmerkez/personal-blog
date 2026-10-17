@@ -120,6 +120,7 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-check.is-done { color: var(--org-accent); }
 .org-row-main { flex: 1; min-height: 44px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
 .org-row-main small { color: var(--org-secondary); font-size: 13px; margin-top: 2px; }
+.org-skip { font-size: 20px; color: var(--org-secondary); width: 40px; height: 44px; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-right: -8px; }
 .org-count { color: var(--org-secondary); font-variant-numeric: tabular-nums; min-width: 24px; text-align: right; }
 .org-details-mark { color: var(--org-tertiary); font-size: 16px; flex: none; }
 .org-reorder { display: inline-flex; flex-direction: column; margin-right: -8px; }

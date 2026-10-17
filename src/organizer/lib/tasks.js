@@ -11,8 +11,13 @@ export function toggleCompletion(task, today) {
   if (isDone(task, today)) {
     return { ...task, completionCount: Math.max(0, task.completionCount - 1), lastCompletedDayKey: null };
   }
-  return { ...task, completionCount: task.completionCount + 1, lastCompletedDayKey: today };
+  return { ...task, completionCount: task.completionCount + 1, lastCompletedDayKey: today, skippedDayKey: null };
 }
+
+// Skipping takes a task off today's To Do without counting it. Like done, it lasts until midnight.
+export const isSkipped = (task, today) => task.skippedDayKey === today && !isDone(task, today);
+export const skipToday = (task, today) => ({ ...task, skippedDayKey: today });
+export const unskip = (task) => ({ ...task, skippedDayKey: null });
 
 const lastDayOfMonth = (day) => new Date(Math.floor(day / 10000), Math.floor(day / 100) % 100, 0).getDate();
 

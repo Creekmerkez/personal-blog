@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
-import { isDone, scheduleSummary, todayList, toggleCompletion } from './tasks';
+import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
 import { answerCurrent, counts, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
@@ -83,6 +83,19 @@ describe('daily tasks', () => {
   it('never goes below zero, and a stored day ahead of today still reads as done (negative)', () => {
     expect(toggleCompletion(task({ completionCount: 0, lastCompletedDayKey: 20260912 }), 20260912).completionCount).toBe(0);
     expect(isDone(task({ lastCompletedDayKey: 20260913 }), 20260912)).toBe(true);
+  });
+
+  it('skipping takes a task off today without counting it, until midnight', () => {
+    const shave = skipToday(task({ name: 'Face shaving', completionCount: 10 }), 20261017);
+    expect(isSkipped(shave, 20261017)).toBe(true);
+    expect(isDone(shave, 20261017)).toBe(false);
+    expect(shave.completionCount).toBe(10);
+    expect(isSkipped(shave, 20261018)).toBe(false); // back on To Do tomorrow
+    expect(isSkipped(unskip(shave), 20261017)).toBe(false);
+    const didItAfterAll = toggleCompletion(shave, 20261017);
+    expect(didItAfterAll.completionCount).toBe(11);
+    expect(isSkipped(didItAfterAll, 20261017)).toBe(false);
+    expect(isSkipped(toggleCompletion(didItAfterAll, 20261017), 20261017)).toBe(false); // unchecking returns it to To Do
   });
 
   it('a one-time task shows on its day only, never the next day', () => {

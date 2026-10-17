@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
-import { isDone, scheduleSummary, todayList, toggleCompletion } from '../lib/tasks';
+import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
 import { Empty, FlagDot, Screen, Section, Segmented, Sheet } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
@@ -16,9 +16,9 @@ export default function TodayScreen({ onOpenSettings }) {
 
   const tasks = data.myTasks;
   const visible = todayList(tasks, today);
-  const todo = visible.filter((task) => !isDone(task, today));
+  const todo = visible.filter((task) => !isDone(task, today) && !isSkipped(task, today));
   const done = visible.filter((task) => isDone(task, today));
-  const shown = view === 'todo' ? todo : done;
+  const skipped = visible.filter((task) => isSkipped(task, today));
   // New tasks go to the top of the list.
   const firstSortOrder = tasks.reduce((min, t) => Math.min(min, t.sortOrder), 0) - 1;
 
@@ -26,6 +26,43 @@ export default function TodayScreen({ onOpenSettings }) {
     update((d) => ({ ...d, myTasks: d.myTasks.some((t) => t.id === task.id) ? d.myTasks.map((t) => (t.id === task.id ? task : t)) : [...d.myTasks, task] }));
 
   const toggle = (task) => replaceTask(toggleCompletion(task, today));
+  const skip = (task) => replaceTask(skipToday(task, today));
+  const restore = (task) => replaceTask(unskip(task));
+
+  const row = (task) => {
+    const checked = isDone(task, today);
+    const wasSkipped = isSkipped(task, today);
+    return (
+      <div key={task.id} className="org-row org-task">
+        <FlagDot flag={task.flag} />
+        <button
+          type="button"
+          className={`org-check ${checked ? 'is-done' : ''}`}
+          aria-label={task.name}
+          aria-pressed={checked}
+          onClick={() => toggle(task)}
+        >
+          {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
+        </button>
+        <button type="button" className="org-row-main" onClick={() => setOpenTask(task)}>
+          <span className={checked || wasSkipped ? 'org-muted' : ''}>{task.name}</span>
+        </button>
+        {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
+        <span className="org-count" aria-label={`${task.completionCount} days`}>{task.completionCount}</span>
+        {!checked && (
+          wasSkipped ? (
+            <button type="button" className="org-skip" aria-label={`Back to To Do: ${task.name}`} onClick={() => restore(task)}>
+              <IoArrowUndoOutline />
+            </button>
+          ) : (
+            <button type="button" className="org-skip" aria-label={`Skip today: ${task.name}`} onClick={() => skip(task)}>
+              <IoPlaySkipForwardOutline />
+            </button>
+          )
+        )}
+      </div>
+    );
+  };
 
   const remove = (task) => {
     if (!window.confirm(`Delete “${task.name}” and its counter (${task.completionCount})?`)) return;
@@ -121,40 +158,24 @@ export default function TodayScreen({ onOpenSettings }) {
               label="Show"
               value={view}
               onChange={setView}
-              options={[{ value: 'todo', label: `To Do (${todo.length})` }, { value: 'done', label: `Done (${done.length})` }]}
+              options={[{ value: 'todo', label: `To Do (${todo.length})` }, { value: 'done', label: `Done (${done.length + skipped.length})` }]}
             />
           </div>
-          {shown.length === 0 ? (
-            view === 'todo' ? (
-              <Empty icon={<IoCheckmarkDoneOutline />} title="Everything Done" text="All of today's tasks are checked. Tomorrow the list starts again." />
+          {view === 'todo' ? (
+            todo.length === 0 ? (
+              <Empty icon={<IoCheckmarkDoneOutline />} title="Everything Done" text="All of today's tasks are checked or skipped. Tomorrow the list starts again." />
             ) : (
-              <Empty icon={<IoEllipseOutline />} title="Nothing Checked Yet" text="Tasks you check today move here." />
+              <Section header={formatDay(today)} footer="Circle: done, counts one more day. Skip: not today, no count.">{todo.map(row)}</Section>
             )
+          ) : done.length + skipped.length === 0 ? (
+            <Empty icon={<IoEllipseOutline />} title="Nothing Checked Yet" text="Tasks you check or skip today move here." />
           ) : (
-            <Section header={formatDay(today)}>
-              {shown.map((task) => {
-                const checked = isDone(task, today);
-                return (
-                  <div key={task.id} className="org-row org-task">
-                    <FlagDot flag={task.flag} />
-                    <button
-                      type="button"
-                      className={`org-check ${checked ? 'is-done' : ''}`}
-                      aria-label={task.name}
-                      aria-pressed={checked}
-                      onClick={() => toggle(task)}
-                    >
-                      {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
-                    </button>
-                    <button type="button" className="org-row-main" onClick={() => setOpenTask(task)}>
-                      <span className={checked ? 'org-muted' : ''}>{task.name}</span>
-                    </button>
-                    {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
-                    <span className="org-count" aria-label={`${task.completionCount} days`}>{task.completionCount}</span>
-                  </div>
-                );
-              })}
-            </Section>
+            <>
+              {done.length > 0 && <Section header="Done">{done.map(row)}</Section>}
+              {skipped.length > 0 && (
+                <Section header="Skipped" footer="Not counted. Tap the circle if you did it after all, or the arrow to put it back on To Do.">{skipped.map(row)}</Section>
+              )}
+            </>
           )}
         </>
       )}

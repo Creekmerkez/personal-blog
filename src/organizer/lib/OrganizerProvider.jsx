@@ -49,7 +49,7 @@ export function OrganizerProvider({ storage, today, children }) {
 
   if (!data) return null;
   return (
-    <OrganizerContext.Provider value={{ data, update, settings, updateSettings, today }}>
+    <OrganizerContext.Provider value={{ data, update, settings, updateSettings, today, storage }}>
       {children}
     </OrganizerContext.Provider>
   );

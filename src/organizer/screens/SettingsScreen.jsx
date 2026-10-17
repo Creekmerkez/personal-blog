@@ -50,9 +50,13 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
   const confirmAndApply = async (text) => {
     const backup = validateBackup(JSON.parse(text));
     const when = dateFromAppleSeconds(backup.exportedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' });
-    if (window.confirm(`Replace all data?\n\nThe file from ${when} has ${summarize(backup)}. Everything currently in the app will be replaced.`)) {
-      await applyImport(backup);
-      window.alert('Your data was imported.');
+    if (window.confirm(`Replace all data?\n\nThe file from ${when} has ${summarize(backup)}. Your tasks, Son and words in the app will be replaced${backup.journal.length ? ', and so will the journal' : '; your journal stays as it is'}.`)) {
+      try {
+        await applyImport(backup);
+        window.alert('Your data was imported.');
+      } catch (err) {
+        window.alert(err.message);
+      }
     }
   };
 

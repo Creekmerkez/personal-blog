@@ -44,7 +44,9 @@ const OrganizerPrivacyPage = () => {
             enter is kept in the browser&apos;s storage on your device and is never sent
             to this site or anywhere else. Loading the page itself is an ordinary visit
             to a website hosted on GitHub Pages, which sees your IP address as any web
-            host does. The page asks search engines not to list it.
+            host does. The page asks search engines not to list it. Journal entries in the
+            web version are stored encrypted and open only with Face ID (a passkey kept
+            in your iPhone&apos;s keychain) or your recovery password.
           </p>
         </section>
 

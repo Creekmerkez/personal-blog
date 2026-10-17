@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
-import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline } from 'react-icons/io5';
+import { useMemo, useRef, useState } from 'react';
+import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline, IoImageOutline, IoClose } from 'react-icons/io5';
 import { appleSeconds, dateFromAppleSeconds, dateFromDayKey, dayKeyFromDate } from '../lib/dates';
 import { newId } from '../lib/backup';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
 import { passkeysSupported } from '../lib/passkey';
-import { Empty, Screen, Section, Sheet } from '../components/ui';
+import { photoFromFile } from '../lib/photos';
+import { Empty, Screen, Section, Segmented, Sheet } from '../components/ui';
 
 const dayInput = (seconds) => {
   const key = dayKeyFromDate(dateFromAppleSeconds(seconds));
@@ -94,19 +95,51 @@ export function Locked({ journal, title = 'Journal', heading = 'Journal Locked',
   );
 }
 
-/** A photo from a link. Loading it fetches it from that site, so the link is shown too, and alone if it fails. */
+const isLink = (photo) => photo.startsWith('https://');
+
+/**
+ * A photo kept in the entry, or one from a link. A linked photo is fetched from
+ * its site, so the link is shown too, and alone if the photo can't be loaded.
+ */
 function EntryPhoto({ url }) {
   const [failed, setFailed] = useState(false);
   return (
     <figure className="org-entry-photo">
       {!failed && <img src={url} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />}
-      <figcaption><a href={url} target="_blank" rel="noopener noreferrer">{failed ? 'Photo could not be loaded. Open link' : 'Open photo'}</a></figcaption>
+      {isLink(url) && <figcaption><a href={url} target="_blank" rel="noopener noreferrer">{failed ? 'Photo could not be loaded. Open link' : 'Open photo'}</a></figcaption>}
     </figure>
   );
 }
 
-function Editor({ draft, setDraft, onSave, onClose }) {
+function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
   const canSave = draft.title.trim() !== '' || draft.text.trim() !== '';
+  const fileInput = useRef(null);
+  const [adding, setAdding] = useState(false);
+
+  const pick = () => {
+    onPicker(true);
+    fileInput.current?.click();
+  };
+  const addPhotos = async (event) => {
+    const files = [...(event.target.files ?? [])];
+    event.target.value = '';
+    onPicker(false);
+    if (files.length === 0) return;
+    setAdding(true);
+    try {
+      const photos = [];
+      for (const file of files) photos.push(await photoFromFile(file));
+      setDraft((d) => ({ ...d, photos: [...d.photos, ...photos] }));
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setAdding(false);
+    }
+  };
+  const removePhoto = (index) => {
+    if (window.confirm('Remove this photo from the entry?')) setDraft((d) => ({ ...d, photos: d.photos.filter((_, i) => i !== index) }));
+  };
+
   return (
     <Sheet
       title={draft.id ? 'Edit Entry' : 'New Entry'}
@@ -121,6 +154,23 @@ function Editor({ draft, setDraft, onSave, onClose }) {
       <Section>
         <textarea className="org-input org-textarea org-journal-text" aria-label="Text" placeholder="Write…" value={draft.text} onChange={(e) => setDraft({ ...draft, text: e.target.value })} />
       </Section>
+      <Section header="Photos" footer="Photos you add are made smaller and kept in the encrypted journal on this iPhone.">
+        {draft.photos.length > 0 && (
+          <div className="org-row org-photo-grid">
+            {draft.photos.map((photo, index) => (
+              // Photos have no ids; the same one may even be added twice, so the position is the key.
+              <div key={index} className="org-photo-thumb">
+                <img src={photo} alt="" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.hidden = true; }} />
+                <button type="button" aria-label={`Remove photo ${index + 1}`} onClick={() => removePhoto(index)}><IoClose /></button>
+              </div>
+            ))}
+          </div>
+        )}
+        <button type="button" className="org-row org-action" disabled={adding} onClick={pick}>
+          <IoImageOutline aria-hidden="true" /> {adding ? 'Adding…' : 'Add Photo'}
+        </button>
+        <input ref={fileInput} type="file" accept="image/*" multiple hidden onChange={addPhotos} onCancel={() => onPicker(false)} />
+      </Section>
     </Sheet>
   );
 }
@@ -130,6 +180,7 @@ export default function JournalScreen({ journal }) {
   const [reading, setReading] = useState(null);
   // The draft lives here, outside the editor, so locking never loses it.
   const [draft, setDraft] = useState(null);
+  const [order, setOrder] = useState('newest');
   const { error, busy, run } = useAsync();
 
   const visible = useMemo(() => {
@@ -137,15 +188,26 @@ export default function JournalScreen({ journal }) {
     const matches = (text) => (text ?? '').toLocaleLowerCase().normalize('NFD').replace(/\p{M}/gu, '').includes(query.normalize('NFD').replace(/\p{M}/gu, ''));
     return [...journal.entries]
       .filter((e) => !query || matches(e.title) || matches(e.text))
-      .sort((a, b) => b.writtenOn - a.writtenOn || b.createdAt - a.createdAt);
-  }, [journal.entries, search]);
+      .sort((a, b) => (b.writtenOn - a.writtenOn || b.createdAt - a.createdAt) * (order === 'newest' ? 1 : -1));
+  }, [journal.entries, search, order]);
+
+  // Entries under a heading for each year, in the chosen order.
+  const years = useMemo(() => {
+    const groups = [];
+    for (const entry of visible) {
+      const year = dateFromAppleSeconds(entry.writtenOn).getFullYear();
+      if (groups.at(-1)?.year !== year) groups.push({ year, entries: [] });
+      groups.at(-1).entries.push(entry);
+    }
+    return groups;
+  }, [visible]);
 
   if (journal.status === 'loading') return null;
   if (journal.status === 'setup') return <Setup journal={journal} />;
   if (journal.status !== 'unlocked') return <Locked journal={journal} />;
 
-  const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()) });
-  const startEdit = (entry) => setDraft({ id: entry.id, title: entry.title ?? '', text: entry.text ?? '', date: dayInput(entry.writtenOn) });
+  const startNew = () => setDraft({ id: null, title: '', text: '', date: dayInput(appleSeconds()), photos: [] });
+  const startEdit = (entry) => setDraft({ id: entry.id, title: entry.title ?? '', text: entry.text ?? '', date: dayInput(entry.writtenOn), photos: entry.photos ?? [] });
 
   const saveDraft = () =>
     run(async () => {
@@ -159,6 +221,7 @@ export default function JournalScreen({ journal }) {
         text: draft.text.trim(),
         writtenOn: sameDay ? existing.writtenOn : fromDayInput(draft.date),
         hasTime: sameDay ? existing.hasTime : false,
+        photos: draft.photos,
         updatedAt: now,
       };
       await journal.saveEntries(existing ? journal.entries.map((e) => (e.id === entry.id ? entry : e)) : [...journal.entries, entry]);
@@ -188,8 +251,11 @@ export default function JournalScreen({ journal }) {
       )}
       {error && <p className="org-error" role="alert">{error}</p>}
       {journal.entries.length > 0 && (
-        <div className="org-section">
+        <div className="org-section org-journal-tools">
           <input className="org-search" type="search" placeholder="Search" aria-label="Search journal" value={search} onChange={(e) => setSearch(e.target.value)} />
+          {journal.entries.length > 1 && (
+            <Segmented label="Order" value={order} onChange={setOrder} options={[{ value: 'newest', label: 'Newest first' }, { value: 'oldest', label: 'Oldest first' }]} />
+          )}
         </div>
       )}
       {journal.entries.length === 0 ? (
@@ -202,17 +268,19 @@ export default function JournalScreen({ journal }) {
       ) : visible.length === 0 ? (
         <Empty icon={<IoJournalOutline />} title="No Results" text={`Nothing matches “${search}”.`} />
       ) : (
-        <Section>
-          {visible.map((entry) => (
-            <button key={entry.id} type="button" className="org-row" onClick={() => setReading(entry)}>
-              <span className="org-row-main">
-                <strong className="org-entry-title">{heading(entry)}</strong>
-                <small>{shortDate(entry.writtenOn)}</small>
-                {entry.title && entry.text && <small className="org-entry-preview">{entry.text}</small>}
-              </span>
-            </button>
-          ))}
-        </Section>
+        years.map(({ year, entries }) => (
+          <Section key={year} header={`${year} · ${entries.length}`}>
+            {entries.map((entry) => (
+              <button key={entry.id} type="button" className="org-row" onClick={() => setReading(entry)}>
+                <span className="org-row-main">
+                  <strong className="org-entry-title">{heading(entry)}</strong>
+                  <small>{shortDate(entry.writtenOn)}{entry.photos?.length ? ` · ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : ''}</small>
+                  {entry.title && entry.text && <small className="org-entry-preview">{entry.text}</small>}
+                </span>
+              </button>
+            ))}
+          </Section>
+        ))
       )}
 
       {reading && !draft && (
@@ -233,7 +301,7 @@ export default function JournalScreen({ journal }) {
           </Section>
         </Sheet>
       )}
-      {draft && <Editor draft={draft} setDraft={setDraft} onSave={saveDraft} onClose={() => setDraft(null)} />}
+      {draft && <Editor draft={draft} setDraft={setDraft} onSave={saveDraft} onClose={() => setDraft(null)} onPicker={journal.holdForPicker} />}
     </Screen>
   );
 }

@@ -16,6 +16,7 @@ export function useJournal(storage) {
   const [entries, setEntries] = useState([]);
   const keyRef = useRef(null);
   const busyRef = useRef(false); // Face ID prompts must not lock the journal mid-way
+  const pickerUntilRef = useRef(0); // nor must picking photos, in case the picker hides the page
 
   useEffect(() => {
     storage.get('journalLock').then((saved) => {
@@ -32,7 +33,7 @@ export function useJournal(storage) {
 
   useEffect(() => {
     const onHide = () => {
-      if (document.visibilityState === 'hidden' && !busyRef.current) lockNow();
+      if (document.visibilityState === 'hidden' && !busyRef.current && Date.now() > pickerUntilRef.current) lockNow();
     };
     document.addEventListener('visibilitychange', onHide);
     return () => document.removeEventListener('visibilitychange', onHide);
@@ -99,6 +100,11 @@ export function useJournal(storage) {
     [storage],
   );
 
+  /** Keeps the journal open while the photo picker is up (at most 5 minutes, if it is never closed). */
+  const holdForPicker = useCallback((open) => {
+    pickerUntilRef.current = open ? Date.now() + 5 * 60 * 1000 : 0;
+  }, []);
+
   /** Adds entries from a journal file to the unlocked journal. Returns { added, updated }. */
   const addEntries = useCallback(
     async (incoming) => {
@@ -123,5 +129,5 @@ export function useJournal(storage) {
     return entries;
   }, [status, lock, entries, unlockWithFaceId, storage]);
 
-  return { status, hasFaceId: Boolean(lock?.passkey), entries, setup, unlockWithPassword, unlockWithFaceId, enableFaceId, lockNow, saveEntries, addEntries, entriesForExport };
+  return { status, hasFaceId: Boolean(lock?.passkey), entries, setup, unlockWithPassword, unlockWithFaceId, enableFaceId, lockNow, saveEntries, addEntries, holdForPicker, entriesForExport };
 }

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { IoAdd, IoRemove, IoShareOutline, IoDownloadOutline, IoCloudUploadOutline } from 'react-icons/io5';
+import { IoAdd, IoRemove, IoDownloadOutline, IoCloudUploadOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { appleSeconds, dateFromAppleSeconds, dayKeyFromDate } from '../lib/dates';
 import { serialize, summarize, validateBackup } from '../lib/backup';
@@ -85,8 +85,12 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
   return (
     <Screen title="Settings">
       {!isStandalone() && (
-        <Section header="Install" footer="This must be open in Safari itself. Tap ••• next to the address bar (or the Share button at the bottom on older iPhones), then Share, scroll down and tap “Add to Home Screen”. The organizer then opens from its own icon, full screen, and works offline. Import your data after opening it from the icon.">
-          <div className="org-row org-labeled"><span>Add to Home Screen</span><IoShareOutline aria-hidden="true" /></div>
+        <Section header="Install on this iPhone" footer="Safari only allows this from its own menu: this page cannot add itself. Import your data after opening the organizer from its new icon.">
+          <ol className="org-row org-steps">
+            <li>Make sure this page is open in <strong>Safari</strong>.</li>
+            <li>Tap <strong>•••</strong> next to the address bar at the bottom of the screen. On older iPhones, tap the Share button in Safari&apos;s bottom bar instead.</li>
+            <li>Tap <strong>Share</strong>, scroll down, and tap <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+          </ol>
         </Section>
       )}
 

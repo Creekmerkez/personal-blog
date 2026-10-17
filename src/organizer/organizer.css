@@ -108,6 +108,8 @@ button:disabled { opacity: 0.35; cursor: default; }
 .org-destructive { color: var(--org-red); justify-content: center; }
 .org-action { color: var(--org-accent); }
 .org-action svg { font-size: 22px; }
+.org-steps { display: block; margin: 0; padding: 12px 16px 12px 36px; line-height: 1.45; }
+.org-steps li + li { margin-top: 8px; }
 .org-error { color: var(--org-red); margin: -14px 16px 20px; font-size: 15px; }
 
 /* Task rows */

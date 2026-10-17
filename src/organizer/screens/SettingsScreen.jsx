@@ -85,7 +85,7 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
   return (
     <Screen title="Settings">
       {!isStandalone() && (
-        <Section header="Install" footer="In Safari, tap the Share button, then “Add to Home Screen”. The organizer then opens from its own icon, full screen, and works offline.">
+        <Section header="Install" footer="This must be open in Safari itself. Tap ••• next to the address bar (or the Share button at the bottom on older iPhones), then Share, scroll down and tap “Add to Home Screen”. The organizer then opens from its own icon, full screen, and works offline. Import your data after opening it from the icon.">
           <div className="org-row org-labeled"><span>Add to Home Screen</span><IoShareOutline aria-hidden="true" /></div>
         </Section>
       )}

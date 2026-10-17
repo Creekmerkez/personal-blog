@@ -4,7 +4,7 @@ import { useOrganizer } from '../lib/context';
 import { appleSeconds, dateFromAppleSeconds, dayKeyFromDate } from '../lib/dates';
 import { serialize, summarize, validateBackup } from '../lib/backup';
 import { isEncrypted, open, seal } from '../lib/crypto';
-import { Screen, Section } from '../components/ui';
+import { Screen, Section, Toggle } from '../components/ui';
 import PasswordSheet from './PasswordSheet';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
@@ -22,7 +22,7 @@ async function saveFile(text, name) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export default function SettingsScreen({ prepareExport, applyImport }) {
+export default function SettingsScreen({ prepareExport, applyImport, journal }) {
   const { data, settings, updateSettings } = useOrganizer();
   const [passwordMode, setPasswordMode] = useState(null); // 'create' | 'enter'
   const [readyFile, setReadyFile] = useState(null);
@@ -30,6 +30,21 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
   const fileInput = useRef(null);
 
   const fileName = `Organizer backup ${dayKeyFromDate()}.json`;
+
+  // Turning the lock on needs one successful unlock first, so it can't lock out an owner
+  // who no longer knows the journal password.
+  const setAppLock = async (on) => {
+    if (!on) return updateSettings({ appLock: false });
+    try {
+      if (journal.status !== 'unlocked') {
+        if (!journal.hasFaceId) throw new Error('Open the Journal tab and unlock it with your password first, then turn the lock on.');
+        await journal.unlockWithFaceId();
+      }
+      updateSettings({ appLock: true });
+    } catch (err) {
+      window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
+    }
+  };
 
   const exportWithPassword = async (password) => {
     const plain = serialize(await prepareExport());
@@ -97,6 +112,17 @@ export default function SettingsScreen({ prepareExport, applyImport }) {
           </ol>
         </Section>
       )}
+
+      <Section
+        header="Privacy"
+        footer={
+          journal.status === 'setup'
+            ? 'Create your Journal first: the lock uses its password and Face ID.'
+            : 'Asks for Face ID or your journal password every time you open the organizer, like the Journal does.'
+        }
+      >
+        <Toggle label="Lock Organizer" checked={settings.appLock === true} disabled={journal.status === 'setup'} onChange={setAppLock} />
+      </Section>
 
       <Section header="Word of the Day" footer="This many words go round and round. A word you remember three times is learned and makes room for the next one. A word you don't remember comes back after a few cards.">
         <div className="org-row org-labeled">

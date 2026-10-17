@@ -5,7 +5,7 @@ import TodayScreen from './screens/TodayScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import WordsScreen from './screens/WordsScreen';
 import SonScreen from './screens/SonScreen';
-import JournalScreen from './screens/JournalScreen';
+import JournalScreen, { Locked } from './screens/JournalScreen';
 import { useJournal } from './lib/useJournal';
 
 const TABS = [
@@ -17,9 +17,13 @@ const TABS = [
 ];
 
 export default function App() {
-  const { data, update, storage } = useOrganizer();
+  const { data, update, storage, settings } = useOrganizer();
   const [tab, setTab] = useState('today');
   const journal = useJournal(storage);
+  // With the app lock on, the journal's lock covers the whole organizer: same password and Face ID,
+  // and it locks again whenever the app leaves the screen. The screens stay mounted underneath, so
+  // nothing in progress is lost, but they are not drawn or read out while locked.
+  const appLocked = settings.appLock === true && (journal.status === 'locked' || journal.status === 'loading');
 
   // The journal is stored separately and encrypted; it joins the export only
   // here, inside the password-protected file.
@@ -44,24 +48,31 @@ export default function App() {
 
   return (
     <div className="org-app">
-      <main className="org-main">
-        {tab === 'today' && <TodayScreen onOpenSettings={() => setTab('settings')} />}
-        {tab === 'son' && <SonScreen />}
-        {tab === 'words' && <WordsScreen />}
-        {tab === 'journal' && <JournalScreen journal={journal} />}
-        {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} />}
-      </main>
-      <nav className="org-tabbar" aria-label="Sections">
-        {TABS.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button key={item.id} type="button" className={tab === item.id ? 'is-active' : ''} aria-current={tab === item.id ? 'page' : undefined} onClick={() => setTab(item.id)}>
-              <Icon aria-hidden="true" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      {appLocked && journal.status === 'locked' && (
+        <main className="org-main">
+          <Locked journal={journal} title="Organizer" heading="Organizer Locked" text="Unlock with Face ID or your journal password." />
+        </main>
+      )}
+      <div hidden={appLocked}>
+        <main className="org-main">
+          {tab === 'today' && <TodayScreen onOpenSettings={() => setTab('settings')} />}
+          {tab === 'son' && <SonScreen />}
+          {tab === 'words' && <WordsScreen />}
+          {tab === 'journal' && <JournalScreen journal={journal} />}
+          {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} journal={journal} />}
+        </main>
+        <nav className="org-tabbar" aria-label="Sections">
+          {TABS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button key={item.id} type="button" className={tab === item.id ? 'is-active' : ''} aria-current={tab === item.id ? 'page' : undefined} onClick={() => setTab(item.id)}>
+                <Icon aria-hidden="true" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }

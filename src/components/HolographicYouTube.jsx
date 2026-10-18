@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/HolographicGallery.css';
 import videos from './youtubeData';
 import HoloClose from './HoloClose';
+import usePhone from './usePhone';
 
 const VIDEO_SLOTS = [
   { left: 6, top: 8, w: 26, h: 28, z: 3 },
@@ -16,6 +17,8 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
   const [render, setRender] = useState(open);
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(null);
+  // On a phone the collage becomes a YouTube-style list.
+  const phone = usePhone();
 
   useEffect(() => {
     if (open) {
@@ -119,6 +122,25 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
           <HoloClose onClose={onClose} />
         </header>
 
+        {phone ? (
+          <div className="holo-yt-list">
+            {videos.map((video) => (
+              <button key={video.id} type="button" className="holo-yt-item" onClick={() => setExpanded(video)} aria-label={`Play ${video.title}`}>
+                <span className="holo-yt-thumb">
+                  <img src={video.thumbnail} alt="" loading="lazy" />
+                  <svg className="holo-yt-play" viewBox="0 0 68 48" aria-hidden="true">
+                    <path d="M66.5 7.7a8.6 8.6 0 0 0-6-6C55.2.3 34 .3 34 .3s-21.2 0-26.5 1.4a8.6 8.6 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.6 8.6 0 0 0 6 6c5.3 1.4 26.5 1.4 26.5 1.4s21.2 0 26.5-1.4a8.6 8.6 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z" fill="#f00" />
+                    <path d="M27 34.3 44.7 24 27 13.7z" fill="#fff" />
+                  </svg>
+                </span>
+                <span className="holo-yt-meta">
+                  <span className="holo-yt-title">{video.title}</span>
+                  <span className="holo-yt-channel">DJ Merkuz · YouTube</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
         <div className="holo-collage holo-video-collage">
           {videos.map((video, index) => {
             const slot = VIDEO_SLOTS[index];
@@ -146,6 +168,7 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
             );
           })}
         </div>
+        )}
 
         <div className={`holo-lightbox ${expanded ? 'visible' : ''}`} onClick={() => setExpanded(null)}>
           {expanded && (

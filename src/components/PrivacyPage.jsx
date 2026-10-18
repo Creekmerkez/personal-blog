@@ -81,9 +81,10 @@ const PrivacyPage = () => {
         <section className="privacy-section">
           <h2>Embedded videos</h2>
           <p>
-            Music pages embed videos from YouTube using its no-cookie address, which
-            avoids tracking cookies. YouTube still receives your IP address when a video
-            loads, as it must to send you the video.
+            Music pages, and the song player on the homepage, embed videos from YouTube
+            using its no-cookie address, which avoids tracking cookies. The homepage
+            player contacts YouTube only once you press play. YouTube still receives your
+            IP address when a video loads, as it must to send you the video.
           </p>
         </section>
 

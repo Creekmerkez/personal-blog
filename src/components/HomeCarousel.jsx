@@ -9,6 +9,7 @@ import HolographicBooks from './HolographicBooks';
 import HolographicYouTube from './HolographicYouTube';
 import HolographicAI from './HolographicAI';
 import HolographicCeskeSamples from './HolographicCeskeSamples';
+import NowPlaying from './NowPlaying';
 import galleryPhotos from './photosData';
 import youtubeVideos from './youtubeData';
 
@@ -707,6 +708,8 @@ const HomeCarousel = () => {
         originRect={ceskeSamplesOrigin}
         onClose={() => setIsCeskeSamplesOpen(false)}
       />
+
+      <NowPlaying />
 
       <section className="home-details" aria-label="Page sections" hidden>
         <article id="books" className="home-detail-block">

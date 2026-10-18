@@ -1082,6 +1082,53 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     margin-left: 0;
   }
 
+  /* Photos: an Instagram-style grid of squares, edge to edge, every photo in
+     one scroll; a tap opens it whole on black. */
+  .holo-collage.holo-photo-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    gap: 2px;
+    align-content: start;
+    margin: 0 -0.5rem;
+  }
+
+  .holo-photo-grid .holo-photo,
+  .holo-photo-grid .holo-photo:hover,
+  .holo-photo-grid .holo-photo:focus-visible {
+    aspect-ratio: 1 / 1;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .holo-photo-grid .holo-photo img,
+  .holo-photo-grid .holo-photo:hover img,
+  .holo-photo-grid .holo-photo:focus-visible img {
+    filter: none;
+    transform: none;
+  }
+
+  .holo-photo-grid .holo-photo-sheen {
+    display: none;
+  }
+
+  .holo-gallery-stage .holo-lightbox,
+  :root[data-theme="dark"] .holo-gallery-stage .holo-lightbox {
+    padding: 0;
+    background: #000000;
+  }
+
+  .holo-lightbox-figure img {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* The captions are placeholder labels ("Photo 5"); the photo says enough. */
+  .holo-gallery-stage .holo-lightbox-caption {
+    display: none;
+  }
+
   .holo-about-panel {
     width: 100%;
     height: 100%;

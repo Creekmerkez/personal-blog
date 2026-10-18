@@ -22,6 +22,19 @@ const SLOTS = [
 
 const PAGE_SIZE = SLOTS.length;
 
+// On a phone the collage becomes an Instagram-style grid of every photo.
+const PHONE = '(max-width: 600px)';
+function usePhone() {
+  const [phone, setPhone] = useState(() => window.matchMedia(PHONE).matches);
+  useEffect(() => {
+    const query = window.matchMedia(PHONE);
+    const onChange = () => setPhone(query.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+  return phone;
+}
+
 const HolographicGallery = ({ open, onClose, originRect }) => {
   // `render` keeps the node mounted through the collapse animation;
   // `visible` drives the emerge / collapse transition.
@@ -30,6 +43,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [page, setPage] = useState(0);
   const [expanded, setExpanded] = useState(null);
+  const phone = usePhone();
 
   useEffect(() => {
     if (open) {
@@ -95,6 +109,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const pagePhotos = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const shown = phone ? filtered : pagePhotos;
 
   const selectFilter = (cat) => {
     setActiveFilter(cat);
@@ -176,15 +191,15 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
           <HoloClose onClose={onClose} />
         </header>
 
-        <div className="holo-collage">
-          {pagePhotos.map((p, i) => {
+        <div className="holo-collage holo-photo-grid">
+          {shown.map((p, i) => {
             const slot = SLOTS[i];
             return (
               <button
                 key={p.id}
                 type="button"
                 className="holo-photo"
-                style={{
+                style={phone ? undefined : {
                   left: `${slot.left}%`,
                   top: `${slot.top}%`,
                   width: `${slot.w}%`,
@@ -201,6 +216,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
           })}
         </div>
 
+        {!phone && (
         <footer className="holo-gallery-footer">
           <button
             type="button"
@@ -234,6 +250,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
             →
           </button>
         </footer>
+        )}
 
       </div>
 

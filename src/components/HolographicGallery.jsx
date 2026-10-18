@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import '../styles/HolographicGallery.css';
 import photos from './photosData';
 import HoloClose from './HoloClose';
+import usePhone from './usePhone';
 
 // Fixed collage slots — absolute positions (in %) that recreate the reference's
 // overlapping, asymmetric floating layout. Each page fills these in order.
@@ -22,19 +23,6 @@ const SLOTS = [
 
 const PAGE_SIZE = SLOTS.length;
 
-// On a phone the collage becomes an Instagram-style grid of every photo.
-const PHONE = '(max-width: 600px)';
-function usePhone() {
-  const [phone, setPhone] = useState(() => window.matchMedia(PHONE).matches);
-  useEffect(() => {
-    const query = window.matchMedia(PHONE);
-    const onChange = () => setPhone(query.matches);
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
-  }, []);
-  return phone;
-}
-
 const HolographicGallery = ({ open, onClose, originRect }) => {
   // `render` keeps the node mounted through the collapse animation;
   // `visible` drives the emerge / collapse transition.
@@ -43,6 +31,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [page, setPage] = useState(0);
   const [expanded, setExpanded] = useState(null);
+  // On a phone the collage becomes an Instagram-style grid of every photo.
   const phone = usePhone();
 
   useEffect(() => {

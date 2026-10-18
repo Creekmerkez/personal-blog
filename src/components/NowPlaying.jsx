@@ -6,7 +6,7 @@ import '../styles/NowPlaying.css';
 // visible and at least 200×200, so it is a small card, not background audio.
 // Browsers don't let a site start sound by itself, so it starts on a tap, and
 // nothing is requested from YouTube before that (youtube-nocookie, like My Music).
-const SONG = { videoId: 'W3_c4-4OMbM', artist: 'DJ Shadow', title: 'Six Days' };
+const SONG = { videoId: 'DLbv8JM_pH4', artist: 'DJ Shadow', title: 'Six Days' };
 
 const NowPlaying = ({ song = SONG }) => {
   const [playing, setPlaying] = useState(false);

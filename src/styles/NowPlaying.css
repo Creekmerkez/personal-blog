@@ -61,9 +61,10 @@
   text-overflow: ellipsis;
 }
 
-/* YouTube asks for a player of at least 200×200. */
+/* As small as YouTube allows: its rules want a visible player of at least
+   200×200, so the song can't play from a hidden one. */
 .now-playing-card {
-  width: min(356px, calc(100vw - 32px));
+  width: 200px;
   height: 200px;
   border-radius: 12px;
   background: #000000;

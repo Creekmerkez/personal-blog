@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline, IoImageOutline, IoClose, IoRefresh } from 'react-icons/io5';
+import { IoLockClosed, IoLockClosedOutline, IoAdd, IoJournalOutline, IoScanOutline, IoKeyOutline, IoImageOutline, IoClose, IoRefresh, IoCheckmarkCircle, IoEllipseOutline, IoRefreshCircle, IoEllipsisHorizontalCircle } from 'react-icons/io5';
 import { appleSeconds, dateFromAppleSeconds, dateFromDayKey, dayKeyFromDate } from '../lib/dates';
 import { newId } from '../lib/backup';
 import { MIN_PASSWORD_LENGTH } from '../lib/crypto';
@@ -208,8 +208,8 @@ function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
   );
 }
 
-/** Puts the entry on jmerkusheva.com/blog, updates it there, or takes it off. */
-function Website({ entry, onPublished }) {
+/** Puts the entry on jmerkusheva.com/blog (show = true), updates it there, or takes it off (show = false). */
+function usePublishing(entry, onPublished) {
   const { storage } = useOrganizer();
   const [busy, setBusy] = useState(false);
   const state = publishState(entry);
@@ -235,6 +235,12 @@ function Website({ entry, onPublished }) {
     }
   };
 
+  return { state, busy, apply };
+}
+
+/** The Website section in an open entry. */
+function Website({ entry, onPublished }) {
+  const { state, busy, apply } = usePublishing(entry, onPublished);
   const footer = busy
     ? 'Saving to the website…'
     : state === 'off'
@@ -249,6 +255,29 @@ function Website({ entry, onPublished }) {
         <button type="button" className="org-row org-action" disabled={busy} onClick={() => apply(true)}><IoRefresh aria-hidden="true" /> Update on Website</button>
       )}
     </Section>
+  );
+}
+
+/**
+ * The check beside an entry in the list: green when it is on the website, orange
+ * when it changed since (tap updates it), empty when it is not (tap publishes).
+ */
+function SiteCheck({ entry, onPublished }) {
+  const { state, busy, apply } = usePublishing(entry, onPublished);
+  const label = { off: 'Not on the website', live: 'On the website', changed: 'On the website, changed since: update' }[state];
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={state !== 'off'}
+      aria-label={`${heading(entry)}: ${label}`}
+      title={label}
+      className={`org-check org-site-check is-${state}`}
+      disabled={busy}
+      onClick={() => apply(state !== 'live')}
+    >
+      {busy ? <IoEllipsisHorizontalCircle /> : state === 'live' ? <IoCheckmarkCircle /> : state === 'changed' ? <IoRefreshCircle /> : <IoEllipseOutline />}
+    </button>
   );
 }
 
@@ -340,7 +369,7 @@ export default function JournalScreen({ journal }) {
     const { published: _, ...rest } = entry;
     const next = hash ? { ...rest, published: hash } : rest;
     await journal.saveEntries(journal.entries.map((e) => (e.id === entry.id ? next : e)));
-    setReading(next);
+    setReading((open) => (open?.id === entry.id ? next : open));
   };
 
   const remove = (entry) => {
@@ -371,6 +400,10 @@ export default function JournalScreen({ journal }) {
           {journal.entries.length > 1 && (
             <Segmented label="Order" value={order} onChange={setOrder} options={[{ value: 'newest', label: 'Newest first' }, { value: 'oldest', label: 'Oldest first' }]} />
           )}
+          <p className="org-site-legend">
+            <IoCheckmarkCircle className="org-site-check is-live" aria-hidden="true" /> on jmerkusheva.com
+            <IoRefreshCircle className="org-site-check is-changed" aria-hidden="true" /> changed, tap to update
+          </p>
         </div>
       )}
       {journal.entries.length === 0 ? (
@@ -386,13 +419,14 @@ export default function JournalScreen({ journal }) {
         years.map(({ year, entries }) => (
           <Section key={year} header={`${year} · ${entries.length}`}>
             {entries.map((entry) => (
-              <button key={entry.id} type="button" className="org-row" onClick={() => setReading(entry)}>
-                <span className="org-row-main">
+              <div key={entry.id} className="org-row org-entry-row">
+                <button type="button" className="org-row-main" onClick={() => setReading(entry)}>
                   <strong className="org-entry-title">{heading(entry)}</strong>
-                  <small>{shortDate(entry.writtenOn)}{entry.photos?.length ? ` · ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : ''}{entry.published ? ' · On website' : ''}</small>
+                  <small>{shortDate(entry.writtenOn)}{entry.photos?.length ? ` · ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : ''}{publishState(entry) === 'changed' ? ' · Changed since published' : entry.published ? ' · On website' : ''}</small>
                   {entry.title && entry.text && <small className="org-entry-preview">{entry.text}</small>}
-                </span>
-              </button>
+                </button>
+                <SiteCheck entry={entry} onPublished={(hash) => setPublished(entry, hash)} />
+              </div>
             ))}
           </Section>
         ))

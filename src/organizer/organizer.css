@@ -119,6 +119,14 @@ a.org-row { text-decoration: none; }
 .org-task { gap: 6px; padding-top: 2px; padding-bottom: 2px; }
 .org-check { font-size: 28px; color: var(--org-tertiary); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
 .org-check.is-done { color: var(--org-accent); }
+/* Journal list: whether an entry is on the website */
+.org-entry-row { padding-right: 6px; }
+.org-site-check.is-live { color: var(--org-green); }
+.org-site-check.is-changed { color: #ff9500; }
+.org-site-check:disabled { opacity: 0.5; }
+.org-site-legend { margin: 0 4px; font-size: 13px; color: var(--org-secondary); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.org-site-legend svg { font-size: 16px; flex: none; }
+.org-site-legend svg + svg, .org-site-legend svg:nth-of-type(2) { margin-left: 10px; }
 .org-row-main { flex: 1; min-height: 44px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
 .org-row-main small { color: var(--org-secondary); font-size: 13px; margin-top: 2px; }
 .org-skip { font-size: 20px; color: var(--org-secondary); width: 40px; height: 44px; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-right: -8px; }

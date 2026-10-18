@@ -113,3 +113,21 @@ describe('searchQA', () => {
     expect(() => searchQA('', 'en')).not.toThrow();
   });
 });
+
+describe('searchQA: the blog', () => {
+  it('answers questions about the blog with its link, in both languages (positive)', () => {
+    const [ua] = searchQA('Про що Юля пише в своєму блозі', 'ua');
+    expect(ua.final).toBe(true);
+    expect(ua.answer).toContain('https://jmerkusheva.com/blog');
+    const [en] = searchQA('Does Julia have a blog?', 'en');
+    expect(en.answer).toContain('https://jmerkusheva.com/blog');
+    expect(searchQA('Where can I read her essays?', 'en')[0].answer).toContain('/blog');
+    expect(searchQA('Де почитати її есе?', 'ua')[0].answer).toContain('/blog');
+    expect(searchQA('Що нового в блогах Юлії?', 'ua')[0].answer).toContain('/blog');
+  });
+
+  it('does not take "весело" or other questions for the blog (negative)', () => {
+    expect(searchQA('Чи весело їй у Празі?', 'ua')[0]?.answer ?? '').not.toContain('/blog');
+    expect(searchQA('Where does Julia live?', 'en')[0]?.answer ?? '').not.toContain('/blog');
+  });
+});

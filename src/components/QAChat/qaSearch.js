@@ -32,6 +32,14 @@ const GREETING =
 // NOTE: \b word boundaries only work for ASCII. Cyrillic terms are placed after | without \b.
 const TOPIC_ROUTES = [
   {
+    // "блоз" is "у блозі". "есе" is matched as a whole word: as a bare substring it is inside "весело".
+    pattern: /\b(blog|blogs|blogging|essays?|livejournal)\b|блог|блоз|(?<![а-яіїєґ])есе(?![а-яіїєґ])|живий журнал/i,
+    hardcoded: {
+      en: "Julia's blog is at https://jmerkusheva.com/blog. She publishes essays and notes from her personal journal there: about life, relationships and growing up, books she has read, and her own ideas about the universe and choice. Some are new, some were written years ago, and each one can be read in Ukrainian, English and Czech.",
+      ua: 'Блог Юлії — https://jmerkusheva.com/blog. Там вона публікує есе й замітки зі свого особистого журналу: про життя, стосунки й дорослішання, книжки, які прочитала, і власні ідеї про всесвіт і вибір. Є нові тексти, а є написані багато років тому, і кожен можна читати українською, англійською та чеською.',
+    },
+  },
+  {
     pattern: /\b(yes or no|is (that|it) (a )?yes|it means yes|does (that|it) mean yes|so (yes|no)\??|just (yes|no)|is the answer yes|i mean yes|mean yes or no)\b|(так чи ні|це так\?|значить так|отже так|мається на увазі так|тобто так чи ні)/i,
     hardcoded: {
       en: "I don't have enough context to give a yes or no — could you rephrase your question? Happy to tell you more about Julia!",

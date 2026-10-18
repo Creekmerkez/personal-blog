@@ -469,7 +469,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
 
   return (
     <div
-      className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
+      className={`holo-gallery-stage holo-ai-stage ${visible ? 'visible' : ''}`}
       onClick={onClose}
       role="presentation"
     >
@@ -493,10 +493,10 @@ const HolographicAI = ({ open, onClose, originRect }) => {
           <span className="holo-rail-mark" />
         </div>
 
-        <header className="holo-gallery-header holo-ai-header">
-          <div className="holo-gallery-titles">
-            <h2 className="holo-gallery-title">MY AI</h2>
-            <span className="holo-gallery-subtitle">{SUBTITLE[lang]}</span>
+        {/* One small row: the chat itself gets the room. The card already says MY AI. */}
+        <header className="holo-ai-header">
+          <div className="holo-ai-titles">
+            <span className="holo-ai-subtitle">{SUBTITLE[lang]}</span>
             <span className="holo-ai-disclosure">
               {DISCLOSURE[lang]}{' '}
               <Link to="/privacy">{DISCLOSURE_LINK[lang]}</Link>
@@ -520,6 +520,9 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               UA
             </button>
           </div>
+          <button type="button" className="holo-ai-close" onClick={onClose} aria-label={lang === 'ua' ? 'Закрити чат' : 'Close chat'}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
         </header>
 
         <div className="holo-ai-chat">

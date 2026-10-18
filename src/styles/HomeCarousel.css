@@ -880,9 +880,6 @@
     height: min(440px, 60vh);
     min-height: 330px;
     padding: 0;
-    /* The cards sit ~105px below the stage's top; lifting it keeps them clear
-       of the song player at the bottom (NowPlaying) on a short phone screen. */
-    margin-top: -4.5rem;
   }
 
   .carousel-card {

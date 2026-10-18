@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/HolographicGallery.css';
 import videos from './youtubeData';
+import HoloClose from './HoloClose';
 
 const VIDEO_SLOTS = [
   { left: 6, top: 8, w: 26, h: 28, z: 3 },
@@ -115,6 +116,7 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
           >
             CHANNEL
           </a>
+          <HoloClose onClose={onClose} />
         </header>
 
         <div className="holo-collage holo-video-collage">

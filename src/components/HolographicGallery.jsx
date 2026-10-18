@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import '../styles/HolographicGallery.css';
 import photos from './photosData';
+import HoloClose from './HoloClose';
 
 // Fixed collage slots — absolute positions (in %) that recreate the reference's
 // overlapping, asymmetric floating layout. Each page fills these in order.
@@ -172,6 +173,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
               </span>
             </nav>
           )}
+          <HoloClose onClose={onClose} />
         </header>
 
         <div className="holo-collage">

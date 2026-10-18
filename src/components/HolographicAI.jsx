@@ -4,6 +4,7 @@ import { searchQA, detectLang, isGreeting, isGeneralQuery, isAboutAI } from './Q
 
 const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
 import '../styles/HolographicGallery.css';
+import HoloClose from './HoloClose';
 
 
 const WELCOME = {
@@ -469,7 +470,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
 
   return (
     <div
-      className={`holo-gallery-stage holo-ai-stage ${visible ? 'visible' : ''}`}
+      className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
       onClick={onClose}
       role="presentation"
     >
@@ -520,9 +521,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               UA
             </button>
           </div>
-          <button type="button" className="holo-ai-close" onClick={onClose} aria-label={lang === 'ua' ? 'Закрити чат' : 'Close chat'}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-          </button>
+          <HoloClose onClose={onClose} label={lang === 'ua' ? 'Закрити чат' : 'Close chat'} />
         </header>
 
         <div className="holo-ai-chat">

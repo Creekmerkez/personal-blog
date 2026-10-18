@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/HolographicGallery.css';
+import HoloClose from './HoloClose';
 
 const samplePages = [
   { id: 'page-2', src: '/images/2.jpg', alt: 'Ceske Realie sample page 2' },
@@ -122,6 +123,7 @@ const HolographicCeskeSamples = ({ open, onClose, originRect }) => {
           >
             DOWNLOAD
           </Link>
+          <HoloClose onClose={onClose} />
         </header>
 
         <div className="holo-collage holo-page-collage">

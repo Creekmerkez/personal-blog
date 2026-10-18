@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import BooksSection from './BooksSection';
 import books from './booksData';
 import '../styles/HolographicGallery.css';
+import HoloClose from './HoloClose';
 
 const HolographicBooks = ({ open, onClose, originRect }) => {
   const [render, setRender] = useState(open);
@@ -91,6 +92,7 @@ const HolographicBooks = ({ open, onClose, originRect }) => {
           <span className="holo-gallery-counter">
             {String(books.length).padStart(2, '0')} TITLES
           </span>
+          <HoloClose onClose={onClose} />
         </header>
 
         <div className="holo-books-scroll">

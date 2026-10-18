@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/HomeCarousel.css';
 import '../styles/HolographicGallery.css';
+import HoloClose from './HoloClose';
 
 const HolographicPlayer = ({ open, videoEl, onClose, originRect }) => {
   const containerRef = useRef(null);
@@ -112,6 +113,7 @@ const HolographicPlayer = ({ open, videoEl, onClose, originRect }) => {
           </div>
 
           <span className="holo-gallery-counter">INTRO</span>
+          <HoloClose onClose={onClose} />
         </header>
 
         <div className="holo-about-body">

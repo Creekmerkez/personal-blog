@@ -61,6 +61,24 @@
    ]
   },
   {
+   "id": "9C2EA162-3216-55C1-BC06-1DD2E56702C8",
+   "date": "2020-10-12",
+   "writtenAt": "2020-10-12T11:04:00.000Z",
+   "uk": {
+    "title": "Сміття",
+    "text": "Суть сміття не змінюється від того, що воно лежить у дорогому сміттєвому пакеті."
+   },
+   "en": {
+    "title": "Trash",
+    "text": "Rubbish doesn't change its nature just because it's lying in an expensive bin bag."
+   },
+   "cs": {
+    "title": "Odpad",
+    "text": "Podstata odpadu se nezmění tím, že leží v drahém pytli na odpadky."
+   },
+   "photos": []
+  },
+  {
    "id": "725CB212-0B76-5F10-A6C9-9220EB1966C2",
    "date": "2020-10-05",
    "writtenAt": "2020-10-05T18:34:00.000Z",

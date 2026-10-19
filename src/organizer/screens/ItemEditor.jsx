@@ -44,7 +44,7 @@ export default function ItemEditor({ title, item, fields, defaults = {}, onSave,
         if (f.type === 'text') {
           return (
             <Section key={f.key}>
-              <input className="org-input" placeholder={f.label} aria-label={f.label} value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} autoFocus={!item} />
+              <input className="org-input" placeholder={f.label} aria-label={f.label} autoComplete="off" value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} data-autofocus={!item || undefined} />
             </Section>
           );
         }
@@ -66,7 +66,7 @@ export default function ItemEditor({ title, item, fields, defaults = {}, onSave,
         }
         return (
           <Section key={f.key} header={f.label}>
-            <textarea className="org-input org-textarea" aria-label={f.label} rows={4} value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} />
+            <textarea className="org-input org-textarea" aria-label={f.label} autoComplete="off" rows={4} value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} />
           </Section>
         );
       })}

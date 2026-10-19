@@ -54,7 +54,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={save}>Save</button>}
     >
       <Section>
-        <input className="org-input" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} aria-label="Name" autoFocus={!task} />
+        <input className="org-input" placeholder="Task" value={name} onChange={(e) => setName(e.target.value)} aria-label="Task" autoComplete="off" data-autofocus={!task || undefined} />
       </Section>
       <Section footer="Green is something you want to do. Red is something you want to keep track of.">
         <div className="org-row">
@@ -120,7 +120,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
         )}
       </Section>
       <Section header="Details" footer="Shown when you open the task, not on the Today list.">
-        <textarea className="org-input org-textarea" value={details} onChange={(e) => setDetails(e.target.value)} aria-label="Details" rows={5} />
+        <textarea className="org-input org-textarea" value={details} onChange={(e) => setDetails(e.target.value)} aria-label="Details" autoComplete="off" rows={5} />
       </Section>
       {task && (
         <>

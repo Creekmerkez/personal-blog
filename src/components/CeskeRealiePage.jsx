@@ -26,6 +26,13 @@ const purchaseOptions = [
   },
 ];
 
+// Pages 2–7 of the book; they used to open in a popup from the homepage card.
+const SAMPLE_PAGES = [2, 3, 4, 5, 6, 7].map((n) => ({
+  src: `/images/${n}.jpg`,
+  alt: `České Reálie sample page ${n}`,
+  caption: `Sample page ${n}`,
+}));
+
 // The book's Instagram reel, served from this site (no Instagram scripts).
 // It plays muted, looping, while on screen, like a reel; its controls give
 // sound and full screen. Left still for visitors who ask for reduced motion.
@@ -396,6 +403,24 @@ const CeskeRealiePage = () => {
             </button>
             <figcaption>Context Page Preview</figcaption>
           </figure>
+        </section>
+
+        <section className="ceske-samples" aria-label="Sample pages">
+          <h2 className="ceske-samples-title">Sample Pages</h2>
+          <div className="ceske-samples-grid">
+            {SAMPLE_PAGES.map((page) => (
+              <figure key={page.src} className="ceske-preview-frame">
+                <button
+                  type="button"
+                  className="ceske-preview-trigger"
+                  onClick={() => setExpandedPreview(page)}
+                  aria-label={`Open full-size ${page.caption.toLowerCase()}`}
+                >
+                  <img src={page.src} alt={page.alt} className="ceske-preview-image" loading="lazy" />
+                </button>
+              </figure>
+            ))}
+          </div>
         </section>
 
         {expandedPreview && ReactDOM.createPortal(

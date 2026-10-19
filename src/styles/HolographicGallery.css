@@ -976,32 +976,6 @@ a.holo-gallery-counter.holo-filter-link:focus-visible {
     height: auto !important;
     z-index: auto !important;
   }
-
-  /* Ceske sample pages: on mobile, the shared 2-column photo grid above
-     slices each page into a narrow, unreadable strip. Show each page
-     full-width, one per row, so it reads like an actual page. Desktop is
-     untouched — these rules only exist inside this mobile breakpoint. */
-  .holo-page-collage {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .holo-photo.holo-page-thumb {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto;
-    /* Without this, flex-shrink:1 (the default) squashes every page down
-       to fit the panel's height instead of letting the column overflow
-       and scroll — that's what was cropping pages to a thin sliver. */
-    flex-shrink: 0;
-  }
-
-  .holo-page-thumb img {
-    height: auto !important;
-    object-fit: contain;
-    filter: none;
-  }
 }
 
 @media (max-width: 600px) {

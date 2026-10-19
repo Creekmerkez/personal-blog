@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import '../styles/CeskeRealiePage.css';
@@ -25,6 +25,41 @@ const purchaseOptions = [
     audioNote: '+ audio MP3 for each topic included',
   },
 ];
+
+// The book's Instagram reel, served from this site (no Instagram scripts).
+// It plays muted, looping, while on screen, like a reel; its controls give
+// sound and full screen. Left still for visitors who ask for reduced motion.
+const BookReel = () => {
+  const ref = useRef(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video || typeof IntersectionObserver === 'undefined') return undefined;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) video.play().catch(() => {});
+      else video.pause();
+    }, { threshold: 0.5 });
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <figure className="ceske-preview-frame ceske-reel">
+      <video
+        ref={ref}
+        className="ceske-reel-video"
+        src="/videos/ceske-realie-reel.mp4"
+        poster="/images/ceske-realie-reel.jpg"
+        muted
+        loop
+        playsInline
+        controls
+        preload="none"
+        aria-label="České Reálie: the book in 80 seconds"
+      />
+      <figcaption>The book in 80 seconds</figcaption>
+    </figure>
+  );
+};
 
 const CeskeRealiePage = () => {
   const navigate = useNavigate();
@@ -313,6 +348,8 @@ const CeskeRealiePage = () => {
             </section>
           )}
         </div>
+
+        <BookReel />
 
         <section className="ceske-content-preview" aria-label="Book cover, back page, and context page preview">
           <figure className="ceske-preview-frame">

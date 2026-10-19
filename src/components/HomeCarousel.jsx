@@ -8,7 +8,6 @@ import HolographicGallery from './HolographicGallery';
 import HolographicBooks from './HolographicBooks';
 import HolographicYouTube from './HolographicYouTube';
 import HolographicAI from './HolographicAI';
-import HolographicCeskeSamples from './HolographicCeskeSamples';
 import galleryPhotos from './photosData';
 import youtubeVideos from './youtubeData';
 
@@ -52,7 +51,8 @@ const cards = [
     title: 'České Reálie',
     subtitle: 'Czech Realities',
     background: ceskeRealieCover,
-    actionType: 'ceske-samples',
+    actionType: 'route',
+    action: '/ceske-realie',
   },
   {
     id: 'photos',
@@ -96,8 +96,6 @@ const HomeCarousel = () => {
   const [youtubeOrigin, setYouTubeOrigin] = useState(null);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [aiOrigin, setAiOrigin] = useState(null);
-  const [isCeskeSamplesOpen, setIsCeskeSamplesOpen] = useState(false);
-  const [ceskeSamplesOrigin, setCeskeSamplesOrigin] = useState(null);
   const rotationRef = useRef(144);
   const velocityRef = useRef(0);
   const snapTargetRef = useRef(null);
@@ -140,13 +138,9 @@ const HomeCarousel = () => {
     });
   }, []);
 
-  // Preload gallery/ceske images on card hover so they're cached before the popup opens
+  // Preload gallery images on card hover so they're cached before the popup opens
   const preloadGallery = useCallback(() => {
     galleryPhotos.forEach(p => { const img = new Image(); img.src = p.src; });
-  }, []);
-
-  const preloadCeske = useCallback(() => {
-    ['2','3','4','5','6','7'].forEach(n => { const img = new Image(); img.src = `/images/${n}.jpg`; });
   }, []);
 
   // Inject mobile overrides at runtime to cover cached-CSS scenarios.
@@ -417,13 +411,6 @@ const HomeCarousel = () => {
       return;
     }
 
-    if (card.actionType === 'ceske-samples') {
-      const rect = event.currentTarget.getBoundingClientRect();
-      setCeskeSamplesOrigin({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
-      setIsCeskeSamplesOpen(true);
-      return;
-    }
-
     if (card.actionType === 'youtube') {
       const rect = event.currentTarget.getBoundingClientRect();
       setYouTubeOrigin({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
@@ -600,7 +587,7 @@ const HomeCarousel = () => {
                 className={`carousel-card ${card.id === 'about' ? 'about-card' : ''} ${card.id === 'photos' ? 'photos-card' : ''} ${card.id === 'contact' ? 'ai-card' : ''} ${selectedCard === card.id && isHologramOpen ? 'carousel-card-active' : ''}`}
                 aria-label={`Open ${card.title}`}
                 aria-expanded={card.id === 'about' ? isHologramOpen : undefined}
-                onMouseEnter={() => { setHovered(card.id); if (card.id === 'photos') preloadGallery(); if (card.id === 'ceske-realie') preloadCeske(); }}
+                onMouseEnter={() => { setHovered(card.id); if (card.id === 'photos') preloadGallery(); }}
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => setHovered(card.id)}
                 onBlur={() => setHovered(null)}
@@ -700,12 +687,6 @@ const HomeCarousel = () => {
         open={isAIOpen}
         originRect={aiOrigin}
         onClose={() => setIsAIOpen(false)}
-      />
-
-      <HolographicCeskeSamples
-        open={isCeskeSamplesOpen}
-        originRect={ceskeSamplesOrigin}
-        onClose={() => setIsCeskeSamplesOpen(false)}
       />
 
       <section className="home-details" aria-label="Page sections" hidden>

@@ -6,7 +6,7 @@ import { scheduleSummary } from '../lib/tasks';
 import WeekdayPicker from '../components/WeekdayPicker';
 import { Section, Segmented, Sheet, Toggle } from '../components/ui';
 
-/** Add (task = null) or edit a task. Works on a draft, so Cancel discards everything. */
+/** A task's screen: add (task = null) or open one, every field ready to edit. Works on a draft, so Cancel discards everything. */
 const toInput = (key) => `${Math.floor(key / 10000)}-${String(Math.floor(key / 100) % 100).padStart(2, '0')}-${String(key % 100).padStart(2, '0')}`;
 const fromInput = (text) => Number(text.replaceAll('-', ''));
 
@@ -48,7 +48,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
 
   return (
     <Sheet
-      title={task ? 'Edit Task' : 'New Task'}
+      title={task ? 'Task' : 'New Task'}
       onClose={onClose}
       leading={<button type="button" className="org-link" onClick={onClose}>Cancel</button>}
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={save}>Save</button>}
@@ -125,6 +125,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       {task && (
         <>
           <Section footer="Turn off to pause the task. Its counter is kept.">
+            <div className="org-row org-labeled"><span>Days checked</span><span className="org-value">{task.completionCount}</span></div>
             <Toggle label="Show on Today" checked={isActive} onChange={setIsActive} />
           </Section>
           <Section>

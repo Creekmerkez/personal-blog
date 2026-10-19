@@ -194,7 +194,7 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
         <Toggle label="Lock Organizer" checked={settings.appLock === true} disabled={!journalLocked} onChange={setAppLock} />
       </Section>
 
-      <Section header="Word of the Day" footer="This many words go round and round. A word you remember three times is learned and makes room for the next one. A word you don't remember comes back after a few cards.">
+      <Section header="Word of the Day" footer="This many words go round and round. A word you remember three times in a row rests and comes back on a later day: after 1, 2, 4, 7, 14 and then 30 days. Remembered again after the 30-day rest, it is learned. A word you don't remember starts over as new and comes back after a few cards.">
         <div className="org-row org-labeled">
           <span>Words in rotation</span>
           <span className="org-stepper">

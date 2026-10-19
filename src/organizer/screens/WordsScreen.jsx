@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { IoAdd, IoListOutline, IoLanguageOutline, IoStarOutline, IoCheckmark, IoClose } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
-import { answerCurrent, counts, RECALLS_TO_LEARN, resetToLearning, rotation } from '../lib/words';
+import { answerCurrent, counts, isResting, nextReturn, RECALLS_TO_LEARN, resetToLearning, rotation } from '../lib/words';
+import { formatDay } from '../lib/dates';
 import { Empty, Screen, Section, Segmented } from '../components/ui';
 import WordEditor from './WordEditor';
 
@@ -38,8 +39,11 @@ function WordCard({ word, summary, onAnswer }) {
   );
 }
 
-function statusOf(word, going) {
+const shortDay = (key) => formatDay(key, { day: 'numeric', month: 'short' });
+
+function statusOf(word, going, today) {
   if (word.isLearned) return 'Learned';
+  if (isResting(word, today)) return `Back ${shortDay(word.nextReviewDayKey)}`;
   if (going.has(word.id)) return `${word.successfulRecalls}/${RECALLS_TO_LEARN}`;
   return 'Waiting';
 }
@@ -54,9 +58,10 @@ export default function WordsScreen() {
 
   const words = data.words;
   const size = settings.rotationSize;
-  const going = rotation(words, size);
+  const going = rotation(words, size, today);
   const goingIds = new Set(going.map((w) => w.id));
-  const tally = counts(words, size);
+  const tally = counts(words, size, today);
+  const comesBack = nextReturn(words, today);
 
   const replaceWord = (word) =>
     update((d) => ({ ...d, words: d.words.some((w) => w.id === word.id) ? d.words.map((w) => (w.id === word.id ? word : w)) : [...d.words, word] }));
@@ -115,7 +120,7 @@ export default function WordsScreen() {
                   <span>{w.word}</span>
                   <small>{w.translation || 'No translation yet'}</small>
                 </span>
-                <span className="org-value">{statusOf(w, goingIds)}</span>
+                <span className="org-value">{statusOf(w, goingIds, today)}</span>
               </button>
             ))}
           </Section>
@@ -136,7 +141,7 @@ export default function WordsScreen() {
         <WordCard
           key={`${going[0].id}-${answered}`}
           word={going[0]}
-          summary={`${tally.going} in rotation · ${tally.waiting} waiting · ${tally.learned} learned`}
+          summary={`${tally.going} in rotation · ${tally.resting} resting · ${tally.waiting} waiting · ${tally.learned} learned`}
           onAnswer={(remembered) => {
             update((d) => ({ ...d, words: answerCurrent(d.words, remembered, today, size) }));
             setAnswered((n) => n + 1);
@@ -147,6 +152,13 @@ export default function WordsScreen() {
           icon={<IoLanguageOutline />}
           title="No Words Yet"
           text="Add words you want to learn, or import your file in Settings."
+          action={<button type="button" className="org-button" onClick={() => setEditing('new')}>Add Word</button>}
+        />
+      ) : comesBack ? (
+        <Empty
+          icon={<IoStarOutline />}
+          title="Done for Today"
+          text={`Every word in learning is resting. The next ones come back on ${formatDay(comesBack)}.`}
           action={<button type="button" className="org-button" onClick={() => setEditing('new')}>Add Word</button>}
         />
       ) : (

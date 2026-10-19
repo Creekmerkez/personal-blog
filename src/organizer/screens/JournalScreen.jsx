@@ -181,11 +181,11 @@ function Editor({ draft, setDraft, onSave, onClose, onPicker }) {
         <Segmented label="Language" value={draft.lang} onChange={(lang) => setDraft((d) => ({ ...d, lang }))} options={LANGUAGE_OPTIONS} />
       </div>
       <Section>
-        <input className="org-input" placeholder="Title (optional)" aria-label="Title" value={current.title} onChange={(e) => setCurrent({ title: e.target.value })} />
+        <input className="org-input" placeholder="Title (optional)" aria-label="Title" autoComplete="off" value={current.title} onChange={(e) => setCurrent({ title: e.target.value })} />
         <input className="org-input" type="date" aria-label="Date" value={draft.date} onChange={(e) => setDraft((d) => ({ ...d, date: e.target.value || d.date }))} />
       </Section>
       <Section footer={draft.lang === 'uk' ? null : 'Translation of the Ukrainian text. Leave it empty if there is none yet.'}>
-        <textarea className="org-input org-textarea org-journal-text" aria-label="Text" placeholder={draft.lang === 'uk' ? 'Write…' : 'Translation…'} value={current.text} onChange={(e) => setCurrent({ text: e.target.value })} />
+        <textarea className="org-input org-textarea org-journal-text" aria-label="Text" autoComplete="off" placeholder={draft.lang === 'uk' ? 'Write…' : 'Translation…'} value={current.text} onChange={(e) => setCurrent({ text: e.target.value })} />
       </Section>
       <Section header="Photos" footer="Photos you add are made smaller and kept in the encrypted journal on this iPhone.">
         {draft.photos.length > 0 && (

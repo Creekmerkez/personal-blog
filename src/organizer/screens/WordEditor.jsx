@@ -30,11 +30,11 @@ export default function WordEditor({ word, today, onSave, onDelete, onLearnAgain
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={save}>Save</button>}
     >
       <Section>
-        <input className="org-input" placeholder="Word" aria-label="Word" value={text} onChange={(e) => setText(e.target.value)} autoCapitalize="none" autoFocus={!word} />
-        <input className="org-input" placeholder="Translation" aria-label="Translation" value={translation} onChange={(e) => setTranslation(e.target.value)} autoCapitalize="none" />
+        <input className="org-input" placeholder="Word" aria-label="Word" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} autoCapitalize="none" autoFocus={!word} />
+        <input className="org-input" placeholder="Translation" aria-label="Translation" autoComplete="off" value={translation} onChange={(e) => setTranslation(e.target.value)} autoCapitalize="none" />
       </Section>
       <Section header="Notes">
-        <textarea className="org-input org-textarea" aria-label="Notes" rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <textarea className="org-input org-textarea" aria-label="Notes" autoComplete="off" rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </Section>
       {word && (
         <Section>

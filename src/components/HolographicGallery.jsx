@@ -3,6 +3,7 @@ import '../styles/HolographicGallery.css';
 import photos from './photosData';
 import HoloClose from './HoloClose';
 import usePhone from './usePhone';
+import useBackToClose from './useBackToClose';
 
 // Fixed collage slots — absolute positions (in %) that recreate the reference's
 // overlapping, asymmetric floating layout. Each page fills these in order.
@@ -33,6 +34,8 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
   const [expanded, setExpanded] = useState(null);
   // On a phone the collage becomes an Instagram-style grid of every photo.
   const phone = usePhone();
+  // Back closes an opened photo first, then the gallery.
+  const collapse = useBackToClose(Boolean(expanded), () => setExpanded(null));
 
   useEffect(() => {
     if (open) {
@@ -78,12 +81,12 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
     if (!render) return undefined;
     const onKey = (e) => {
       if (e.key !== 'Escape') return;
-      if (expanded) setExpanded(null);
+      if (expanded) collapse();
       else onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [render, expanded, onClose]);
+  }, [render, expanded, onClose, collapse]);
 
   const categories = useMemo(() => {
     const unique = Array.from(new Set(photos.map((p) => p.category).filter(Boolean)));
@@ -123,7 +126,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
   return (
     <div
       className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
-      onClick={() => { if (expanded) { setExpanded(null); return; } onClose(); }}
+      onClick={() => { if (expanded) { collapse(); return; } onClose(); }}
       role="presentation"
     >
       <div
@@ -245,7 +248,7 @@ const HolographicGallery = ({ open, onClose, originRect }) => {
 
       <div
         className={`holo-lightbox ${expanded ? 'visible' : ''}`}
-        onClick={(e) => { e.stopPropagation(); setExpanded(null); }}
+        onClick={(e) => { e.stopPropagation(); collapse(); }}
       >
         {expanded && (
           <figure className="holo-lightbox-figure">

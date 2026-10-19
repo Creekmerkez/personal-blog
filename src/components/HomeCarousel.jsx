@@ -8,6 +8,7 @@ import HolographicGallery from './HolographicGallery';
 import HolographicBooks from './HolographicBooks';
 import HolographicYouTube from './HolographicYouTube';
 import HolographicAI from './HolographicAI';
+import useBackToClose from './useBackToClose';
 import galleryPhotos from './photosData';
 import youtubeVideos from './youtubeData';
 
@@ -400,6 +401,11 @@ const HomeCarousel = () => {
     setSelectedCard(null);
     setHologramVideoEl(null);
   };
+  const closePlayer = useBackToClose(isHologramOpen, closeHologram);
+  const closeGallery = useBackToClose(isGalleryOpen, () => setIsGalleryOpen(false));
+  const closeBooks = useBackToClose(isBooksOpen, () => setIsBooksOpen(false));
+  const closeYouTube = useBackToClose(isYouTubeOpen, () => setIsYouTubeOpen(false));
+  const closeAI = useBackToClose(isAIOpen, () => setIsAIOpen(false));
 
   const handleNavigation = (event, card) => {
     if (dragStartedRef.current) return; // dragged, not clicked — suppress navigation
@@ -663,30 +669,30 @@ const HomeCarousel = () => {
         </div>
       </section>
 
-      <HolographicPlayer open={isHologramOpen} videoEl={hologramVideoEl} originRect={aboutOrigin} onClose={closeHologram} />
+      <HolographicPlayer open={isHologramOpen} videoEl={hologramVideoEl} originRect={aboutOrigin} onClose={closePlayer} />
 
       <HolographicGallery
         open={isGalleryOpen}
         originRect={galleryOrigin}
-        onClose={() => setIsGalleryOpen(false)}
+        onClose={closeGallery}
       />
 
       <HolographicBooks
         open={isBooksOpen}
         originRect={booksOrigin}
-        onClose={() => setIsBooksOpen(false)}
+        onClose={closeBooks}
       />
 
       <HolographicYouTube
         open={isYouTubeOpen}
         originRect={youtubeOrigin}
-        onClose={() => setIsYouTubeOpen(false)}
+        onClose={closeYouTube}
       />
 
       <HolographicAI
         open={isAIOpen}
         originRect={aiOrigin}
-        onClose={() => setIsAIOpen(false)}
+        onClose={closeAI}
       />
 
       <section className="home-details" aria-label="Page sections" hidden>

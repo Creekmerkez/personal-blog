@@ -3,6 +3,7 @@ import '../styles/HolographicGallery.css';
 import videos from './youtubeData';
 import HoloClose from './HoloClose';
 import usePhone from './usePhone';
+import { hushMusic } from './musicHush';
 
 const VIDEO_SLOTS = [
   { left: 6, top: 8, w: 26, h: 28, z: 3 },
@@ -47,6 +48,14 @@ const HolographicYouTube = ({ open, onClose, originRect }) => {
   // (gating on `visible` instead moved it a frame later, into the entrance
   // animation, and the resulting reflow made the panel's controls jitter) while
   // still releasing the moment closing begins.
+  // The site's background music waits while a video plays.
+  const playing = render && expanded !== null;
+  useEffect(() => {
+    if (!playing) return undefined;
+    hushMusic(true);
+    return () => hushMusic(false);
+  }, [playing]);
+
   useEffect(() => {
     if (!open) return undefined;
     const previous = document.body.style.overflow;

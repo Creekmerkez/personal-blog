@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import HolographicGallery from './HolographicGallery';
 
@@ -46,5 +46,16 @@ describe('HolographicGallery', () => {
     render(<HolographicGallery open onClose={onClose} />);
     await userEvent.click(await screen.findByRole('button', { name: 'Close' }));
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("the browser's Back closes an opened photo, not the gallery (positive and negative)", async () => {
+    screenIs(true);
+    const onClose = vi.fn();
+    render(<HolographicGallery open onClose={onClose} />);
+    await userEvent.click((await screen.findAllByRole('button', { name: /^Expand / }))[0]);
+    expect(document.querySelector('.holo-lightbox-figure')).not.toBeNull();
+    window.history.back();
+    await waitFor(() => expect(document.querySelector('.holo-lightbox-figure')).toBeNull());
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

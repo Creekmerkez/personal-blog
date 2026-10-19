@@ -29,6 +29,25 @@ test.describe('Homepage carousel', () => {
     await expect(page.locator('.holo-ai-panel')).toBeHidden({ timeout: 8000 });
   });
 
+  test("the browser's Back closes a panel and stays on the site (positive)", async ({ page }) => {
+    await page.goto('/');
+    await openAiChatCard(page);
+    await expect(page.locator('.holo-ai-panel')).toBeVisible();
+    await page.goBack();
+    await expect(page.locator('.holo-ai-panel')).toBeHidden({ timeout: 8000 });
+    expect(new URL(page.url()).pathname).toBe('/');
+    await expect(page.locator('.carousel-card')).toHaveCount(7);
+  });
+
+  test('closing a panel another way leaves no extra Back step behind (negative)', async ({ page }) => {
+    await page.goto('/');
+    await openAiChatCard(page);
+    await expect(page.locator('.holo-ai-panel')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.holo-ai-panel')).toBeHidden({ timeout: 8000 });
+    expect(await page.evaluate(() => window.history.state?.popup)).toBeUndefined();
+  });
+
   test('does not throw a page error on load (negative — regression guard)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));

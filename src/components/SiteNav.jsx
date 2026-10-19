@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { applyTheme, getCurrentTheme } from '../theme';
+import BackgroundMusic from './BackgroundMusic';
 import '../styles/SiteNav.css';
 
 const SiteNav = () => {
@@ -58,6 +59,7 @@ const SiteNav = () => {
             </svg>
           )}
         </button>
+        <BackgroundMusic />
       </div>
     </nav>
   );

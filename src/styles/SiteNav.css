@@ -40,12 +40,12 @@ body:has(.hologram-stage.visible) .site-nav {
 
 .site-actions {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.6rem;
 }
 
-.theme-toggle {
+.theme-toggle,
+.music-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -61,15 +61,75 @@ body:has(.hologram-stage.visible) .site-nav {
 }
 
 .theme-toggle:hover,
-.theme-toggle:focus-visible {
+.theme-toggle:focus-visible,
+.music-toggle:hover,
+.music-toggle:focus-visible {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.65);
 }
 
-.theme-toggle svg {
+.theme-toggle svg,
+.music-toggle svg {
   width: 1.02rem;
   height: 1.02rem;
   display: block;
+}
+
+/* Background music: on/off and a small volume slider, next to the theme toggle. */
+.music-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  --track: rgba(27, 27, 27, 0.18);
+  --thumb: #1b1b1b;
+}
+
+.music-volume {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 4.5rem;
+  height: 1.9rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.music-controls.playing .music-volume,
+.music-volume:hover,
+.music-volume:focus-visible {
+  opacity: 1;
+}
+
+.music-volume::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--thumb) var(--fill), var(--track) var(--fill));
+}
+
+.music-volume::-moz-range-track {
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--thumb) var(--fill), var(--track) var(--fill));
+}
+
+.music-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4.5px;
+  border: none;
+  border-radius: 50%;
+  background: var(--thumb);
+}
+
+.music-volume::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--thumb);
 }
 
 @media (max-width: 720px) {
@@ -96,16 +156,21 @@ body:has(.hologram-stage.visible) .site-nav {
   background: rgba(18, 20, 26, 0.55);
 }
 
-:root[data-theme="dark"] .theme-toggle {
+:root[data-theme="dark"] .theme-toggle,
+:root[data-theme="dark"] .music-toggle {
   color: #f3f4f7;
-}
-
-:root[data-theme="dark"] .theme-toggle {
   border-color: rgba(243, 244, 247, 0.22);
   background: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme="dark"] .theme-toggle:hover,
-:root[data-theme="dark"] .theme-toggle:focus-visible {
+:root[data-theme="dark"] .theme-toggle:focus-visible,
+:root[data-theme="dark"] .music-toggle:hover,
+:root[data-theme="dark"] .music-toggle:focus-visible {
   background: rgba(255, 255, 255, 0.16);
+}
+
+:root[data-theme="dark"] .music-controls {
+  --track: rgba(243, 244, 247, 0.22);
+  --thumb: #f3f4f7;
 }

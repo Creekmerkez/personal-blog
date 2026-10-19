@@ -30,7 +30,7 @@ export default function WordEditor({ word, today, onSave, onDelete, onLearnAgain
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={save}>Save</button>}
     >
       <Section>
-        <input className="org-input" placeholder="Word" aria-label="Word" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} autoCapitalize="none" autoFocus={!word} />
+        <input className="org-input" placeholder="Word" aria-label="Word" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} autoCapitalize="none" data-autofocus={!word || undefined} />
         <input className="org-input" placeholder="Translation" aria-label="Translation" autoComplete="off" value={translation} onChange={(e) => setTranslation(e.target.value)} autoCapitalize="none" />
       </Section>
       <Section header="Notes">

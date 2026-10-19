@@ -44,7 +44,7 @@ export default function ItemEditor({ title, item, fields, defaults = {}, onSave,
         if (f.type === 'text') {
           return (
             <Section key={f.key}>
-              <input className="org-input" placeholder={f.label} aria-label={f.label} autoComplete="off" value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} autoFocus={!item} />
+              <input className="org-input" placeholder={f.label} aria-label={f.label} autoComplete="off" value={values[f.key]} onChange={(e) => set(f.key)(e.target.value)} data-autofocus={!item || undefined} />
             </Section>
           );
         }

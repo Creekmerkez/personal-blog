@@ -24,6 +24,7 @@ export function Screen({ title, leading, trailing, onBack, backLabel, children }
 }
 
 /** A bottom sheet with its own small navigation bar, like a SwiftUI sheet. */
+const SHEET_IN_MS = 300; // the org-sheet-in animation (0.28s) and a frame
 let openSheets = 0;
 let savedScrollY = 0;
 
@@ -48,6 +49,21 @@ export function Sheet({ title, leading, trailing, onClose, children }) {
     if (bodyRef.current) bodyRef.current.scrollTop = 0;
     freezePage();
     return unfreezePage;
+  }, []);
+
+  // A field focused while the sheet still slides up from below makes iOS scroll
+  // the screen down to it, so the form opened scrolled past its top. The field
+  // marked data-autofocus gets the cursor only once the sheet is in place,
+  // without scrolling, and the sheet is put back at the top then.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const body = bodyRef.current;
+      if (!body) return;
+      window.scrollTo(0, 0);
+      body.scrollTop = 0;
+      body.querySelector('[data-autofocus]')?.focus({ preventScroll: true });
+    }, SHEET_IN_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

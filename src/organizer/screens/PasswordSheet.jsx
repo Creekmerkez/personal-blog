@@ -43,7 +43,7 @@ export default function PasswordSheet({ mode, onSubmit, onClose, title, action, 
               : 'Enter the password chosen when this file was exported.')
           }
         >
-          <input className="org-input" type="password" autoComplete={creating ? 'new-password' : 'current-password'} placeholder="Password" aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
+          <input className="org-input" type="password" autoComplete={creating ? 'new-password' : 'current-password'} placeholder="Password" aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)} data-autofocus />
           {creating && (
             <input className="org-input" type="password" autoComplete="new-password" placeholder="Repeat Password" aria-label="Repeat Password" value={repeated} onChange={(e) => setRepeated(e.target.value)} />
           )}

@@ -54,7 +54,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       trailing={<button type="button" className="org-link org-strong" disabled={!canSave} onClick={save}>Save</button>}
     >
       <Section>
-        <input className="org-input" placeholder="Task" value={name} onChange={(e) => setName(e.target.value)} aria-label="Task" autoComplete="off" autoFocus={!task} />
+        <input className="org-input" placeholder="Task" value={name} onChange={(e) => setName(e.target.value)} aria-label="Task" autoComplete="off" data-autofocus={!task || undefined} />
       </Section>
       <Section footer="Green is something you want to do. Red is something you want to keep track of.">
         <div className="org-row">

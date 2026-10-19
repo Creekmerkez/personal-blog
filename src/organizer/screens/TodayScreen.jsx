@@ -3,7 +3,7 @@ import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoL
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
-import { Empty, FlagDot, Screen, Section, Segmented, Sheet } from '../components/ui';
+import { Empty, FlagDot, Screen, Section, Segmented } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
 
@@ -11,7 +11,6 @@ export default function TodayScreen({ onOpenSettings }) {
   const { data, update, today } = useOrganizer();
   const [showAll, setShowAll] = useState(false);
   const [editing, setEditing] = useState(null); // task, 'new', or null
-  const [openTask, setOpenTask] = useState(null);
   const [view, setView] = useState('todo'); // 'todo' | 'done'
 
   const tasks = data.myTasks;
@@ -44,7 +43,7 @@ export default function TodayScreen({ onOpenSettings }) {
         >
           {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
         </button>
-        <button type="button" className="org-row-main" onClick={() => setOpenTask(task)}>
+        <button type="button" className="org-row-main" onClick={() => setEditing(task)}>
           <span className={checked || wasSkipped ? 'org-muted' : ''}>{task.name}</span>
         </button>
         {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
@@ -68,7 +67,6 @@ export default function TodayScreen({ onOpenSettings }) {
     if (!window.confirm(`Delete “${task.name}” and its counter (${task.completionCount})?`)) return;
     update((d) => ({ ...d, myTasks: d.myTasks.filter((t) => t.id !== task.id) }));
     setEditing(null);
-    setOpenTask(null);
   };
 
   const move = (task, offset) => {
@@ -97,7 +95,6 @@ export default function TodayScreen({ onOpenSettings }) {
       onSave={(task) => {
         replaceTask(task);
         setEditing(null);
-        if (openTask?.id === task.id) setOpenTask(task);
       }}
     />
   );
@@ -180,29 +177,6 @@ export default function TodayScreen({ onOpenSettings }) {
         </>
       )}
 
-      {openTask && !editing && (
-        <Sheet
-          key={`details-${openTask.id}`}
-          title={openTask.name}
-          onClose={() => setOpenTask(null)}
-          leading={<button type="button" className="org-link" onClick={() => setOpenTask(null)}>Close</button>}
-          trailing={<button type="button" className="org-link" onClick={() => setEditing(openTask)}>Edit</button>}
-        >
-          <Section>
-            <div className="org-row org-labeled"><span>Type</span><span className="org-value"><FlagDot flag={openTask.flag} /> {openTask.flag === 'red' ? 'Red' : 'Green'}</span></div>
-            <div className="org-row org-labeled"><span>Repeats</span><span className="org-value">{scheduleSummary(openTask, today)}</span></div>
-            <div className="org-row org-labeled"><span>Days checked</span><span className="org-value">{openTask.completionCount}</span></div>
-            {!openTask.isActive && <div className="org-row org-labeled"><span>Status</span><span className="org-value">Paused</span></div>}
-          </Section>
-          <Section header="Details">
-            <p className="org-row org-prewrap">{openTask.details || <span className="org-muted">No details</span>}</p>
-          </Section>
-          <Section>
-            <button type="button" className="org-row org-action org-center" onClick={() => setEditing(openTask)}>Edit Task</button>
-            <button type="button" className="org-row org-destructive" onClick={() => remove(openTask)}>Delete Task</button>
-          </Section>
-        </Sheet>
-      )}
       {editor}
     </Screen>
   );

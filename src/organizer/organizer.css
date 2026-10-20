@@ -274,7 +274,7 @@ a.org-row { text-decoration: none; }
 .org-word-notes { color: var(--org-secondary); white-space: pre-wrap; margin: 10px 0 0; line-height: 1.4; }
 @keyframes org-fade { from { opacity: 0; } to { opacity: 1; } }
 .org-word-actions { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
-.org-big-button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 14px; font-weight: 600; font-size: 17px; }
+.org-big-button { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 14px; font-weight: 600; font-size: 17px; }
 .org-big-button svg { font-size: 22px; }
 .org-primary { background: var(--org-accent); color: #fff; }
 .org-remembered { background: var(--org-green); color: #fff; }

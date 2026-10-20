@@ -11,6 +11,7 @@
   --org-red: #ff3b30;
   --org-fill: rgba(118, 118, 128, 0.12);
   --org-bar: rgba(249, 249, 249, 0.94);
+  --org-segment: #ffffff; /* the selected segment, as on iOS */
   color-scheme: light dark;
 }
 
@@ -27,6 +28,7 @@
     --org-red: #ff453a;
     --org-fill: rgba(118, 118, 128, 0.24);
     --org-bar: rgba(22, 22, 24, 0.94);
+    --org-segment: #636366;
   }
 }
 
@@ -151,7 +153,7 @@ a.org-row { text-decoration: none; }
 
 .org-segmented { display: flex; width: 100%; background: var(--org-fill); border-radius: 9px; padding: 2px; }
 .org-segmented button { flex: 1; min-height: 32px; border-radius: 7px; font-size: 14px; font-weight: 500; }
-.org-segmented button.is-selected { background: var(--org-card); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+.org-segmented button.is-selected { background: var(--org-segment); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
 
 .org-weekdays { display: flex; gap: 6px; width: 100%; }
 .org-weekdays button { flex: 1; min-height: 40px; border-radius: 20px; background: var(--org-fill); font-size: 14px; font-weight: 600; }

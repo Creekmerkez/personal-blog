@@ -7,7 +7,7 @@ import { HUSH_EVENT } from './musicHush';
 // (remembered). It steps aside while something else with sound plays: a video
 // on the site, a YouTube video, or an embedded player the visitor clicked into.
 
-const SRC = '/audio/concrete-alibi.mp3';
+const SRC = '/audio/glass-ivy.mp3';
 const DEFAULT_VOLUME = 0.3;
 
 const read = (key) => {

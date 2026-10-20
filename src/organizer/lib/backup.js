@@ -4,7 +4,8 @@ import { appleSeconds } from './dates';
 // backup file, so export and import work in both directions unchanged.
 export const FORMAT_VERSION = 1;
 
-export const LISTS = ['myTasks', 'sonTasks', 'vaccinations', 'doctorVisits', 'games', 'places', 'words', 'journal'];
+// examTopics is this web app's own (the Zkouška tab); the iPhone app skips keys it doesn't know.
+export const LISTS = ['myTasks', 'sonTasks', 'vaccinations', 'doctorVisits', 'games', 'places', 'words', 'journal', 'examTopics'];
 
 export function emptyData() {
   return {
@@ -18,6 +19,7 @@ export function emptyData() {
     places: [],
     words: [],
     journal: [],
+    examTopics: [],
   };
 }
 
@@ -47,6 +49,11 @@ export function validateBackup(value) {
   }
   for (const word of data.words) {
     if (typeof word.word !== 'string' || typeof word.nextReviewDayKey !== 'number') {
+      throw new Error('This file is damaged.');
+    }
+  }
+  for (const topic of data.examTopics) {
+    if (typeof topic.title !== 'string' || typeof topic.text !== 'string' || typeof topic.number !== 'number') {
       throw new Error('This file is damaged.');
     }
   }

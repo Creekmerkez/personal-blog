@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { IoCheckboxOutline, IoPeopleOutline, IoLanguageOutline, IoJournalOutline, IoSettingsOutline } from 'react-icons/io5';
+import { IoCheckboxOutline, IoPeopleOutline, IoLanguageOutline, IoSchoolOutline, IoJournalOutline, IoSettingsOutline } from 'react-icons/io5';
 import { useOrganizer } from './lib/context';
 import TodayScreen from './screens/TodayScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import WordsScreen from './screens/WordsScreen';
 import SonScreen from './screens/SonScreen';
+import ExamScreen from './screens/ExamScreen';
 import JournalScreen, { Locked } from './screens/JournalScreen';
 import { useJournal } from './lib/useJournal';
 
@@ -12,6 +13,7 @@ const TABS = [
   { id: 'today', label: 'Today', icon: IoCheckboxOutline },
   { id: 'son', label: 'Son', icon: IoPeopleOutline },
   { id: 'words', label: 'Words', icon: IoLanguageOutline },
+  { id: 'exam', label: 'Zkouška', icon: IoSchoolOutline },
   { id: 'journal', label: 'Journal', icon: IoJournalOutline },
   { id: 'settings', label: 'Settings', icon: IoSettingsOutline },
 ];
@@ -29,8 +31,8 @@ export default function App() {
   // here, inside the password-protected file.
   const prepareExport = useCallback(async () => ({ ...data, journal: await journal.entriesForExport() }), [data, journal]);
 
-  // A file's journal entries replace the journal only when the file has some,
-  // so importing a tasks-and-words file never empties the journal.
+  // A file's journal entries and exam topics replace them only when the file has some,
+  // so importing a tasks-and-words file (or one from the iPhone app) never empties them.
   const applyImport = useCallback(
     async (backup) => {
       if (backup.journal.length > 0) {
@@ -41,7 +43,7 @@ export default function App() {
         }
         await journal.saveEntries(backup.journal);
       }
-      update(() => ({ ...backup, journal: [] }));
+      update((current) => ({ ...backup, examTopics: backup.examTopics.length ? backup.examTopics : current.examTopics, journal: [] }));
     },
     [update, journal],
   );
@@ -71,6 +73,7 @@ export default function App() {
           {tab === 'today' && <TodayScreen onOpenSettings={() => setTab('settings')} />}
           {tab === 'son' && <SonScreen />}
           {tab === 'words' && <WordsScreen />}
+          {tab === 'exam' && <ExamScreen />}
           {tab === 'journal' && <JournalScreen journal={journal} />}
           {tab === 'settings' && <SettingsScreen prepareExport={prepareExport} applyImport={applyImport} addJournalEntries={addJournalEntries} journal={journal} />}
         </main>

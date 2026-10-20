@@ -256,7 +256,7 @@ a.org-row { text-decoration: none; }
   border-top: 0.5px solid var(--org-separator);
   padding: 6px 0 max(6px, env(safe-area-inset-bottom));
 }
-.org-tabbar button { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 64px; color: #8e8e93; font-size: 10px; font-weight: 500; }
+.org-tabbar button { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; min-width: 0; color: #8e8e93; font-size: 10px; font-weight: 500; }
 .org-tabbar button svg { font-size: 26px; }
 .org-tabbar button.is-active { color: var(--org-accent); }
 
@@ -337,3 +337,14 @@ a.org-row { text-decoration: none; }
 .org-entry .org-prewrap { font-size: 17px; line-height: 1.55; }
 .org-journal-text { min-height: 50dvh; }
 .org-muted-link { color: var(--org-secondary); font-size: 14px; margin-top: 28px; }
+
+/* Zkouška */
+.org-exam-badge { width: 30px; height: 30px; border-radius: 50%; flex: none; display: inline-flex; align-items: center; justify-content: center; background: var(--org-fill); color: var(--org-accent); font-size: 15px; font-weight: 600; }
+.org-exam-today .org-exam-badge { background: var(--org-accent); color: #fff; }
+.org-exam-done { color: var(--org-green); font-size: 24px; flex: none; }
+.org-exam-number { color: var(--org-secondary); margin: -8px 0 14px; }
+.org-exam-sentences { margin: 0; padding: 12px 16px 12px 40px; font-size: 19px; line-height: 1.45; }
+.org-exam-sentences li + li { margin-top: 10px; }
+.org-exam-sentences li::marker { color: var(--org-secondary); font-size: 15px; }
+.org-exam-hidden { color: var(--org-accent); text-align: left; min-height: 28px; }
+.org-exam-textarea { font-size: 16px; line-height: 1.45; }

@@ -124,6 +124,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const stageRef = useRef(null);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -193,6 +194,28 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
   }, [open]);
+
+  // With the keyboard up, iOS Safari keeps fixed elements on the full-height page, so the
+  // keyboard covered the input and the site's footer showed below the chat. The stage is
+  // fitted to the part of the screen that is actually visible instead.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const stage = stageRef.current;
+    if (!render || !viewport || !stage) return undefined;
+    const fit = () => {
+      stage.style.top = `${viewport.offsetTop}px`;
+      stage.style.bottom = 'auto';
+      stage.style.height = `${viewport.height}px`;
+    };
+    fit();
+    viewport.addEventListener('resize', fit);
+    viewport.addEventListener('scroll', fit);
+    return () => {
+      viewport.removeEventListener('resize', fit);
+      viewport.removeEventListener('scroll', fit);
+      Object.assign(stage.style, { top: '', bottom: '', height: '' });
+    };
+  }, [render]);
 
   useEffect(() => {
     if (!render) return undefined;
@@ -479,6 +502,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
 
   return (
     <div
+      ref={stageRef}
       className={`holo-gallery-stage ${visible ? 'visible' : ''}`}
       onClick={onClose}
       role="presentation"
@@ -565,6 +589,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
               onKeyDown={handleKey}
               disabled={loading}
               maxLength={500}
+              autoComplete="off"
             />
             {SpeechRecognitionClass && (
               <button

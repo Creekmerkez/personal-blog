@@ -64,28 +64,28 @@ const TOPIC_ROUTES = [
   {
     // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
     // Shown word for word, not rephrased by the AI.
-    pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)/i,
+    pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)|хто\s+(?:\S+\s+){0,2}(?:подруга|подружка)(?![а-яіїєґ])/i,
     verbatim: true,
     beforeOverview: true,
     hardcoded: {
-      en: "You, of course, Havryliuchka! 😄 If you're asking, it must be you: only Havryliuchka would ask that. Seriously though, Julia's best friend is Ira, her Havryliuchka, back in Ukraine.",
-      ua: 'Звісно ж ти, Гаврилючко! 😄 Якщо питаєш — значить, ти: таке питання може поставити тільки Гаврилючка. А якщо серйозно, найкраща подружка Юлії — Ірка, її Гаврилючка, яка живе в Україні.',
+      en: "You, of course, Havryliuchka! 😄 If you're asking, it must be you: only Havryliuchka would ask that. Seriously though, Julia's best friend is Ira Havryliuk — Havryliuchka — back in Ukraine.",
+      ua: 'Звісно ж ти, Гаврилючко! 😄 Якщо питаєш — значить, ти: таке питання може поставити тільки Гаврилючка. А якщо серйозно, найкраща подружка Юлії — Ірка Гаврилюк, або просто Гаврилючка, яка живе в Україні.',
     },
   },
   {
     pattern: /havryl|гаврилю|(?<![а-яіїєґ])ірк[аиуоі]?(?![а-яіїєґ])/i,
     beforeOverview: true, // "Хто така Гаврилючка?" would otherwise read as "who is she"
     hardcoded: {
-      en: 'Havryliuchka is Ira, Julia\'s best friend in Ukraine. They talk almost every day, and even after a week or two of silence they simply pick up where they left off — no hellos or goodbyes needed. Julia misses her very much.',
-      ua: 'Гаврилючка — це Ірка, найкраща подружка Юлії з України. Вони спілкуються майже щодня, а навіть якщо тиждень чи два мовчать, то просто продовжують розмову з того місця, де зупинилися, — без жодних «привіт» і «бувай». Юлія дуже за нею сумує.',
+      en: 'Havryliuchka is Ira Havryliuk, Julia\'s best friend in Ukraine (the nickname comes from her surname). They talk almost every day, and even after a week or two of silence they simply pick up where they left off — no hellos or goodbyes needed. Julia misses her very much.',
+      ua: 'Гаврилючка — це Ірка Гаврилюк, найкраща подружка Юлії з України. Вони спілкуються майже щодня, а навіть якщо тиждень чи два мовчать, то просто продовжують розмову з того місця, де зупинилися, — без жодних «привіт» і «бувай». Юлія дуже за нею сумує.',
     },
   },
   {
     // "друг" only as a whole word: inside "друга", "другий" it means "second".
     pattern: /\b(friends?|friendship|social)\b|друз|подруг|подружк|дружб|(?<![а-яіїєґ])друг(?![а-яіїєґ])|соціальн/i,
     hardcoded: {
-      en: 'Several of Julia\'s best friends stayed in Ukraine. The closest is Ira, her Havryliuchka: they talk almost every day, and even after a week or two of silence they carry on as if there had been no pause. Julia would love to find friends as loyal in the Czech Republic, but it hasn\'t happened yet: over the years she has become less social — she used to be an extrovert and now feels more of an introvert.',
-      ua: 'У Юлії в Україні залишилося кілька найкращих друзів. Найближча — Гаврилючка, подружка Ірка: вони спілкуються майже щодня, а навіть після тижня чи двох тиші продовжують розмову так, ніби й не було паузи. У Чехії Юлії хотілося б знайти таких самих вірних друзів, але поки що не склалося: з роками вона стала менш соціальною — колись була екстравертом, а тепер радше інтровертка.',
+      en: 'Several of Julia\'s best friends stayed in Ukraine. The closest is Ira Havryliuk, Havryliuchka: they talk almost every day, and even after a week or two of silence they carry on as if there had been no pause. Julia would love to find friends as loyal in the Czech Republic, but it hasn\'t happened yet: over the years she has become less social — she used to be an extrovert and now feels more of an introvert.',
+      ua: 'У Юлії в Україні залишилося кілька найкращих друзів. Найближча — Ірка Гаврилюк, Гаврилючка: вони спілкуються майже щодня, а навіть після тижня чи двох тиші продовжують розмову так, ніби й не було паузи. У Чехії Юлії хотілося б знайти таких самих вірних друзів, але поки що не склалося: з роками вона стала менш соціальною — колись була екстравертом, а тепер радше інтровертка.',
     },
   },
   {
@@ -162,7 +162,7 @@ const TOPIC_ROUTES = [
     pattern: /\b(work|job|profession|career|engineer|automation|testing|tester|tech)\b|(чим займаєш|спеціальність|фах|професія|тестуван|автоматизац)/i,
     hardcoded: {
       en: "Julia is a Test Automation Engineer with 10 years of experience. The job has changed a lot: she used to write tests in Java, and now test automation is done mostly together with AI. She builds helper skills and commands that write and fix tests faster, and today she reads and reviews code more than she writes it — a whole new level.",
-      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Її робота дуже змінилася: колись вона писала тести на Java, а тепер автоматизація майже вся йде разом із ШІ. Юлія створює допоміжні скіли й команди, щоб швидше писати й виправляти тести, і зараз більше читає та перевіряє код, ніж пише його, — це зовсім інша планка.",
+      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Її робота дуже змінилася: колись вона писала тести на Java, а тепер автоматизацію майже повністю роблять разом зі ШІ. Юлія створює допоміжні скіли й команди, щоб швидше писати й виправляти тести, і зараз більше читає та перевіряє код, ніж пише його, — це зовсім інша планка.",
     },
   },
   {

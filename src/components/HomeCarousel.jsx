@@ -10,13 +10,12 @@ import HolographicYouTube from './HolographicYouTube';
 import HolographicAI from './HolographicAI';
 import useBackToClose from './useBackToClose';
 import galleryPhotos from './photosData';
-import youtubeVideos from './youtubeData';
 
 const heroVideoSrc = '/videos/banner.mp4';
 
 // The owner's chosen picture as the Photos card cover.
 const photosCover = '/images/photos-card.jpg';
-const youtubeCover = youtubeVideos[0]?.thumbnail ?? '/images/book1.jpg';
+const musicCover = '/images/music-card.jpg';
 // Local files only: an external (Pinterest) cover was once hotlink-blocked on Android.
 const ceskeRealieCover = '/images/ceske-realie-card.jpg';
 const myAICardCover = '/images/my-ai-card.jpg';
@@ -26,7 +25,7 @@ const cards = [
     id: 'youtube',
     title: 'My Music',
     subtitle: 'Music I Created',
-    background: youtubeCover,
+    background: musicCover,
     actionType: 'youtube',
   },
   {
@@ -126,13 +125,6 @@ const HomeCarousel = () => {
       window.removeEventListener(THEME_CHANGE_EVENT, syncBg);
       document.body.style.backgroundColor = previousBg;
     };
-  }, []);
-
-  // Preload dynamic card covers (static ones are preloaded via <link rel="preload"> in index.html)
-  useEffect(() => {
-    [youtubeCover].forEach(src => {
-      if (src) { const img = new Image(); img.src = src; }
-    });
   }, []);
 
   // Preload gallery images on card hover so they're cached before the popup opens

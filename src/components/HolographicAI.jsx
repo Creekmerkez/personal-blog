@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { searchQA, detectLang, isGreeting, isGeneralQuery, isAboutAI } from './QAChat/qaSearch';
+import { uaYears, yearsInPrague } from './QAChat/facts';
 
 const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
 import '../styles/HolographicGallery.css';
@@ -81,8 +82,8 @@ const ERROR_MSG = {
 };
 
 const JULIA_OVERVIEW = {
-  en: "Julia is a Test Automation Engineer from Ukraine, based in Prague for about 11 years. She's also a DJ, children's book author, and AI enthusiast. Feel free to ask anything specific about her!",
-  ua: "Юлія — Test Automation Engineer з України, живе в Празі вже близько 11 років. Ще вона DJ, авторка дитячих книг і захоплена ШІ. Питайте що завгодно конкретніше про неї!",
+  en: `Julia is a Test Automation Engineer from Ukraine, based in Prague since 2016 (about ${yearsInPrague()} years). She's also a DJ, children's book author, and AI enthusiast. Feel free to ask anything specific about her!`,
+  ua: `Юлія — Test Automation Engineer з України, живе в Празі з 2016 року (вже близько ${uaYears(yearsInPrague())}). Ще вона DJ, авторка дитячих книг і захоплена ШІ. Питайте що завгодно конкретніше про неї!`,
 };
 
 function renderWithLinks(text) {
@@ -404,6 +405,14 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       return;
     }
 
+    // A few answers (the best-friend joke) are the owner's exact words, not for the AI to rephrase.
+    const exact = searchQA(query, queryLang, 1)[0];
+    if (exact?.verbatim) {
+      setMessages((prev) => [...prev, { role: 'ai', text: exact.answer }]);
+      setLoading(false);
+      return;
+    }
+
     if (WORKER_URL) {
       // Claude path — intelligent, handles any phrasing in any language.
       // Fuse matches are passed as extra context; Claude can answer even without them.
@@ -424,7 +433,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     }
 
     // Fallback: client-side regex + Fuse (no worker configured).
-    if (isGeneralQuery(query)) {
+    if (isGeneralQuery(query) && !exact?.final) {
       setLoading(false);
       setMessages((prev) => [...prev, { role: 'ai', text: JULIA_OVERVIEW[queryLang] }]);
       return;

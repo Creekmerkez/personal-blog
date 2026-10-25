@@ -1,5 +1,9 @@
 import Fuse from 'fuse.js';
 import { qaData } from './qaData';
+import { montikAgeAtLeast, uaYears, yearsInPrague } from './facts';
+
+const PRAGUE_YEARS = yearsInPrague();
+const MONTIK_AGE = montikAgeAtLeast();
 
 const fuseOptions = {
   keys: [
@@ -47,6 +51,51 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // The owner's answer to anyone who argues the war is "not so clear-cut" (in any of
+    // the usual phrasings, Ukrainian, Russian or English). Her words, shown as they are.
+    pattern: /не все так однозначн|не всё так однозначн|не все так просто|не всё так просто|я (?:не |поза |вне )(?:в )?політиц|я (?:не |вне )(?:в )?политик|я поза політикою|не розуміюся в політиц|не разбираюсь в политик|обидві сторони|обе стороны|нато (?:спровок|винн|винова)|україна (?:сама )?(?:почала|винна|спровокувал)|украина (?:сама )?(?:начала|виновата|спровоцировал)|братні\S* народ|братск\S* народ|один народ|\b(?:not (?:so )?black and white|not that simple|both sides|not into politics|out of politics|nato provoked|ukraine (?:started|provoked)|one people|brotherly nations?)\b/i,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "If I were Julia, I'd tell you to fuck off.",
+      ua: 'Якби я була Юлею, я б тебе послала нахуй.',
+    },
+  },
+  {
+    // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
+    // Shown word for word, not rephrased by the AI.
+    pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)/i,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "You, of course, Havryliuchka! 😄 If you're asking, it must be you: only Havryliuchka would ask that. Seriously though, Julia's best friend is Ira, her Havryliuchka, back in Ukraine.",
+      ua: 'Звісно ж ти, Гаврилючко! 😄 Якщо питаєш — значить, ти: таке питання може поставити тільки Гаврилючка. А якщо серйозно, найкраща подружка Юлії — Ірка, її Гаврилючка, яка живе в Україні.',
+    },
+  },
+  {
+    pattern: /havryl|гаврилю|(?<![а-яіїєґ])ірк[аиуоі]?(?![а-яіїєґ])/i,
+    beforeOverview: true, // "Хто така Гаврилючка?" would otherwise read as "who is she"
+    hardcoded: {
+      en: 'Havryliuchka is Ira, Julia\'s best friend in Ukraine. They talk almost every day, and even after a week or two of silence they simply pick up where they left off — no hellos or goodbyes needed. Julia misses her very much.',
+      ua: 'Гаврилючка — це Ірка, найкраща подружка Юлії з України. Вони спілкуються майже щодня, а навіть якщо тиждень чи два мовчать, то просто продовжують розмову з того місця, де зупинилися, — без жодних «привіт» і «бувай». Юлія дуже за нею сумує.',
+    },
+  },
+  {
+    // "друг" only as a whole word: inside "друга", "другий" it means "second".
+    pattern: /\b(friends?|friendship|social)\b|друз|подруг|подружк|дружб|(?<![а-яіїєґ])друг(?![а-яіїєґ])|соціальн/i,
+    hardcoded: {
+      en: 'Several of Julia\'s best friends stayed in Ukraine. The closest is Ira, her Havryliuchka: they talk almost every day, and even after a week or two of silence they carry on as if there had been no pause. Julia would love to find friends as loyal in the Czech Republic, but it hasn\'t happened yet: over the years she has become less social — she used to be an extrovert and now feels more of an introvert.',
+      ua: 'У Юлії в Україні залишилося кілька найкращих друзів. Найближча — Гаврилючка, подружка Ірка: вони спілкуються майже щодня, а навіть після тижня чи двох тиші продовжують розмову так, ніби й не було паузи. У Чехії Юлії хотілося б знайти таких самих вірних друзів, але поки що не склалося: з роками вона стала менш соціальною — колись була екстравертом, а тепер радше інтровертка.',
+    },
+  },
+  {
+    pattern: /\b(introvert\w*|extrovert\w*|homebody|free time|spare time|weekends?|hobb(?:y|ies)|playstation|ps5|video games?|gaming)\b|інтроверт|екстраверт|вільн\S* час|вихідн|хобі|плейстейшн/i,
+    hardcoded: {
+      en: 'Julia used to be an extrovert; these days she feels more of an introvert. She loves being at home: watching films, playing PlayStation, cooking, playing with her son, going places together and surprising him. Her son is the most important thing in her life right now.',
+      ua: 'Колись Юлія була екстравертом, а тепер відчуває себе радше інтроверткою. Вона любить бути вдома: дивитися фільми, грати в PlayStation, готувати, гратися із сином, їздити з ним кудись разом і дивувати його. Син — це для неї зараз найголовніше.',
+    },
+  },
+  {
     pattern: /\b(husband|spouse|partner)\b|(чоловік|партнер)/i,
     hardcoded: {
       en: "Julia lives in Prague with her husband and son. She keeps his personal details private, but speaks of him with warmth and gratitude.",
@@ -56,22 +105,22 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(family|relatives|parents)\b|(сім.?я|батьк|рідн)/i,
     hardcoded: {
-      en: "Family is everything to Julia. She lives in Prague with her wonderful husband and son — her ideal day is all of them spending time together, ideally with her parents too.",
-      ua: "Сім'я — це все для Юлії. Вона живе в Празі з чудовим чоловіком і сином. Ідеальний день для неї — провести час разом, ідеально ще й із батьками.",
+      en: "Family is everything to Julia. She lives in Prague with her wonderful husband and son. Her parents live in Ukraine — she misses them very much and wishes she could visit and see them more often.",
+      ua: "Сім'я — це все для Юлії. Вона живе в Празі з чудовим чоловіком і сином. Її батьки живуть в Україні — Юлія дуже за ними сумує й хотіла б навідувати їх і бачити частіше.",
     },
   },
   {
     pattern: /\b(from|origin(?:ally)?|hometown|born)\b|grew up|kyiv region|(рідне місто|звідки|де (?:ти )?народил|де (?:ти )?виросл)/i,
     hardcoded: {
-      en: "Julia is originally from the Kyiv region of Ukraine — she spent a significant part of her life in Kyiv before relocating to Prague about 11 years ago for work.",
-      ua: "Юлія родом із Київської області України — значну частину свого життя вона прожила в Києві, перш ніж переїхати до Праги близько 11 років тому через роботу.",
+      en: "Julia is originally from the Kyiv region of Ukraine — she spent a significant part of her life in Kyiv before relocating to Prague in 2016 for work.",
+      ua: "Юлія родом із Київської області України — значну частину свого життя вона прожила в Києві, перш ніж переїхати до Праги у 2016 році через роботу.",
     },
   },
   {
     pattern: /\b(prague|czech republic|which city|which country)\b|where.{0,12}(?:live|based|stay)|live.{0,12}where|how long.{0,10}(?:prague|czech)|lived.{0,10}prague|(де (?:ти )?жив|де живеш|Прага|переїхала|скільки.{0,10}празі)/i,
     hardcoded: {
-      en: "Julia lives in Prague, Czech Republic — she's been here for about 11 years, originally relocating for a job opportunity. She lives with her husband and son and loves the city.",
-      ua: "Юлія живе в Празі, Чехія — вже близько 11 років, спочатку переїхала сюди через роботу. Живе з чоловіком і сином і дуже любить це місто.",
+      en: `Julia lives in Prague, Czech Republic — she moved here in 2016, about ${PRAGUE_YEARS} years ago, originally for a job opportunity. She lives with her husband and son and loves the city.`,
+      ua: `Юлія живе в Празі, Чехія, з 2016 року — вже близько ${uaYears(PRAGUE_YEARS)}; спочатку переїхала сюди через роботу. Живе з чоловіком і сином і дуже любить це місто.`,
     },
   },
   {
@@ -105,15 +154,15 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(like|enjoy|love|hate|dislike|feel about|passionate about)\b.{0,25}\b(job|work|career|profession)\b|\b(job|work|career)\b.{0,25}\b(like|enjoy|love|hate|satisfy|fulfil|make her happy)\b|(подобається.{0,20}робот|робот.{0,20}подобається|чи любить роботу|як ставиться до роботи)/i,
     hardcoded: {
-      en: "Julia has spent 10+ years in IT — that kind of commitment is a pretty clear yes. She's especially passionate about AI and building digital experiences, which goes well beyond just doing a job.",
-      ua: "Юлія понад 10 років у IT — така відданість красномовно говорить «так». Особливо захоплена ШІ і створенням цифрових продуктів — це явно більше, ніж просто робота.",
+      en: "Julia has spent 10 years in test automation — that kind of commitment is a pretty clear yes. Her work has moved closer and closer to AI — she now builds the AI skills and commands that help write and fix tests — which she finds especially exciting.",
+      ua: "Юлія вже 10 років в автоматизації тестування — така відданість красномовно говорить «так». Її робота дедалі тісніше пов'язана зі ШІ — тепер вона створює AI-скіли й команди, які допомагають писати й виправляти тести, — і це її особливо захоплює.",
     },
   },
   {
     pattern: /\b(work|job|profession|career|engineer|automation|testing|tester|tech)\b|(чим займаєш|спеціальність|фах|професія|тестуван|автоматизац)/i,
     hardcoded: {
-      en: "Julia is a Test Automation Engineer with 10+ years in IT, specializing in automated testing and quality assurance. She's also deeply interested in AI and helps people create AI-powered digital experiences.",
-      ua: "Юлія — Test Automation Engineer з понад 10 роками досвіду в IT. Спеціалізується на автоматизованому тестуванні та QA, а також цікавиться ШІ і допомагає людям створювати цифрові продукти на його основі.",
+      en: "Julia is a Test Automation Engineer with 10 years of experience. The job has changed a lot: she used to write tests in Java, and now test automation is done mostly together with AI. She builds helper skills and commands that write and fix tests faster, and today she reads and reviews code more than she writes it — a whole new level.",
+      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Її робота дуже змінилася: колись вона писала тести на Java, а тепер автоматизація майже вся йде разом із ШІ. Юлія створює допоміжні скіли й команди, щоб швидше писати й виправляти тести, і зараз більше читає та перевіряє код, ніж пише його, — це зовсім інша планка.",
     },
   },
   {
@@ -133,15 +182,23 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(vegetarian|vegan|plant.based|meat.free|no meat|diet|food|eat|meal|cook|recipe|how long vegan)\b|(веган|вегетаріан|рослинн|без м.яса|їж(?!\w)|харчуван|готуєш|страва|рецепт)/i,
     hardcoded: {
-      en: "Julia has followed a plant-based, meat-free lifestyle for over 8 years — it comes from deep respect for all living beings. Her favorite dishes include chickpea omelets and curry with rice. She puts a lot of care into food because for her it's the foundation.",
-      ua: "Юлія живе за рослинним способом харчування вже понад 8 років — це з глибокої поваги до всіх живих істот. З улюблених страв — омлет із нуту та карі з рисом. Вона приділяє багато уваги їжі — для неї це основа.",
+      en: "Julia is pescatarian: she eats fish and seafood, and now and then eggs or cheese, but she is firmly against eating meat. Her favorite dishes include chickpea omelets and curry with rice. She puts a lot of care into food because for her it's the foundation.",
+      ua: "Юлія — пескетаріанка: їсть рибу й морепродукти, часом яйця чи сир, але категорично проти вживання м'яса. З улюблених страв — омлет із нуту та карі з рисом. Вона приділяє багато уваги їжі — для неї це основа.",
     },
   },
   {
     pattern: /\b(son|child|kid|baby|mother|motherhood|mom|mum|parent)\b|(дитина|мама|материнство|малюк|бути мамою|материн)/i,
     hardcoded: {
-      en: "For Julia, becoming a mother was a completely new life. When you bring a new person into the world, an all-encompassing love appears in you that you've never felt before. She wishes everyone could experience this — provided there's support and stability.",
-      ua: "Для Юлії материнство — це абсолютно нове життя. Коли народжується нова людина, відчуваєш всеосяжну любов, якої раніше не знала. Юлія бажає кожному відчути це — за умови, що є підтримка і стабільність.",
+      en: "For Julia, becoming a mother was a completely new life. When you bring a new person into the world, an all-encompassing love appears in you that you've never felt before. She wishes everyone could experience this — provided there's support and stability. Right now her son is the most important thing to her: playing together, going places, surprising him.",
+      ua: "Для Юлії материнство — це абсолютно нове життя. Коли народжується нова людина, відчуваєш всеосяжну любов, якої раніше не знала. Юлія бажає кожному відчути це — за умови, що є підтримка і стабільність. А зараз син — для неї найголовніше: гратися з ним, їздити кудись разом, дивувати його.",
+    },
+  },
+  {
+    // Ahead of the general "loves" route, so "Які фільми вона любить?" is about films.
+    pattern: /\b(movies?|films?|series|shows?|watch\w*|stand.?up|comedians?)\b|(фільм|серіал|дивит|дивил|стендап|комік(?!с)|передач)/i,
+    hardcoded: {
+      en: "Like most people, Julia watches whatever is popular and everyone is talking about — films and series with high ratings, and some with not-so-high ones. Above all, she deliberately supports Ukrainian content so that it grows: Ukrainian stand-up comedians (she goes to their shows around Europe), scientists who tell fascinating stories about the universe, true crime, investigations, news and military experts. She also follows AI news and everything new.",
+      ua: "Як і більшість людей, Юлія дивиться те, що зараз у топі й що всі обговорюють, — популярні фільми й серіали, і з високими рейтингами, і не дуже. А найбільше вона свідомо підтримує український контент, щоб він ріс: дивиться українських стендап-коміків (і ходить на їхні виступи в Європі), науковців, які цікаво розповідають про всесвіт, true crime, розслідування, новини та військових експертів. А ще стежить за новинами ШІ та всім новим.",
     },
   },
   {
@@ -152,6 +209,14 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // What she reads now; ahead of the book route, which is about the books she writes.
+    pattern: /\b(reading|reads|recommend\w*)\b|what (?:does|do) (?:she|julia|you) read|(читає|читаєш|почитати|порад\S*|що читати|читал)/i,
+    hardcoded: {
+      en: "Right now Julia mostly reads about child development — the child's brain, psychology and upbringing — and she is studying for her Czech language and Czech realia exam. Among her favourite books are The Book Thief, Flowers for Algernon, Never Let Me Go, and the books of Lyuko Dashvar and Bernard Werber.",
+      ua: 'Зараз Юлія найбільше читає про розвиток дітей — про дитячий мозок, психологію й виховання, — а ще вчиться, бо готується до іспиту з чеської мови та чеських реалій. Серед улюблених книг — «Крадійка книжок», «Квіти для Елджернона», «Не відпускай мене», книги Люко Дашвар і Бернара Вербера.',
+    },
+  },
+  {
     pattern: /\b(book|author|writ(?:e|ing|ten)|novel|comic)\b|(книг(?!\w)|автор|роман|пис(?:ати|ала)|написат|коміксів)/i,
     hardcoded: {
       en: "Julia is working on a science fiction novel about a black hole. Her next children's book she envisions as a comic about superhero animals — a cat, a dog, and a rabbit — who are friends and save the forest.",
@@ -159,10 +224,10 @@ const TOPIC_ROUTES = [
     },
   },
   {
-    pattern: /\b(animal|pet|cat|dog|cats|dogs)\b|(тварин|кіт(?!\w)|собак|тваринн)/i,
+    pattern: /\b(animal|pet|pets|cat|dog|cats|dogs|kitty|montik)\b|\b(leather|fur|zoos?|circus(?:es)?|dolphin\w*)\b|(тварин|кіт(?![а-яіїєґ])|котик|кота(?![а-яіїєґ])|кішк|монтік|собак|тваринн|шкірян|хутр|зоопарк|цирк|дельфінар)/i,
     hardcoded: {
-      en: "Julia loves all animals equally. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
-      ua: "Юлія любить однаково всіх тварин. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
+      en: `Julia loves all animals equally. At home she has a cat, Montik — born around 2014, he is getting on now, over ${MONTIK_AGE} years old. She never buys leather or fur and strongly condemns using animals for entertainment — dolphinariums, circuses with animals, zoos; it hurts her that this still exists in the modern world. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.`,
+      ua: `Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький: народився приблизно у 2014-му, тож йому вже понад ${uaYears(MONTIK_AGE)}. Вона не купує виробів зі шкіри чи хутра й засуджує будь-яку експлуатацію тварин для розваг — дельфінарії, цирки з тваринами, зоопарки; їй дуже болісно, що в сучасному світі таке досі існує. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.`,
     },
   },
   {
@@ -175,8 +240,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(ukraine|war|bucha|mariupol)\b|(україн|війн|окупац|буча|маріупол)/i,
     hardcoded: {
-      en: "The war is endless pain for Julia. Her parents could have died — occupiers came to her city and committed terrible atrocities. She says: if Ukraine wins — the whole world wins. If not — it's the beginning of the end.",
-      ua: "Для Юлії ця війна — безкінечна біль. Її батьки могли загинути, бо окупанти прийшли в її місто і чинили жахливі звірства. Вона каже: якщо переможе Україна — переможе весь світ. Якщо ні — це початок кінця.",
+      en: "The war is endless pain for Julia. Her parents could have died — occupiers came to her city and committed terrible atrocities. For her it is absolutely clear who the aggressor is and who attacked, so she sees no point in talking about the war with anyone who says \"I'm not into politics\" or \"it's not so black and white\". She says: if Ukraine wins — the whole world wins. If not — it's the beginning of the end.",
+      ua: "Для Юлії ця війна — безкінечна біль. Її батьки могли загинути, бо окупанти прийшли в її місто і чинили жахливі звірства. Для неї абсолютно очевидно, хто агресор і хто напав, тож вона не бачить сенсу говорити про війну з тими, хто каже «я поза політикою» чи «не все так однозначно». Вона каже: якщо переможе Україна — переможе весь світ. Якщо ні — це початок кінця.",
     },
   },
   {
@@ -254,13 +319,6 @@ const TOPIC_ROUTES = [
     hardcoded: {
       en: "For Julia, happiness is simply having everything she wants. And she considers herself very happy right now.",
       ua: "Щастя для Юлії — просто мати все, чого вона хоче. І вона вважає, що зараз дуже щаслива.",
-    },
-  },
-  {
-    pattern: /\b(movie|film|series|show|read|watch)\b|(фільм|серіал|читал|дивил)/i,
-    hardcoded: {
-      en: "Julia's favourite books include The Book Thief, Flowers for Algernon, Never Let Me Go, all books by Lyko Dashvar and Bernard Werber. From films she loves romantic movies and sci-fi — recently 'Oxygen' and 'Ginny & Georgia' impressed her most.",
-      ua: "З улюблених книг Юлії — «Крадійка книжок», «Квіти для Елджернона», «Не відпускай мене», всі книги Люко Дашвар і Бернара Вербера. З фільмів любить романтичні та фантастику — останнє, що вразило: фільм «Кисень» і серіал «Джинні й Джорджія».",
     },
   },
   {
@@ -364,6 +422,11 @@ export function isGeneralQuery(query) {
 export function searchQA(query, lang = 'en', maxResults = 3) {
   const data = qaData[lang] ?? qaData.en;
 
+  const named = TOPIC_ROUTES.find((route) => route.beforeOverview && route.pattern.test(query));
+  if (named) {
+    return [{ question: query, answer: named.hardcoded[lang] ?? named.hardcoded.en, final: true, verbatim: named.verbatim === true }];
+  }
+
   if (GENERAL_QUERY.test(query)) {
     return OVERVIEW_IDS.slice(0, maxResults).map((id) => {
       const item = data.find((qa) => qa.id === id);
@@ -374,7 +437,7 @@ export function searchQA(query, lang = 'en', maxResults = 3) {
   for (const route of TOPIC_ROUTES) {
     if (route.pattern.test(query)) {
       if (route.hardcoded) {
-        return [{ question: query, answer: route.hardcoded[lang] ?? route.hardcoded.en, final: true }];
+        return [{ question: query, answer: route.hardcoded[lang] ?? route.hardcoded.en, final: true, verbatim: route.verbatim === true }];
       }
       if (route.ids) {
         const entries = route.ids

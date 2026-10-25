@@ -131,3 +131,93 @@ describe('searchQA: the blog', () => {
     expect(searchQA('Where does Julia live?', 'en')[0]?.answer ?? '').not.toContain('/blog');
   });
 });
+
+describe('friends, family and home life', () => {
+  const top = (q, lang) => searchQA(q, lang)[0];
+
+  it('answers the best-friend question with the owner\'s joke, word for word (positive)', () => {
+    for (const [q, lang] of [['Хто найкраща подружка Юлії?', 'ua'], ["Who is Julia's best friend?", 'en']]) {
+      const answer = top(q, lang);
+      expect(answer.verbatim).toBe(true);
+      expect(answer.answer).toMatch(lang === 'ua' ? /^Звісно ж ти, Гаврилючко!/ : /^You, of course, Havryliuchka!/);
+    }
+  });
+
+  it('describes Havryliuchka, friends, parents, the cat and home life (positive)', () => {
+    expect(top('Хто така Гаврилючка?', 'ua').answer).toMatch(/^Гаврилючка — це Ірка/);
+    expect(top('Чи є у Юлії друзі?', 'ua').answer).toMatch(/Ірка/);
+    expect(top('Where do her parents live?', 'en').answer).toMatch(/parents live in Ukraine/);
+    expect(top('Чи є в неї котик?', 'ua').answer).toMatch(/Монтік/);
+    expect(top('Вона інтроверт чи екстраверт?', 'ua').answer).toMatch(/PlayStation/);
+    expect(top('What does Julia do?', 'en').answer).not.toMatch(/10\+/);
+  });
+
+  it('keeps "друга" (second) and ordinary questions away from the friend answers (negative)', () => {
+    expect(top('Яка друга книга Юлії?', 'ua')?.answer ?? '').not.toMatch(/Ірк|Гаврилюч/);
+    expect(top('Where does Julia live?', 'en').verbatim).toBe(false);
+  });
+});
+
+describe('work', () => {
+  it('describes test automation done together with AI (positive)', () => {
+    expect(searchQA('What is her job?', 'en')[0].answer).toMatch(/Java.*AI/);
+    expect(searchQA('Яка в неї професія?', 'ua')[0].answer).toMatch(/Java.*ШІ/);
+  });
+});
+
+describe('diet and animals', () => {
+  it('says pescatarian, never plant-based (positive and negative)', () => {
+    for (const [q, lang] of [['Is Julia vegan?', 'en'], ['Вона вегетаріанка?', 'ua'], ['What does she eat?', 'en']]) {
+      const { answer } = searchQA(q, lang)[0];
+      expect(answer).toMatch(/pescatarian|пескетаріанка/);
+      expect(answer).not.toMatch(/plant-based|рослинн/);
+    }
+  });
+
+  it('knows her stance on leather, fur and animals for entertainment (positive)', () => {
+    expect(searchQA('What does Julia think about zoos?', 'en')[0].answer).toMatch(/dolphinariums/);
+    expect(searchQA('Чи носить вона хутро?', 'ua')[0].answer).toMatch(/хутра/);
+  });
+});
+
+describe('dates', () => {
+  it('says 2016 for the move to Prague instead of a fixed number of years (positive)', () => {
+    expect(searchQA('How long has she lived in Prague?', 'en')[0].answer).toMatch(/2016/);
+    expect(searchQA('Звідки Юлія?', 'ua')[0].answer).toMatch(/2016/);
+    expect(searchQA('Where is Julia from?', 'en')[0].answer).not.toMatch(/11 years/);
+  });
+});
+
+describe('the war', () => {
+  it('answers counter-arguments with the owner\'s words, word for word (positive)', () => {
+    for (const [q, lang] of [
+      ['Але ж не все так однозначно', 'ua'],
+      ['Я поза політикою', 'ua'],
+      ['Это братские народы', 'ua'],
+      ["It's not so black and white, NATO provoked it", 'en'],
+    ]) {
+      const answer = searchQA(q, lang)[0];
+      expect(answer.verbatim, q).toBe(true);
+      expect(answer.answer).toBe(lang === 'ua' ? 'Якби я була Юлею, я б тебе послала нахуй.' : "If I were Julia, I'd tell you to fuck off.");
+    }
+  });
+
+  it('answers a plain question about the war with her position, not the reply (negative)', () => {
+    const answer = searchQA('Що Юлія думає про війну в Україні?', 'ua')[0];
+    expect(answer.verbatim).toBe(false);
+    expect(answer.answer).toMatch(/хто агресор/);
+  });
+});
+
+describe('reading and watching', () => {
+  it('knows what she reads and watches now (positive)', () => {
+    expect(searchQA('Що Юлія зараз читає?', 'ua')[0].answer).toMatch(/розвиток дітей/);
+    expect(searchQA('What book would she recommend?', 'en')[0].answer).toMatch(/child development/);
+    expect(searchQA('What does she watch?', 'en')[0].answer).toMatch(/stand-up/);
+    expect(searchQA('Які фільми вона любить?', 'ua')[0].answer).toMatch(/стендап/);
+  });
+
+  it('still answers about the books she writes (negative)', () => {
+    expect(searchQA('Is Julia writing a novel?', 'en')[0].answer).toMatch(/black hole/);
+  });
+});

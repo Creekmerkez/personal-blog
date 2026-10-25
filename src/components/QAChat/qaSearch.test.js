@@ -136,7 +136,7 @@ describe('friends, family and home life', () => {
   const top = (q, lang) => searchQA(q, lang)[0];
 
   it('answers the best-friend question with the owner\'s joke, word for word (positive)', () => {
-    for (const [q, lang] of [['Хто найкраща подружка Юлії?', 'ua'], ["Who is Julia's best friend?", 'en']]) {
+    for (const [q, lang] of [['Хто найкраща подружка Юлії?', 'ua'], ['Хто Юлі подружка', 'ua'], ["Who is Julia's best friend?", 'en']]) {
       const answer = top(q, lang);
       expect(answer.verbatim).toBe(true);
       expect(answer.answer).toMatch(lang === 'ua' ? /^Звісно ж ти, Гаврилючко!/ : /^You, of course, Havryliuchka!/);

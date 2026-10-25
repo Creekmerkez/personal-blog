@@ -63,10 +63,9 @@ const cards = [
     id: 'about',
     title: 'About',
     subtitle: 'The story behind the work',
-    background: '/images/book1.jpg',
+    background: '/images/about-card.jpg',
     actionType: 'modal',
     action: heroVideoSrc,
-    videoSrc: heroVideoSrc,
   },
   {
     id: 'contact',
@@ -602,37 +601,24 @@ const HomeCarousel = () => {
                 <div
                   className="card-face"
                   style={{
-                    backgroundColor: card.id === 'about' ? '#090909' : undefined,
+                    // The About card's own ::before carries the dark gradient, under its play button.
                     backgroundImage:
                       card.id === 'about'
-                        ? undefined
+                        ? `url('${card.background}')`
                         : `linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, rgba(4, 5, 9, 0.7) 42%, rgba(2, 3, 6, 0.9) 84%), url('${card.background}')`,
-                    backgroundSize: card.id === 'about' ? undefined : 'cover',
-                    backgroundPosition: card.id === 'about' ? undefined : 'center',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                   }}
                 >
                   {card.id === 'about' && (
-                    <>
-                      <video
-                        className="card-video-preview"
-                        src={card.videoSrc}
-                        loop
-                        muted
-                        autoPlay
-                        playsInline
-                        preload="metadata"
-                        aria-hidden="true"
-                        tabIndex={-1}
-                      />
-                      <div
-                        className="card-click-target"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNavigation(e, card);
-                        }}
-                        aria-hidden="true"
-                      />
-                    </>
+                    <div
+                      className="card-click-target"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigation(e, card);
+                      }}
+                      aria-hidden="true"
+                    />
                   )}
                   <div className="card-overlay" />
                   <div className="card-content">
@@ -642,13 +628,9 @@ const HomeCarousel = () => {
                 </div>
 
                 <div className="card-reflection" style={{
-                  backgroundColor: card.id === 'about' ? 'rgba(12, 12, 18, 0.42)' : undefined,
-                  backgroundImage:
-                    card.id === 'about'
-                      ? undefined
-                      : `linear-gradient(180deg, rgba(6, 7, 12, 0.45) 0%, rgba(3, 4, 8, 0.84) 50%, rgba(2, 3, 6, 0.95) 84%), url('${card.background}')`,
-                  backgroundSize: card.id === 'about' ? undefined : 'cover',
-                  backgroundPosition: card.id === 'about' ? undefined : 'center',
+                  backgroundImage: `linear-gradient(180deg, rgba(6, 7, 12, 0.45) 0%, rgba(3, 4, 8, 0.84) 50%, rgba(2, 3, 6, 0.95) 84%), url('${card.background}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
                 }} />
               </button>
             ))}

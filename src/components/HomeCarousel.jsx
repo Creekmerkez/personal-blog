@@ -10,40 +10,36 @@ import HolographicYouTube from './HolographicYouTube';
 import HolographicAI from './HolographicAI';
 import useBackToClose from './useBackToClose';
 import galleryPhotos from './photosData';
-import youtubeVideos from './youtubeData';
 
 const heroVideoSrc = '/videos/banner.mp4';
 
-// Random photo from the gallery as the Photos card cover (picked once per page load,
-// in sync with the gallery's own random shuffle). Falls back to a book image.
-const photosCover = galleryPhotos[0]?.src ?? '/images/book3.jpg';
-const youtubeCover = youtubeVideos[0]?.thumbnail ?? '/images/book1.jpg';
-// External Pinterest URL was blocked by Pinterest's hotlink protection, causing
-// the card to render as a grey/white rectangle on Android (gradient only, no image).
-// Replaced with a local dark gradient — no external dependency.
-const ceskeRealieCover = '/images/ceske-realie-cover.png';
-const myAICardCover = '/images/my-ai-card.jpg';
+// The owner's chosen picture as the Photos card cover.
+const photosCover = '/images/photos-card.jpg';
+const musicCover = '/images/music-card.jpg';
+// Local files only: an external (Pinterest) cover was once hotlink-blocked on Android.
+const ceskeRealieCover = '/images/ceske-realie-card.jpg';
+const myAICardCover = '/images/my-ai-card-profile.jpg';
 
 const cards = [
   {
     id: 'youtube',
     title: 'My Music',
     subtitle: 'Music I Created',
-    background: youtubeCover,
+    background: musicCover,
     actionType: 'youtube',
   },
   {
     id: 'books',
     title: 'My Books',
     subtitle: 'Written Words',
-    background: '/images/book2.jpg',
+    background: '/images/books-card.jpg',
     actionType: 'books',
   },
   {
     id: 'blog',
     title: 'My Blog',
     subtitle: 'Notes and Essays',
-    background: '/images/blog-card.jpg',
+    background: '/images/blog-card-collage.jpg',
     actionType: 'route',
     action: '/blog',
   },
@@ -66,10 +62,9 @@ const cards = [
     id: 'about',
     title: 'About',
     subtitle: 'The story behind the work',
-    background: '/images/book1.jpg',
+    background: '/images/about-card.jpg',
     actionType: 'modal',
     action: heroVideoSrc,
-    videoSrc: heroVideoSrc,
   },
   {
     id: 'contact',
@@ -130,13 +125,6 @@ const HomeCarousel = () => {
       window.removeEventListener(THEME_CHANGE_EVENT, syncBg);
       document.body.style.backgroundColor = previousBg;
     };
-  }, []);
-
-  // Preload dynamic card covers (static ones are preloaded via <link rel="preload"> in index.html)
-  useEffect(() => {
-    [photosCover, youtubeCover].forEach(src => {
-      if (src) { const img = new Image(); img.src = src; }
-    });
   }, []);
 
   // Preload gallery images on card hover so they're cached before the popup opens
@@ -605,39 +593,24 @@ const HomeCarousel = () => {
                 <div
                   className="card-face"
                   style={{
-                    backgroundColor: card.id === 'about' ? '#090909' : undefined,
+                    // The About card's own ::before carries the dark gradient, under its play button.
                     backgroundImage:
                       card.id === 'about'
-                        ? undefined
-                        : card.id === 'photos'
-                        ? `linear-gradient(165deg, rgba(34, 52, 86, 0.5) 0%, rgba(10, 16, 28, 0.7) 38%, rgba(3, 5, 10, 0.9) 80%), url('${card.background}')`
+                        ? `url('${card.background}')`
                         : `linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, rgba(4, 5, 9, 0.7) 42%, rgba(2, 3, 6, 0.9) 84%), url('${card.background}')`,
-                    backgroundSize: card.id === 'about' ? undefined : 'cover',
-                    backgroundPosition: card.id === 'about' ? undefined : 'center',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                   }}
                 >
                   {card.id === 'about' && (
-                    <>
-                      <video
-                        className="card-video-preview"
-                        src={card.videoSrc}
-                        loop
-                        muted
-                        autoPlay
-                        playsInline
-                        preload="metadata"
-                        aria-hidden="true"
-                        tabIndex={-1}
-                      />
-                      <div
-                        className="card-click-target"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNavigation(e, card);
-                        }}
-                        aria-hidden="true"
-                      />
-                    </>
+                    <div
+                      className="card-click-target"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigation(e, card);
+                      }}
+                      aria-hidden="true"
+                    />
                   )}
                   <div className="card-overlay" />
                   <div className="card-content">
@@ -647,15 +620,9 @@ const HomeCarousel = () => {
                 </div>
 
                 <div className="card-reflection" style={{
-                  backgroundColor: card.id === 'about' ? 'rgba(12, 12, 18, 0.42)' : undefined,
-                  backgroundImage:
-                    card.id === 'about'
-                      ? undefined
-                      : card.id === 'photos'
-                      ? `linear-gradient(165deg, rgba(34, 52, 86, 0.4) 0%, rgba(8, 12, 22, 0.78) 40%, rgba(2, 4, 8, 0.94) 80%), url('${card.background}')`
-                      : `linear-gradient(180deg, rgba(6, 7, 12, 0.45) 0%, rgba(3, 4, 8, 0.84) 50%, rgba(2, 3, 6, 0.95) 84%), url('${card.background}')`,
-                  backgroundSize: card.id === 'about' ? undefined : 'cover',
-                  backgroundPosition: card.id === 'about' ? undefined : 'center',
+                  backgroundImage: `linear-gradient(180deg, rgba(6, 7, 12, 0.45) 0%, rgba(3, 4, 8, 0.84) 50%, rgba(2, 3, 6, 0.95) 84%), url('${card.background}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
                 }} />
               </button>
             ))}

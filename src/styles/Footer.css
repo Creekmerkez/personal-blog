@@ -111,3 +111,12 @@
     transition: none;
   }
 }
+
+/* While a popup is open the footer is hidden, as the nav is (see SiteNav.css):
+   on iPhone it painted over the MY AI chat, right next to the input, despite
+   the popup's far higher z-index. */
+body:has(.holo-gallery-stage.visible) .site-footer,
+body:has(.hologram-stage.visible) .site-footer {
+  visibility: hidden;
+  pointer-events: none;
+}

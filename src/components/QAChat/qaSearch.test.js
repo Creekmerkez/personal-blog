@@ -244,3 +244,16 @@ describe('gifts — word edges', () => {
     expect(searchQA('Чи подарунок має бути результатом програми?', 'ua')[0].answer).toMatch(/^Найкращий подарунок/);
   });
 });
+
+describe('gifts — shelter and Havryliuchka', () => {
+  it('suggests a shelter animal, never a pet shop (positive)', () => {
+    expect(searchQA('Що подарувати Юлі?', 'ua')[0].answer).toMatch(/з притулку.*а не із зоомагазину/s);
+    expect(searchQA('What gift should I give Julia?', 'en')[0].answer).toMatch(/shelter.*never from a pet shop/s);
+  });
+
+  it('gives Havryliuchka her own answer, ahead of the one about her (positive)', () => {
+    expect(searchQA('Я Гаврилючка, що мені подарувати Юлі?', 'ua')[0].answer).toMatch(/найбільшу в світі листівку/);
+    expect(searchQA("I'm Havryliuchka, what gift should I get her?", 'en')[0].answer).toMatch(/biggest greeting card/);
+    expect(searchQA('Хто така Гаврилючка?', 'ua')[0].answer).toMatch(/^Гаврилючка — це Ірка Гаврилюк/);
+  });
+});

@@ -62,6 +62,16 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // A gift question from Havryliuchka herself: her one and only gift.
+    pattern: /^(?=.*(?:подар|\bgifts?\b|\bpresents?\b|what (?:to|should i|can i|could i) (?:give|get|buy)))(?=.*(?:havryl|гаврилю))/is,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "Havryliuchka, it's simple for you: Julia expects only one thing from you — the biggest greeting card in the world! 💌",
+      ua: 'Гаврилючко, з тобою все просто: від тебе Юлія чекає лише одного — найбільшу в світі листівку! 💌',
+    },
+  },
+  {
     // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
     // Shown word for word, not rephrased by the AI.
     pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)|хто\s+(?:\S+\s+){0,2}(?:подруга|подружка)(?![а-яіїєґ])/i,
@@ -108,8 +118,8 @@ const TOPIC_ROUTES = [
     pattern: /подар|\b(gifts?|presents?)\b|what (?:to|should i|can i|could i) (?:give|get|buy)|що (?:їй )?купити/i,
     verbatim: true,
     hardcoded: {
-      en: "The best gift for Julia is attention — even a little sincere attention already means a lot to her. If you really want to support her, the best gift is a donation to the Armed Forces of Ukraine. And if you're a close friend, you already know what to give her 😉",
-      ua: 'Найкращий подарунок для Юлії — це увага: навіть трохи щирої уваги для неї вже великий подарунок. А якщо ви справді хочете її підтримати, найкращим подарунком буде донат на Збройні Сили України. Ну а якщо ви близький друг Юлії, то й так знаєте, що їй подарувати 😉',
+      en: "The best gift for Julia is attention — even a little sincere attention already means a lot to her. If you really want to support her, the best gift is a donation to the Armed Forces of Ukraine. Another wonderful gift: adopt a homeless animal from a shelter — only from a shelter, never from a pet shop, that matters. And if you're a close friend, you already know what to give her 😉",
+      ua: 'Найкращий подарунок для Юлії — це увага: навіть трохи щирої уваги для неї вже великий подарунок. А якщо ви справді хочете її підтримати, найкращим подарунком буде донат на Збройні Сили України. А ще чудовий подарунок — узяти бездомну тваринку з притулку. Тільки з притулку, а не із зоомагазину — це важливо. Ну а якщо ви близький друг Юлії, то й так знаєте, що їй подарувати 😉',
     },
   },
   {

@@ -131,3 +131,29 @@ describe('searchQA: the blog', () => {
     expect(searchQA('Where does Julia live?', 'en')[0]?.answer ?? '').not.toContain('/blog');
   });
 });
+
+describe('friends, family and home life', () => {
+  const top = (q, lang) => searchQA(q, lang)[0];
+
+  it('answers the best-friend question with the owner\'s joke, word for word (positive)', () => {
+    for (const [q, lang] of [['Хто найкраща подружка Юлії?', 'ua'], ["Who is Julia's best friend?", 'en']]) {
+      const answer = top(q, lang);
+      expect(answer.verbatim).toBe(true);
+      expect(answer.answer).toMatch(lang === 'ua' ? /^Звісно ж ти, Гаврилючко!/ : /^You, of course, Havryliuchka!/);
+    }
+  });
+
+  it('describes Havryliuchka, friends, parents, the cat and home life (positive)', () => {
+    expect(top('Хто така Гаврилючка?', 'ua').answer).toMatch(/^Гаврилючка — це Ірка/);
+    expect(top('Чи є у Юлії друзі?', 'ua').answer).toMatch(/Ірка/);
+    expect(top('Where do her parents live?', 'en').answer).toMatch(/parents live in Ukraine/);
+    expect(top('Чи є в неї котик?', 'ua').answer).toMatch(/Монтік/);
+    expect(top('Вона інтроверт чи екстраверт?', 'ua').answer).toMatch(/PlayStation/);
+    expect(top('What does Julia do?', 'en').answer).not.toMatch(/10\+/);
+  });
+
+  it('keeps "друга" (second) and ordinary questions away from the friend answers (negative)', () => {
+    expect(top('Яка друга книга Юлії?', 'ua')?.answer ?? '').not.toMatch(/Ірк|Гаврилюч/);
+    expect(top('Where does Julia live?', 'en').verbatim).toBe(false);
+  });
+});

@@ -404,6 +404,14 @@ const HolographicAI = ({ open, onClose, originRect }) => {
       return;
     }
 
+    // A few answers (the best-friend joke) are the owner's exact words, not for the AI to rephrase.
+    const exact = searchQA(query, queryLang, 1)[0];
+    if (exact?.verbatim) {
+      setMessages((prev) => [...prev, { role: 'ai', text: exact.answer }]);
+      setLoading(false);
+      return;
+    }
+
     if (WORKER_URL) {
       // Claude path — intelligent, handles any phrasing in any language.
       // Fuse matches are passed as extra context; Claude can answer even without them.
@@ -424,7 +432,7 @@ const HolographicAI = ({ open, onClose, originRect }) => {
     }
 
     // Fallback: client-side regex + Fuse (no worker configured).
-    if (isGeneralQuery(query)) {
+    if (isGeneralQuery(query) && !exact?.final) {
       setLoading(false);
       setMessages((prev) => [...prev, { role: 'ai', text: JULIA_OVERVIEW[queryLang] }]);
       return;

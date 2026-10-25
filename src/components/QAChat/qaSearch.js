@@ -47,6 +47,40 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
+    // Shown word for word, not rephrased by the AI.
+    pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)/i,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "You, of course, Havryliuchka! 😄 If you're asking, it must be you: only Havryliuchka would ask that. Seriously though, Julia's best friend is Ira, her Havryliuchka, back in Ukraine.",
+      ua: 'Звісно ж ти, Гаврилючко! 😄 Якщо питаєш — значить, ти: таке питання може поставити тільки Гаврилючка. А якщо серйозно, найкраща подружка Юлії — Ірка, її Гаврилючка, яка живе в Україні.',
+    },
+  },
+  {
+    pattern: /havryl|гаврилю|(?<![а-яіїєґ])ірк[аиуоі]?(?![а-яіїєґ])/i,
+    beforeOverview: true, // "Хто така Гаврилючка?" would otherwise read as "who is she"
+    hardcoded: {
+      en: 'Havryliuchka is Ira, Julia\'s best friend in Ukraine. They talk almost every day, and even after a week or two of silence they simply pick up where they left off — no hellos or goodbyes needed. Julia misses her very much.',
+      ua: 'Гаврилючка — це Ірка, найкраща подружка Юлії з України. Вони спілкуються майже щодня, а навіть якщо тиждень чи два мовчать, то просто продовжують розмову з того місця, де зупинилися, — без жодних «привіт» і «бувай». Юлія дуже за нею сумує.',
+    },
+  },
+  {
+    // "друг" only as a whole word: inside "друга", "другий" it means "second".
+    pattern: /\b(friends?|friendship|social)\b|друз|подруг|подружк|дружб|(?<![а-яіїєґ])друг(?![а-яіїєґ])|соціальн/i,
+    hardcoded: {
+      en: 'Several of Julia\'s best friends stayed in Ukraine. The closest is Ira, her Havryliuchka: they talk almost every day, and even after a week or two of silence they carry on as if there had been no pause. Julia would love to find friends as loyal in the Czech Republic, but it hasn\'t happened yet: over the years she has become less social — she used to be an extrovert and now feels more of an introvert.',
+      ua: 'У Юлії в Україні залишилося кілька найкращих друзів. Найближча — Гаврилючка, подружка Ірка: вони спілкуються майже щодня, а навіть після тижня чи двох тиші продовжують розмову так, ніби й не було паузи. У Чехії Юлії хотілося б знайти таких самих вірних друзів, але поки що не склалося: з роками вона стала менш соціальною — колись була екстравертом, а тепер радше інтровертка.',
+    },
+  },
+  {
+    pattern: /\b(introvert\w*|extrovert\w*|homebody|free time|spare time|weekends?|hobb(?:y|ies)|playstation|ps5|video games?|gaming)\b|інтроверт|екстраверт|вільн\S* час|вихідн|хобі|плейстейшн/i,
+    hardcoded: {
+      en: 'Julia used to be an extrovert; these days she feels more of an introvert. She loves being at home: watching films, playing PlayStation, cooking, playing with her son, going places together and surprising him. Her son is the most important thing in her life right now.',
+      ua: 'Колись Юлія була екстравертом, а тепер відчуває себе радше інтроверткою. Вона любить бути вдома: дивитися фільми, грати в PlayStation, готувати, гратися із сином, їздити з ним кудись разом і дивувати його. Син — це для неї зараз найголовніше.',
+    },
+  },
+  {
     pattern: /\b(husband|spouse|partner)\b|(чоловік|партнер)/i,
     hardcoded: {
       en: "Julia lives in Prague with her husband and son. She keeps his personal details private, but speaks of him with warmth and gratitude.",
@@ -56,8 +90,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(family|relatives|parents)\b|(сім.?я|батьк|рідн)/i,
     hardcoded: {
-      en: "Family is everything to Julia. She lives in Prague with her wonderful husband and son — her ideal day is all of them spending time together, ideally with her parents too.",
-      ua: "Сім'я — це все для Юлії. Вона живе в Празі з чудовим чоловіком і сином. Ідеальний день для неї — провести час разом, ідеально ще й із батьками.",
+      en: "Family is everything to Julia. She lives in Prague with her wonderful husband and son. Her parents live in Ukraine — she misses them very much and wishes she could visit and see them more often.",
+      ua: "Сім'я — це все для Юлії. Вона живе в Празі з чудовим чоловіком і сином. Її батьки живуть в Україні — Юлія дуже за ними сумує й хотіла б навідувати їх і бачити частіше.",
     },
   },
   {
@@ -105,15 +139,15 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(like|enjoy|love|hate|dislike|feel about|passionate about)\b.{0,25}\b(job|work|career|profession)\b|\b(job|work|career)\b.{0,25}\b(like|enjoy|love|hate|satisfy|fulfil|make her happy)\b|(подобається.{0,20}робот|робот.{0,20}подобається|чи любить роботу|як ставиться до роботи)/i,
     hardcoded: {
-      en: "Julia has spent 10+ years in IT — that kind of commitment is a pretty clear yes. She's especially passionate about AI and building digital experiences, which goes well beyond just doing a job.",
-      ua: "Юлія понад 10 років у IT — така відданість красномовно говорить «так». Особливо захоплена ШІ і створенням цифрових продуктів — це явно більше, ніж просто робота.",
+      en: "Julia has spent 10 years in test automation — that kind of commitment is a pretty clear yes. She's especially passionate about AI and building digital experiences, which goes well beyond just doing a job.",
+      ua: "Юлія вже 10 років в автоматизації тестування — така відданість красномовно говорить «так». Особливо захоплена ШІ і створенням цифрових продуктів — це явно більше, ніж просто робота.",
     },
   },
   {
     pattern: /\b(work|job|profession|career|engineer|automation|testing|tester|tech)\b|(чим займаєш|спеціальність|фах|професія|тестуван|автоматизац)/i,
     hardcoded: {
-      en: "Julia is a Test Automation Engineer with 10+ years in IT, specializing in automated testing and quality assurance. She's also deeply interested in AI and helps people create AI-powered digital experiences.",
-      ua: "Юлія — Test Automation Engineer з понад 10 роками досвіду в IT. Спеціалізується на автоматизованому тестуванні та QA, а також цікавиться ШІ і допомагає людям створювати цифрові продукти на його основі.",
+      en: "Julia is a Test Automation Engineer with 10 years of experience, specializing in automated testing and quality assurance. She's also deeply interested in AI and helps people create AI-powered digital experiences.",
+      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Спеціалізується на автоматизованому тестуванні та QA, а також цікавиться ШІ і допомагає людям створювати цифрові продукти на його основі.",
     },
   },
   {
@@ -140,8 +174,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(son|child|kid|baby|mother|motherhood|mom|mum|parent)\b|(дитина|мама|материнство|малюк|бути мамою|материн)/i,
     hardcoded: {
-      en: "For Julia, becoming a mother was a completely new life. When you bring a new person into the world, an all-encompassing love appears in you that you've never felt before. She wishes everyone could experience this — provided there's support and stability.",
-      ua: "Для Юлії материнство — це абсолютно нове життя. Коли народжується нова людина, відчуваєш всеосяжну любов, якої раніше не знала. Юлія бажає кожному відчути це — за умови, що є підтримка і стабільність.",
+      en: "For Julia, becoming a mother was a completely new life. When you bring a new person into the world, an all-encompassing love appears in you that you've never felt before. She wishes everyone could experience this — provided there's support and stability. Right now her son is the most important thing to her: playing together, going places, surprising him.",
+      ua: "Для Юлії материнство — це абсолютно нове життя. Коли народжується нова людина, відчуваєш всеосяжну любов, якої раніше не знала. Юлія бажає кожному відчути це — за умови, що є підтримка і стабільність. А зараз син — для неї найголовніше: гратися з ним, їздити кудись разом, дивувати його.",
     },
   },
   {
@@ -159,10 +193,10 @@ const TOPIC_ROUTES = [
     },
   },
   {
-    pattern: /\b(animal|pet|cat|dog|cats|dogs)\b|(тварин|кіт(?!\w)|собак|тваринн)/i,
+    pattern: /\b(animal|pet|pets|cat|dog|cats|dogs|kitty|montik)\b|(тварин|кіт(?![а-яіїєґ])|котик|кота(?![а-яіїєґ])|кішк|монтік|собак|тваринн)/i,
     hardcoded: {
-      en: "Julia loves all animals equally. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
-      ua: "Юлія любить однаково всіх тварин. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
+      en: "Julia loves all animals equally. At home she has a cat, Montik — he is getting on now, 11 years old. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
+      ua: "Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький, йому 11 років. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
     },
   },
   {
@@ -364,6 +398,11 @@ export function isGeneralQuery(query) {
 export function searchQA(query, lang = 'en', maxResults = 3) {
   const data = qaData[lang] ?? qaData.en;
 
+  const named = TOPIC_ROUTES.find((route) => route.beforeOverview && route.pattern.test(query));
+  if (named) {
+    return [{ question: query, answer: named.hardcoded[lang] ?? named.hardcoded.en, final: true, verbatim: named.verbatim === true }];
+  }
+
   if (GENERAL_QUERY.test(query)) {
     return OVERVIEW_IDS.slice(0, maxResults).map((id) => {
       const item = data.find((qa) => qa.id === id);
@@ -374,7 +413,7 @@ export function searchQA(query, lang = 'en', maxResults = 3) {
   for (const route of TOPIC_ROUTES) {
     if (route.pattern.test(query)) {
       if (route.hardcoded) {
-        return [{ question: query, answer: route.hardcoded[lang] ?? route.hardcoded.en, final: true }];
+        return [{ question: query, answer: route.hardcoded[lang] ?? route.hardcoded.en, final: true, verbatim: route.verbatim === true }];
       }
       if (route.ids) {
         const entries = route.ids

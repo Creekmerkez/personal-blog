@@ -77,6 +77,18 @@ const cards = [
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
+const STEP = 360 / cards.length;
+// Opens with Photos centred, as before.
+const START_ROTATION = 360 - STEP * cards.findIndex((c) => c.id === 'photos');
+// A card always comes to rest in the centre (the magnet). When idle, the centred
+// card stays there this long before the next one glides in; after the visitor
+// touches the carousel it waits longer, so the card they chose stays put.
+const REST_MS = 4000;
+const REST_AFTER_TOUCH_MS = 9000;
+// The cover image stays clear; only the lower part darkens, behind the title.
+// Cards away from the centre are dimmed by their depth filter instead.
+const FACE_SHADE = 'linear-gradient(180deg, rgba(4, 5, 9, 0) 0%, rgba(4, 5, 9, 0.06) 45%, rgba(3, 4, 8, 0.72) 76%, rgba(2, 3, 6, 0.92) 100%)';
+
 const HomeCarousel = () => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(null);
@@ -92,7 +104,8 @@ const HomeCarousel = () => {
   const [youtubeOrigin, setYouTubeOrigin] = useState(null);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [aiOrigin, setAiOrigin] = useState(null);
-  const rotationRef = useRef(144);
+  const rotationRef = useRef(START_ROTATION);
+  const restUntilRef = useRef(0);
   const velocityRef = useRef(0);
   const snapTargetRef = useRef(null);
   const pointerRef = useRef({ active: false, startX: 0, lastX: 0 });
@@ -229,22 +242,33 @@ const HomeCarousel = () => {
   }, [selectedCard, isHologramOpen, applyCardStyles]);
 
   useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const animate = () => {
       if (!pointerRef.current.active) {
+        const now = performance.now();
         if (snapTargetRef.current !== null) {
-          // Spring toward the nearest card position
+          // Spring toward the target card position
           const diff = snapTargetRef.current - rotationRef.current;
           if (Math.abs(diff) < 0.08) {
             rotationRef.current = snapTargetRef.current;
             snapTargetRef.current = null;
+            restUntilRef.current = Math.max(restUntilRef.current, now + REST_MS);
           } else {
             rotationRef.current += diff * 0.12;
           }
         } else {
-          // Gentle auto-rotation when idle
-          rotationRef.current += 0.025;
+          const nearest = Math.round(rotationRef.current / STEP) * STEP;
+          if (Math.abs(nearest - rotationRef.current) > 0.08) {
+            // Off-centre (keys, an interrupted glide): pull it to the middle.
+            snapTargetRef.current = nearest;
+          } else if (now >= restUntilRef.current && !hoveredRef.current && !isHologramOpenRef.current && !reducedMotion.matches) {
+            // Idle: the next card glides into the centre.
+            snapTargetRef.current = nearest + STEP;
+          }
         }
         applyCardStyles(rotationRef.current);
+      } else {
+        restUntilRef.current = performance.now() + REST_AFTER_TOUCH_MS;
       }
       frameRef.current = requestAnimationFrame(animate);
     };
@@ -281,7 +305,6 @@ const HomeCarousel = () => {
     let lastX = 0;
     let dragging = false;
     let touchStartTime = 0;
-    const STEP = 360 / cards.length;
     const DRAG_THRESHOLD = 8;
 
     const onTouchStart = (e) => {
@@ -291,6 +314,7 @@ const HomeCarousel = () => {
       dragging = false;
       touchStartTime = Date.now();
       snapTargetRef.current = null; // Cancel any active snap on new touch
+      restUntilRef.current = performance.now() + REST_AFTER_TOUCH_MS;
     };
 
     const onTouchMove = (e) => {
@@ -483,8 +507,8 @@ const HomeCarousel = () => {
 
   const handleWheel = (event) => {
     event.preventDefault();
-    const STEP = 360 / cards.length;
     const now = Date.now();
+    restUntilRef.current = performance.now() + REST_AFTER_TOUCH_MS;
     // One wheel tick = one card; 400 ms cooldown lets the snap animation finish
     if (now - lastWheelRef.current < 400) return;
     lastWheelRef.current = now;
@@ -597,7 +621,7 @@ const HomeCarousel = () => {
                     backgroundImage:
                       card.id === 'about'
                         ? `url('${card.background}')`
-                        : `linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, rgba(4, 5, 9, 0.7) 42%, rgba(2, 3, 6, 0.9) 84%), url('${card.background}')`,
+                        : `${FACE_SHADE}, url('${card.background}')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}

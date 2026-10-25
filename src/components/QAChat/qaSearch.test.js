@@ -187,3 +187,37 @@ describe('dates', () => {
     expect(searchQA('Where is Julia from?', 'en')[0].answer).not.toMatch(/11 years/);
   });
 });
+
+describe('the war', () => {
+  it('answers counter-arguments with the owner\'s words, word for word (positive)', () => {
+    for (const [q, lang] of [
+      ['Але ж не все так однозначно', 'ua'],
+      ['Я поза політикою', 'ua'],
+      ['Это братские народы', 'ua'],
+      ["It's not so black and white, NATO provoked it", 'en'],
+    ]) {
+      const answer = searchQA(q, lang)[0];
+      expect(answer.verbatim, q).toBe(true);
+      expect(answer.answer).toBe(lang === 'ua' ? 'Якби я була Юлею, я б тебе послала нахуй.' : "If I were Julia, I'd tell you to fuck off.");
+    }
+  });
+
+  it('answers a plain question about the war with her position, not the reply (negative)', () => {
+    const answer = searchQA('Що Юлія думає про війну в Україні?', 'ua')[0];
+    expect(answer.verbatim).toBe(false);
+    expect(answer.answer).toMatch(/хто агресор/);
+  });
+});
+
+describe('reading and watching', () => {
+  it('knows what she reads and watches now (positive)', () => {
+    expect(searchQA('Що Юлія зараз читає?', 'ua')[0].answer).toMatch(/розвиток дітей/);
+    expect(searchQA('What book would she recommend?', 'en')[0].answer).toMatch(/child development/);
+    expect(searchQA('What does she watch?', 'en')[0].answer).toMatch(/stand-up/);
+    expect(searchQA('Які фільми вона любить?', 'ua')[0].answer).toMatch(/стендап/);
+  });
+
+  it('still answers about the books she writes (negative)', () => {
+    expect(searchQA('Is Julia writing a novel?', 'en')[0].answer).toMatch(/black hole/);
+  });
+});

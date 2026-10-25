@@ -51,6 +51,17 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // The owner's answer to anyone who argues the war is "not so clear-cut" (in any of
+    // the usual phrasings, Ukrainian, Russian or English). Her words, shown as they are.
+    pattern: /не все так однозначн|не всё так однозначн|не все так просто|не всё так просто|я (?:не |поза |вне )(?:в )?політиц|я (?:не |вне )(?:в )?политик|я поза політикою|не розуміюся в політиц|не разбираюсь в политик|обидві сторони|обе стороны|нато (?:спровок|винн|винова)|україна (?:сама )?(?:почала|винна|спровокувал)|украина (?:сама )?(?:начала|виновата|спровоцировал)|братні\S* народ|братск\S* народ|один народ|\b(?:not (?:so )?black and white|not that simple|both sides|not into politics|out of politics|nato provoked|ukraine (?:started|provoked)|one people|brotherly nations?)\b/i,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "If I were Julia, I'd tell you to fuck off.",
+      ua: 'Якби я була Юлею, я б тебе послала нахуй.',
+    },
+  },
+  {
     // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
     // Shown word for word, not rephrased by the AI.
     pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)/i,
@@ -183,10 +194,26 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // Ahead of the general "loves" route, so "Які фільми вона любить?" is about films.
+    pattern: /\b(movies?|films?|series|shows?|watch\w*|stand.?up|comedians?)\b|(фільм|серіал|дивит|дивил|стендап|комік(?!с)|передач)/i,
+    hardcoded: {
+      en: "Julia has probably seen all the world's best-known films and biggest series, so there is nothing unusual there that others haven't watched. These days she deliberately supports Ukrainian content so that it grows: Ukrainian stand-up comedians (she goes to their shows around Europe), scientists who tell fascinating stories about the universe, true crime, investigations, news and military experts. She also follows AI news and everything new.",
+      ua: "Юлія, мабуть, бачила всі найвідоміші фільми й найкасовіші серіали світу, тож чогось незвичного, чого не дивилися інші, тут не буде. Зараз вона свідомо підтримує український контент, щоб він ріс: дивиться українських стендап-коміків (і ходить на їхні виступи в Європі), науковців, які цікаво розповідають про всесвіт, true crime, розслідування, новини та військових експертів. А ще стежить за новинами ШІ та всім новим.",
+    },
+  },
+  {
     pattern: /\b(loves?|loved?|cherish|enjoy|favorite|favourite)\b|(любить|кохає|обожнює|найулюбленіш|кого вона)/i,
     hardcoded: {
       en: "Julia loves her family deeply — her wonderful husband, her son, and her parents. She also loves all animals equally. And spreading love and care through her work is very important to her too.",
       ua: "Юлія глибоко любить свою сім'ю — чудового чоловіка, сина та батьків. Вона також однаково любить усіх тварин. І для неї дуже важливо поширювати любов і турботу через свою роботу.",
+    },
+  },
+  {
+    // What she reads now; ahead of the book route, which is about the books she writes.
+    pattern: /\b(reading|reads|recommend\w*)\b|what (?:does|do) (?:she|julia|you) read|(читає|читаєш|почитати|порад\S*|що читати|читал)/i,
+    hardcoded: {
+      en: "Right now Julia mostly reads about child development — the child's brain, psychology and upbringing — and she is studying for her Czech language and Czech realia exam. Among her favourite books are The Book Thief, Flowers for Algernon, Never Let Me Go, and the books of Lyuko Dashvar and Bernard Werber.",
+      ua: 'Зараз Юлія найбільше читає про розвиток дітей — про дитячий мозок, психологію й виховання, — а ще вчиться, бо готується до іспиту з чеської мови та чеських реалій. Серед улюблених книг — «Крадійка книжок», «Квіти для Елджернона», «Не відпускай мене», книги Люко Дашвар і Бернара Вербера.',
     },
   },
   {
@@ -213,8 +240,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(ukraine|war|bucha|mariupol)\b|(україн|війн|окупац|буча|маріупол)/i,
     hardcoded: {
-      en: "The war is endless pain for Julia. Her parents could have died — occupiers came to her city and committed terrible atrocities. She says: if Ukraine wins — the whole world wins. If not — it's the beginning of the end.",
-      ua: "Для Юлії ця війна — безкінечна біль. Її батьки могли загинути, бо окупанти прийшли в її місто і чинили жахливі звірства. Вона каже: якщо переможе Україна — переможе весь світ. Якщо ні — це початок кінця.",
+      en: "The war is endless pain for Julia. Her parents could have died — occupiers came to her city and committed terrible atrocities. For her it is absolutely clear who the aggressor is and who attacked, so she sees no point in talking about the war with anyone who says \"I'm not into politics\" or \"it's not so black and white\". She says: if Ukraine wins — the whole world wins. If not — it's the beginning of the end.",
+      ua: "Для Юлії ця війна — безкінечна біль. Її батьки могли загинути, бо окупанти прийшли в її місто і чинили жахливі звірства. Для неї абсолютно очевидно, хто агресор і хто напав, тож вона не бачить сенсу говорити про війну з тими, хто каже «я поза політикою» чи «не все так однозначно». Вона каже: якщо переможе Україна — переможе весь світ. Якщо ні — це початок кінця.",
     },
   },
   {
@@ -292,13 +319,6 @@ const TOPIC_ROUTES = [
     hardcoded: {
       en: "For Julia, happiness is simply having everything she wants. And she considers herself very happy right now.",
       ua: "Щастя для Юлії — просто мати все, чого вона хоче. І вона вважає, що зараз дуже щаслива.",
-    },
-  },
-  {
-    pattern: /\b(movie|film|series|show|read|watch)\b|(фільм|серіал|читал|дивил)/i,
-    hardcoded: {
-      en: "Julia's favourite books include The Book Thief, Flowers for Algernon, Never Let Me Go, all books by Lyko Dashvar and Bernard Werber. From films she loves romantic movies and sci-fi — recently 'Oxygen' and 'Ginny & Georgia' impressed her most.",
-      ua: "З улюблених книг Юлії — «Крадійка книжок», «Квіти для Елджернона», «Не відпускай мене», всі книги Люко Дашвар і Бернара Вербера. З фільмів любить романтичні та фантастику — останнє, що вразило: фільм «Кисень» і серіал «Джинні й Джорджія».",
     },
   },
   {

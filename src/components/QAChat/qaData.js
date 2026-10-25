@@ -60,7 +60,7 @@ export const qaData = {
     },
     {
       id: 12,
-      "question": "Яка твоя улюблена вегетаріанська страва?",
+      "question": "Яка твоя улюблена страва?",
       "answer": "Обожнюю омлети з нуту, карі з рисом і ще багато всього. Ми щодня їмо смачно й різноманітно. Щоранку готую сину окреме збалансоване меню на весь день — сніданок, обід і вечеря. Завжди щось нове, смачне, красиве й корисне. Я витрачаю багато часу на їжу, бо це — основа."
     },
     {
@@ -332,7 +332,7 @@ export const qaData = {
     },
     {
       id: 12,
-      "question": "What's your favorite vegetarian dish?",
+      "question": "What's your favorite dish?",
       "answer": "I adore chickpea omelets, curry with rice, and much more. We eat deliciously and variedly every day. Every morning I prepare a separate balanced menu for my son for the whole day — breakfast, lunch, and dinner. Always something new, tasty, beautiful, and healthy. I spend a lot of time on food because it's the foundation."
     },
     {

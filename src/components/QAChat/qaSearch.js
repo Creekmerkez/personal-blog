@@ -167,8 +167,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(vegetarian|vegan|plant.based|meat.free|no meat|diet|food|eat|meal|cook|recipe|how long vegan)\b|(веган|вегетаріан|рослинн|без м.яса|їж(?!\w)|харчуван|готуєш|страва|рецепт)/i,
     hardcoded: {
-      en: "Julia has followed a plant-based, meat-free lifestyle for over 8 years — it comes from deep respect for all living beings. Her favorite dishes include chickpea omelets and curry with rice. She puts a lot of care into food because for her it's the foundation.",
-      ua: "Юлія живе за рослинним способом харчування вже понад 8 років — це з глибокої поваги до всіх живих істот. З улюблених страв — омлет із нуту та карі з рисом. Вона приділяє багато уваги їжі — для неї це основа.",
+      en: "Julia is pescatarian: she eats fish and seafood, and now and then eggs or cheese, but she is firmly against eating meat. Her favorite dishes include chickpea omelets and curry with rice. She puts a lot of care into food because for her it's the foundation.",
+      ua: "Юлія — пескетаріанка: їсть рибу й морепродукти, часом яйця чи сир, але категорично проти вживання м'яса. З улюблених страв — омлет із нуту та карі з рисом. Вона приділяє багато уваги їжі — для неї це основа.",
     },
   },
   {
@@ -193,10 +193,10 @@ const TOPIC_ROUTES = [
     },
   },
   {
-    pattern: /\b(animal|pet|pets|cat|dog|cats|dogs|kitty|montik)\b|(тварин|кіт(?![а-яіїєґ])|котик|кота(?![а-яіїєґ])|кішк|монтік|собак|тваринн)/i,
+    pattern: /\b(animal|pet|pets|cat|dog|cats|dogs|kitty|montik)\b|\b(leather|fur|zoos?|circus(?:es)?|dolphin\w*)\b|(тварин|кіт(?![а-яіїєґ])|котик|кота(?![а-яіїєґ])|кішк|монтік|собак|тваринн|шкірян|хутр|зоопарк|цирк|дельфінар)/i,
     hardcoded: {
-      en: "Julia loves all animals equally. At home she has a cat, Montik — he is getting on now, 11 years old. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
-      ua: "Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький, йому 11 років. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
+      en: "Julia loves all animals equally. At home she has a cat, Montik — he is getting on now, 11 years old. She never buys leather or fur and strongly condemns using animals for entertainment — dolphinariums, circuses with animals, zoos; it hurts her that this still exists in the modern world. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
+      ua: "Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький, йому 11 років. Вона не купує виробів зі шкіри чи хутра й засуджує будь-яку експлуатацію тварин для розваг — дельфінарії, цирки з тваринами, зоопарки; їй дуже болісно, що в сучасному світі таке досі існує. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
     },
   },
   {

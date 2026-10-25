@@ -164,3 +164,18 @@ describe('work', () => {
     expect(searchQA('Яка в неї професія?', 'ua')[0].answer).toMatch(/Java.*ШІ/);
   });
 });
+
+describe('diet and animals', () => {
+  it('says pescatarian, never plant-based (positive and negative)', () => {
+    for (const [q, lang] of [['Is Julia vegan?', 'en'], ['Вона вегетаріанка?', 'ua'], ['What does she eat?', 'en']]) {
+      const { answer } = searchQA(q, lang)[0];
+      expect(answer).toMatch(/pescatarian|пескетаріанка/);
+      expect(answer).not.toMatch(/plant-based|рослинн/);
+    }
+  });
+
+  it('knows her stance on leather, fur and animals for entertainment (positive)', () => {
+    expect(searchQA('What does Julia think about zoos?', 'en')[0].answer).toMatch(/dolphinariums/);
+    expect(searchQA('Чи носить вона хутро?', 'ua')[0].answer).toMatch(/хутра/);
+  });
+});

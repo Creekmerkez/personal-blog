@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { searchQA, detectLang, isGreeting, isGeneralQuery, isAboutAI } from './QAChat/qaSearch';
+import { uaYears, yearsInPrague } from './QAChat/facts';
 
 const WORKER_URL = import.meta.env.VITE_WORKER_URL ?? '';
 import '../styles/HolographicGallery.css';
@@ -81,8 +82,8 @@ const ERROR_MSG = {
 };
 
 const JULIA_OVERVIEW = {
-  en: "Julia is a Test Automation Engineer from Ukraine, based in Prague for about 11 years. She's also a DJ, children's book author, and AI enthusiast. Feel free to ask anything specific about her!",
-  ua: "Юлія — Test Automation Engineer з України, живе в Празі вже близько 11 років. Ще вона DJ, авторка дитячих книг і захоплена ШІ. Питайте що завгодно конкретніше про неї!",
+  en: `Julia is a Test Automation Engineer from Ukraine, based in Prague since 2016 (about ${yearsInPrague()} years). She's also a DJ, children's book author, and AI enthusiast. Feel free to ask anything specific about her!`,
+  ua: `Юлія — Test Automation Engineer з України, живе в Празі з 2016 року (вже близько ${uaYears(yearsInPrague())}). Ще вона DJ, авторка дитячих книг і захоплена ШІ. Питайте що завгодно конкретніше про неї!`,
 };
 
 function renderWithLinks(text) {

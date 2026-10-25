@@ -179,3 +179,11 @@ describe('diet and animals', () => {
     expect(searchQA('Чи носить вона хутро?', 'ua')[0].answer).toMatch(/хутра/);
   });
 });
+
+describe('dates', () => {
+  it('says 2016 for the move to Prague instead of a fixed number of years (positive)', () => {
+    expect(searchQA('How long has she lived in Prague?', 'en')[0].answer).toMatch(/2016/);
+    expect(searchQA('Звідки Юлія?', 'ua')[0].answer).toMatch(/2016/);
+    expect(searchQA('Where is Julia from?', 'en')[0].answer).not.toMatch(/11 years/);
+  });
+});

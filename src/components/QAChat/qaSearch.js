@@ -1,5 +1,9 @@
 import Fuse from 'fuse.js';
 import { qaData } from './qaData';
+import { montikAgeAtLeast, uaYears, yearsInPrague } from './facts';
+
+const PRAGUE_YEARS = yearsInPrague();
+const MONTIK_AGE = montikAgeAtLeast();
 
 const fuseOptions = {
   keys: [
@@ -97,15 +101,15 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(from|origin(?:ally)?|hometown|born)\b|grew up|kyiv region|(рідне місто|звідки|де (?:ти )?народил|де (?:ти )?виросл)/i,
     hardcoded: {
-      en: "Julia is originally from the Kyiv region of Ukraine — she spent a significant part of her life in Kyiv before relocating to Prague about 11 years ago for work.",
-      ua: "Юлія родом із Київської області України — значну частину свого життя вона прожила в Києві, перш ніж переїхати до Праги близько 11 років тому через роботу.",
+      en: "Julia is originally from the Kyiv region of Ukraine — she spent a significant part of her life in Kyiv before relocating to Prague in 2016 for work.",
+      ua: "Юлія родом із Київської області України — значну частину свого життя вона прожила в Києві, перш ніж переїхати до Праги у 2016 році через роботу.",
     },
   },
   {
     pattern: /\b(prague|czech republic|which city|which country)\b|where.{0,12}(?:live|based|stay)|live.{0,12}where|how long.{0,10}(?:prague|czech)|lived.{0,10}prague|(де (?:ти )?жив|де живеш|Прага|переїхала|скільки.{0,10}празі)/i,
     hardcoded: {
-      en: "Julia lives in Prague, Czech Republic — she's been here for about 11 years, originally relocating for a job opportunity. She lives with her husband and son and loves the city.",
-      ua: "Юлія живе в Празі, Чехія — вже близько 11 років, спочатку переїхала сюди через роботу. Живе з чоловіком і сином і дуже любить це місто.",
+      en: `Julia lives in Prague, Czech Republic — she moved here in 2016, about ${PRAGUE_YEARS} years ago, originally for a job opportunity. She lives with her husband and son and loves the city.`,
+      ua: `Юлія живе в Празі, Чехія, з 2016 року — вже близько ${uaYears(PRAGUE_YEARS)}; спочатку переїхала сюди через роботу. Живе з чоловіком і сином і дуже любить це місто.`,
     },
   },
   {
@@ -195,8 +199,8 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(animal|pet|pets|cat|dog|cats|dogs|kitty|montik)\b|\b(leather|fur|zoos?|circus(?:es)?|dolphin\w*)\b|(тварин|кіт(?![а-яіїєґ])|котик|кота(?![а-яіїєґ])|кішк|монтік|собак|тваринн|шкірян|хутр|зоопарк|цирк|дельфінар)/i,
     hardcoded: {
-      en: "Julia loves all animals equally. At home she has a cat, Montik — he is getting on now, 11 years old. She never buys leather or fur and strongly condemns using animals for entertainment — dolphinariums, circuses with animals, zoos; it hurts her that this still exists in the modern world. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.",
-      ua: "Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький, йому 11 років. Вона не купує виробів зі шкіри чи хутра й засуджує будь-яку експлуатацію тварин для розваг — дельфінарії, цирки з тваринами, зоопарки; їй дуже болісно, що в сучасному світі таке досі існує. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.",
+      en: `Julia loves all animals equally. At home she has a cat, Montik — born around 2014, he is getting on now, over ${MONTIK_AGE} years old. She never buys leather or fur and strongly condemns using animals for entertainment — dolphinariums, circuses with animals, zoos; it hurts her that this still exists in the modern world. She dreams that killing an animal would be equated to killing a human and considered the same serious crime.`,
+      ua: `Юлія любить однаково всіх тварин. Удома в неї живе котик Монтік — він уже старенький: народився приблизно у 2014-му, тож йому вже понад ${uaYears(MONTIK_AGE)}. Вона не купує виробів зі шкіри чи хутра й засуджує будь-яку експлуатацію тварин для розваг — дельфінарії, цирки з тваринами, зоопарки; їй дуже болісно, що в сучасному світі таке досі існує. Вона мріє, щоб вбивство тварини прирівнювалося до вбивства людини і вважалося таким самим тяжким злочином.`,
     },
   },
   {

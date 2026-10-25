@@ -96,6 +96,23 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // What to give Julia — her own answer, word for word. Her parents get their own answer.
+    pattern: /^(?=.*(?:подар|\bgifts?\b|\bpresents?\b|what (?:to|should i|can i|could i) (?:give|get|buy)))(?=.*(?:\bmom\b|\bmum\b|\bmother\b|\bdad\b|\bfather\b|\bparents?\b|(?<![а-яіїєґ])(?:мам|тат|батьк)))/is,
+    verbatim: true,
+    hardcoded: {
+      en: 'Mom, Dad: what matters most to Julia is that you are healthy and take care of your health. See your doctors, get your check-ups and treatment, take your vitamins, live healthily and keep active. That is the best gift you could give her — she needs nothing else.',
+      ua: "Мамо, тату, для Юлії найголовніше — щоб ви були здорові й дбали про своє здоров'я. Ходіть до лікарів, робіть аналізи й лікуйтеся, пийте вітаміни, ведіть здоровий спосіб життя й займайтеся спортом. Це і є для неї найкращий подарунок — більше нічого не треба.",
+    },
+  },
+  {
+    pattern: /подар|\b(gifts?|presents?)\b|what (?:to|should i|can i|could i) (?:give|get|buy)|що (?:їй )?купити/i,
+    verbatim: true,
+    hardcoded: {
+      en: "The best gift for Julia is attention — even a little sincere attention already means a lot to her. If you really want to support her, the best gift is a donation to the Armed Forces of Ukraine. And if you're a close friend, you already know what to give her 😉",
+      ua: 'Найкращий подарунок для Юлії — це увага: навіть трохи щирої уваги для неї вже великий подарунок. А якщо ви справді хочете її підтримати, найкращим подарунком буде донат на Збройні Сили України. Ну а якщо ви близький друг Юлії, то й так знаєте, що їй подарувати 😉',
+    },
+  },
+  {
     pattern: /\b(husband|spouse|partner)\b|(чоловік|партнер)/i,
     hardcoded: {
       en: "Julia lives in Prague with her husband and son. She keeps his personal details private, but speaks of him with warmth and gratitude.",

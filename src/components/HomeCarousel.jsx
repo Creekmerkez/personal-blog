@@ -43,7 +43,7 @@ const cards = [
     id: 'blog',
     title: 'My Blog',
     subtitle: 'Notes and Essays',
-    background: '/images/blog-card.jpg',
+    background: '/images/blog-card-collage.jpg',
     actionType: 'route',
     action: '/blog',
   },

@@ -85,9 +85,6 @@ const START_ROTATION = 360 - STEP * cards.findIndex((c) => c.id === 'photos');
 // touches the carousel it waits longer, so the card they chose stays put.
 const REST_MS = 4000;
 const REST_AFTER_TOUCH_MS = 9000;
-// The cover image stays clear; only the lower part darkens, behind the title.
-// Cards away from the centre are dimmed by their depth filter instead.
-const FACE_SHADE = 'linear-gradient(180deg, rgba(4, 5, 9, 0) 0%, rgba(4, 5, 9, 0.06) 45%, rgba(3, 4, 8, 0.72) 76%, rgba(2, 3, 6, 0.92) 100%)';
 
 const HomeCarousel = () => {
   const navigate = useNavigate();
@@ -617,11 +614,8 @@ const HomeCarousel = () => {
                 <div
                   className="card-face"
                   style={{
-                    // The About card's own ::before carries the dark gradient, under its play button.
-                    backgroundImage:
-                      card.id === 'about'
-                        ? `url('${card.background}')`
-                        : `${FACE_SHADE}, url('${card.background}')`,
+                    // The cover stays clear; .card-face::before shades only behind the title.
+                    backgroundImage: `url('${card.background}')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}

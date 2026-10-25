@@ -14,9 +14,8 @@ import youtubeVideos from './youtubeData';
 
 const heroVideoSrc = '/videos/banner.mp4';
 
-// Random photo from the gallery as the Photos card cover (picked once per page load,
-// in sync with the gallery's own random shuffle). Falls back to a book image.
-const photosCover = galleryPhotos[0]?.src ?? '/images/book3.jpg';
+// The owner's chosen picture as the Photos card cover.
+const photosCover = '/images/photos-card.jpg';
 const youtubeCover = youtubeVideos[0]?.thumbnail ?? '/images/book1.jpg';
 // External Pinterest URL was blocked by Pinterest's hotlink protection, causing
 // the card to render as a grey/white rectangle on Android (gradient only, no image).
@@ -134,7 +133,7 @@ const HomeCarousel = () => {
 
   // Preload dynamic card covers (static ones are preloaded via <link rel="preload"> in index.html)
   useEffect(() => {
-    [photosCover, youtubeCover].forEach(src => {
+    [youtubeCover].forEach(src => {
       if (src) { const img = new Image(); img.src = src; }
     });
   }, []);
@@ -609,8 +608,6 @@ const HomeCarousel = () => {
                     backgroundImage:
                       card.id === 'about'
                         ? undefined
-                        : card.id === 'photos'
-                        ? `linear-gradient(165deg, rgba(34, 52, 86, 0.5) 0%, rgba(10, 16, 28, 0.7) 38%, rgba(3, 5, 10, 0.9) 80%), url('${card.background}')`
                         : `linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, rgba(4, 5, 9, 0.7) 42%, rgba(2, 3, 6, 0.9) 84%), url('${card.background}')`,
                     backgroundSize: card.id === 'about' ? undefined : 'cover',
                     backgroundPosition: card.id === 'about' ? undefined : 'center',
@@ -651,8 +648,6 @@ const HomeCarousel = () => {
                   backgroundImage:
                     card.id === 'about'
                       ? undefined
-                      : card.id === 'photos'
-                      ? `linear-gradient(165deg, rgba(34, 52, 86, 0.4) 0%, rgba(8, 12, 22, 0.78) 40%, rgba(2, 4, 8, 0.94) 80%), url('${card.background}')`
                       : `linear-gradient(180deg, rgba(6, 7, 12, 0.45) 0%, rgba(3, 4, 8, 0.84) 50%, rgba(2, 3, 6, 0.95) 84%), url('${card.background}')`,
                   backgroundSize: card.id === 'about' ? undefined : 'cover',
                   backgroundPosition: card.id === 'about' ? undefined : 'center',

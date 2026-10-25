@@ -18,7 +18,7 @@ const photosCover = '/images/photos-card.jpg';
 const musicCover = '/images/music-card.jpg';
 // Local files only: an external (Pinterest) cover was once hotlink-blocked on Android.
 const ceskeRealieCover = '/images/ceske-realie-card.jpg';
-const myAICardCover = '/images/my-ai-card.jpg';
+const myAICardCover = '/images/my-ai-card-profile.jpg';
 
 const cards = [
   {

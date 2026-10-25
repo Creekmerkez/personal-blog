@@ -197,8 +197,8 @@ const TOPIC_ROUTES = [
     // Ahead of the general "loves" route, so "Які фільми вона любить?" is about films.
     pattern: /\b(movies?|films?|series|shows?|watch\w*|stand.?up|comedians?)\b|(фільм|серіал|дивит|дивил|стендап|комік(?!с)|передач)/i,
     hardcoded: {
-      en: "Julia has probably seen all the world's best-known films and biggest series, so there is nothing unusual there that others haven't watched. These days she deliberately supports Ukrainian content so that it grows: Ukrainian stand-up comedians (she goes to their shows around Europe), scientists who tell fascinating stories about the universe, true crime, investigations, news and military experts. She also follows AI news and everything new.",
-      ua: "Юлія, мабуть, бачила всі найвідоміші фільми й найкасовіші серіали світу, тож чогось незвичного, чого не дивилися інші, тут не буде. Зараз вона свідомо підтримує український контент, щоб він ріс: дивиться українських стендап-коміків (і ходить на їхні виступи в Європі), науковців, які цікаво розповідають про всесвіт, true crime, розслідування, новини та військових експертів. А ще стежить за новинами ШІ та всім новим.",
+      en: "Like most people, Julia watches whatever is popular and everyone is talking about — films and series with high ratings, and some with not-so-high ones. Above all, she deliberately supports Ukrainian content so that it grows: Ukrainian stand-up comedians (she goes to their shows around Europe), scientists who tell fascinating stories about the universe, true crime, investigations, news and military experts. She also follows AI news and everything new.",
+      ua: "Як і більшість людей, Юлія дивиться те, що зараз у топі й що всі обговорюють, — популярні фільми й серіали, і з високими рейтингами, і не дуже. А найбільше вона свідомо підтримує український контент, щоб він ріс: дивиться українських стендап-коміків (і ходить на їхні виступи в Європі), науковців, які цікаво розповідають про всесвіт, true crime, розслідування, новини та військових експертів. А ще стежить за новинами ШІ та всім новим.",
     },
   },
   {

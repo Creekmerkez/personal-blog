@@ -139,15 +139,15 @@ const TOPIC_ROUTES = [
   {
     pattern: /\b(like|enjoy|love|hate|dislike|feel about|passionate about)\b.{0,25}\b(job|work|career|profession)\b|\b(job|work|career)\b.{0,25}\b(like|enjoy|love|hate|satisfy|fulfil|make her happy)\b|(подобається.{0,20}робот|робот.{0,20}подобається|чи любить роботу|як ставиться до роботи)/i,
     hardcoded: {
-      en: "Julia has spent 10 years in test automation — that kind of commitment is a pretty clear yes. She's especially passionate about AI and building digital experiences, which goes well beyond just doing a job.",
-      ua: "Юлія вже 10 років в автоматизації тестування — така відданість красномовно говорить «так». Особливо захоплена ШІ і створенням цифрових продуктів — це явно більше, ніж просто робота.",
+      en: "Julia has spent 10 years in test automation — that kind of commitment is a pretty clear yes. Her work has moved closer and closer to AI — she now builds the AI skills and commands that help write and fix tests — which she finds especially exciting.",
+      ua: "Юлія вже 10 років в автоматизації тестування — така відданість красномовно говорить «так». Її робота дедалі тісніше пов'язана зі ШІ — тепер вона створює AI-скіли й команди, які допомагають писати й виправляти тести, — і це її особливо захоплює.",
     },
   },
   {
     pattern: /\b(work|job|profession|career|engineer|automation|testing|tester|tech)\b|(чим займаєш|спеціальність|фах|професія|тестуван|автоматизац)/i,
     hardcoded: {
-      en: "Julia is a Test Automation Engineer with 10 years of experience, specializing in automated testing and quality assurance. She's also deeply interested in AI and helps people create AI-powered digital experiences.",
-      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Спеціалізується на автоматизованому тестуванні та QA, а також цікавиться ШІ і допомагає людям створювати цифрові продукти на його основі.",
+      en: "Julia is a Test Automation Engineer with 10 years of experience. The job has changed a lot: she used to write tests in Java, and now test automation is done mostly together with AI. She builds helper skills and commands that write and fix tests faster, and today she reads and reviews code more than she writes it — a whole new level.",
+      ua: "Юлія — Test Automation Engineer з 10-річним досвідом. Її робота дуже змінилася: колись вона писала тести на Java, а тепер автоматизація майже вся йде разом із ШІ. Юлія створює допоміжні скіли й команди, щоб швидше писати й виправляти тести, і зараз більше читає та перевіряє код, ніж пише його, — це зовсім інша планка.",
     },
   },
   {

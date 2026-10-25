@@ -157,3 +157,10 @@ describe('friends, family and home life', () => {
     expect(top('Where does Julia live?', 'en').verbatim).toBe(false);
   });
 });
+
+describe('work', () => {
+  it('describes test automation done together with AI (positive)', () => {
+    expect(searchQA('What is her job?', 'en')[0].answer).toMatch(/Java.*AI/);
+    expect(searchQA('Яка в неї професія?', 'ua')[0].answer).toMatch(/Java.*ШІ/);
+  });
+});

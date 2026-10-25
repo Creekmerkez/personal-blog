@@ -379,8 +379,8 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  /* Match the heavy dark glass gradient the image cards bake into their bg. */
-  background: linear-gradient(180deg, rgba(6, 7, 12, 0.5) 0%, rgba(3, 4, 8, 0.78) 50%, rgba(2, 3, 6, 0.95) 84%);
+  /* The same shade the image cards bake into their bg (FACE_SHADE in HomeCarousel.jsx). */
+  background: linear-gradient(180deg, rgba(4, 5, 9, 0) 0%, rgba(4, 5, 9, 0.06) 45%, rgba(3, 4, 8, 0.72) 76%, rgba(2, 3, 6, 0.92) 100%);
   pointer-events: none;
 }
 

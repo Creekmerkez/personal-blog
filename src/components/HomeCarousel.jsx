@@ -17,10 +17,8 @@ const heroVideoSrc = '/videos/banner.mp4';
 // The owner's chosen picture as the Photos card cover.
 const photosCover = '/images/photos-card.jpg';
 const youtubeCover = youtubeVideos[0]?.thumbnail ?? '/images/book1.jpg';
-// External Pinterest URL was blocked by Pinterest's hotlink protection, causing
-// the card to render as a grey/white rectangle on Android (gradient only, no image).
-// Replaced with a local dark gradient — no external dependency.
-const ceskeRealieCover = '/images/ceske-realie-cover.png';
+// Local files only: an external (Pinterest) cover was once hotlink-blocked on Android.
+const ceskeRealieCover = '/images/ceske-realie-card.jpg';
 const myAICardCover = '/images/my-ai-card.jpg';
 
 const cards = [
@@ -35,7 +33,7 @@ const cards = [
     id: 'books',
     title: 'My Books',
     subtitle: 'Written Words',
-    background: '/images/book2.jpg',
+    background: '/images/books-card.jpg',
     actionType: 'books',
   },
   {

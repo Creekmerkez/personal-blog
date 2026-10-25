@@ -48,6 +48,18 @@ test.describe('Homepage carousel', () => {
     expect(await page.evaluate(() => window.history.state?.popup)).toBeUndefined();
   });
 
+  test('the site footer is hidden while the MY AI panel is open, and back after (positive)', async ({ page }) => {
+    await page.goto('/');
+    const footer = page.locator('.site-footer');
+    await expect(footer).toBeVisible();
+    await openAiChatCard(page);
+    await expect(page.locator('.holo-ai-panel')).toBeVisible();
+    await expect(footer).toBeHidden();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.holo-ai-panel')).toBeHidden({ timeout: 8000 });
+    await expect(footer).toBeVisible();
+  });
+
   test('does not throw a page error on load (negative — regression guard)', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));

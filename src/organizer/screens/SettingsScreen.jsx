@@ -7,6 +7,7 @@ import { isEncrypted, open, seal } from '../lib/crypto';
 import { Screen, Section, Toggle } from '../components/ui';
 import PasswordSheet from './PasswordSheet';
 import { fileToTranslate, isJournalFile, journalEntriesFrom } from '../lib/journalFile';
+import { exerciseFileFrom, isExerciseFile, mergeLog } from '../lib/exercises';
 import { BLOG_URL, checkToken, TOKEN_KEY } from '../lib/publish';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
@@ -25,7 +26,7 @@ async function saveFile(text, name) {
 }
 
 export default function SettingsScreen({ prepareExport, applyImport, addJournalEntries, journal }) {
-  const { data, settings, updateSettings, storage } = useOrganizer();
+  const { data, update, settings, updateSettings, storage } = useOrganizer();
   const [hasToken, setHasToken] = useState(false);
   useEffect(() => {
     storage.get(TOKEN_KEY).then((token) => setHasToken(Boolean(token)));
@@ -130,6 +131,15 @@ export default function SettingsScreen({ prepareExport, applyImport, addJournalE
       } catch (err) {
         window.alert(err?.name === 'NotAllowedError' ? 'Face ID was cancelled.' : err.message);
       }
+      return;
+    }
+    if (isExerciseFile(value)) {
+      const { entries, plans } = exerciseFileFrom(value);
+      const planNote = plans.length ? ' Day A and Day B are set from the file.' : '';
+      if (!window.confirm(`Add ${entries.length} runs and workouts to your exercise history?${planNote}\n\nNothing else changes. Days already in the history stay as they are.`)) return;
+      const { added } = mergeLog(data.exerciseLog, entries);
+      update((d) => ({ ...d, exerciseLog: mergeLog(d.exerciseLog, entries).log, exercisePlans: plans.length ? plans : d.exercisePlans }));
+      window.alert(`${added} ${added === 1 ? 'day' : 'days'} added to your exercise history.`);
       return;
     }
     const backup = validateBackup(value);

@@ -1,17 +1,21 @@
 import { useState } from 'react';
-import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline, IoBarbellOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
 import { Empty, FlagDot, Screen, Section, Segmented } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
+import ExercisesScreen, { ExerciseSheet } from './Exercises';
+import { removeDay } from '../lib/exercises';
 
 export default function TodayScreen({ onOpenSettings }) {
   const { data, update, today } = useOrganizer();
   const [showAll, setShowAll] = useState(false);
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [view, setView] = useState('todo'); // 'todo' | 'done'
+  const [choosing, setChoosing] = useState(null); // an exercises task being checked
+  const [showExercises, setShowExercises] = useState(false);
 
   const tasks = data.myTasks;
   const visible = todayList(tasks, today);
@@ -25,6 +29,13 @@ export default function TodayScreen({ onOpenSettings }) {
     update((d) => ({ ...d, myTasks: d.myTasks.some((t) => t.id === task.id) ? d.myTasks.map((t) => (t.id === task.id ? task : t)) : [...d.myTasks, task] }));
 
   const toggle = (task) => replaceTask(toggleCompletion(task, today));
+  // An exercises task asks "run or workout?" when checked; unchecking takes the day out of the history.
+  const check = (task) => {
+    if (!task.exercises) return toggle(task);
+    if (!isDone(task, today)) return setChoosing(task);
+    update((d) => ({ ...d, exerciseLog: removeDay(d.exerciseLog, today) }));
+    return toggle(task);
+  };
   const skip = (task) => replaceTask(skipToday(task, today));
   const restore = (task) => replaceTask(unskip(task));
 
@@ -39,7 +50,7 @@ export default function TodayScreen({ onOpenSettings }) {
           className={`org-check ${checked ? 'is-done' : ''}`}
           aria-label={task.name}
           aria-pressed={checked}
-          onClick={() => toggle(task)}
+          onClick={() => check(task)}
         >
           {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
         </button>
@@ -99,6 +110,18 @@ export default function TodayScreen({ onOpenSettings }) {
     />
   );
 
+  if (showExercises) return <ExercisesScreen onBack={() => setShowExercises(false)} />;
+
+  const chooser = choosing && (
+    <ExerciseSheet
+      onClose={() => setChoosing(null)}
+      onDone={() => {
+        toggle(choosing);
+        setChoosing(null);
+      }}
+    />
+  );
+
   if (showAll) {
     const ordered = [...tasks].sort((a, b) => a.sortOrder - b.sortOrder);
     return (
@@ -132,9 +155,14 @@ export default function TodayScreen({ onOpenSettings }) {
     <Screen
       title="Today"
       leading={
-        <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
-          <IoListOutline />
-        </button>
+        <>
+          <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
+            <IoListOutline />
+          </button>
+          <button type="button" className="org-icon-button" aria-label="Exercise history" onClick={() => setShowExercises(true)}>
+            <IoBarbellOutline />
+          </button>
+        </>
       }
       trailing={addButton}
     >
@@ -178,6 +206,7 @@ export default function TodayScreen({ onOpenSettings }) {
       )}
 
       {editor}
+      {chooser}
     </Screen>
   );
 }

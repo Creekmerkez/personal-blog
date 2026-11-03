@@ -22,6 +22,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
   });
   const [details, setDetails] = useState(task?.details ?? '');
   const [isActive, setIsActive] = useState(task?.isActive ?? true);
+  const [exercises, setExercises] = useState(task?.exercises === true);
 
   const mask = maskFromDraft(draft);
   const canSave = name.trim() !== '' && mask !== 0;
@@ -43,6 +44,7 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
       monthDay: draft.mode === 'monthly' ? draft.monthDay : null,
       details: details.trim(),
       isActive,
+      exercises,
     });
   };
 
@@ -118,6 +120,9 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
         {draft.mode === 'exceptDays' && (
           <div className="org-row"><WeekdayPicker mask={draft.exceptDays} onChange={(exceptDays) => setDraft({ ...draft, exceptDays })} /></div>
         )}
+      </Section>
+      <Section footer="Checking it asks whether it was a run or a workout, shows today's workout (Day A and Day B take turns), and keeps the history.">
+        <Toggle label="Run or workout" checked={exercises} onChange={setExercises} />
       </Section>
       <Section header="Details" footer="Shown when you open the task, not on the Today list.">
         <textarea className="org-input org-textarea" value={details} onChange={(e) => setDetails(e.target.value)} aria-label="Details" autoComplete="off" rows={5} />

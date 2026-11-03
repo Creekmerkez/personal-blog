@@ -4,8 +4,9 @@ import { appleSeconds } from './dates';
 // backup file, so export and import work in both directions unchanged.
 export const FORMAT_VERSION = 1;
 
-// examTopics is this web app's own (the Zkouška tab); the iPhone app skips keys it doesn't know.
-export const LISTS = ['myTasks', 'sonTasks', 'vaccinations', 'doctorVisits', 'games', 'places', 'words', 'journal', 'examTopics'];
+// examTopics (the Zkouška tab) and the exercise plans and history are this web app's own;
+// the iPhone app skips keys it doesn't know.
+export const LISTS = ['myTasks', 'sonTasks', 'vaccinations', 'doctorVisits', 'games', 'places', 'words', 'journal', 'examTopics', 'exercisePlans', 'exerciseLog'];
 
 export function emptyData() {
   return {
@@ -20,6 +21,8 @@ export function emptyData() {
     words: [],
     journal: [],
     examTopics: [],
+    exercisePlans: [],
+    exerciseLog: [],
   };
 }
 
@@ -56,6 +59,12 @@ export function validateBackup(value) {
     if (typeof topic.title !== 'string' || typeof topic.text !== 'string' || typeof topic.number !== 'number') {
       throw new Error('This file is damaged.');
     }
+  }
+  for (const plan of data.exercisePlans) {
+    if (typeof plan.id !== 'string' || !Array.isArray(plan.items)) throw new Error('This file is damaged.');
+  }
+  for (const entry of data.exerciseLog) {
+    if (typeof entry.dayKey !== 'number' || typeof entry.kind !== 'string') throw new Error('This file is damaged.');
   }
   data.exportedAt = typeof value.exportedAt === 'number' ? value.exportedAt : appleSeconds();
   return data;

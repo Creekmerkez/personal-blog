@@ -221,3 +221,39 @@ describe('reading and watching', () => {
     expect(searchQA('Is Julia writing a novel?', 'en')[0].answer).toMatch(/black hole/);
   });
 });
+
+describe('gifts', () => {
+  it('answers what to give Julia, and has a separate answer for her parents (positive)', () => {
+    const general = searchQA('Що подарувати Юлі на день народження?', 'ua')[0];
+    expect(general.verbatim).toBe(true);
+    expect(general.answer).toMatch(/увага.*Збройні Сили України/s);
+    expect(searchQA('What gift would Julia like?', 'en')[0].answer).toMatch(/^The best gift for Julia is attention/);
+    for (const q of ['Я мама Юлі, що їй подарувати?', 'Що тато може подарувати доньці?']) {
+      expect(searchQA(q, 'ua')[0].answer, q).toMatch(/^Мамо, тату/);
+    }
+    expect(searchQA('What present can her parents give her?', 'en')[0].answer).toMatch(/^Mom, Dad/);
+  });
+
+  it('leaves questions about her parents without a gift to the family answer (negative)', () => {
+    expect(searchQA('Де живуть її батьки?', 'ua')[0].answer).toMatch(/батьки живуть в Україні/);
+  });
+});
+
+describe('gifts — word edges', () => {
+  it('does not take "результат" or "програма" for dad or mom (negative)', () => {
+    expect(searchQA('Чи подарунок має бути результатом програми?', 'ua')[0].answer).toMatch(/^Найкращий подарунок/);
+  });
+});
+
+describe('gifts — shelter and Havryliuchka', () => {
+  it('suggests a shelter animal, never a pet shop (positive)', () => {
+    expect(searchQA('Що подарувати Юлі?', 'ua')[0].answer).toMatch(/з притулку.*а не із зоомагазину/s);
+    expect(searchQA('What gift should I give Julia?', 'en')[0].answer).toMatch(/shelter.*never from a pet shop/s);
+  });
+
+  it('gives Havryliuchka her own answer, ahead of the one about her (positive)', () => {
+    expect(searchQA('Я Гаврилючка, що мені подарувати Юлі?', 'ua')[0].answer).toMatch(/найбільшу в світі листівку/);
+    expect(searchQA("I'm Havryliuchka, what gift should I get her?", 'en')[0].answer).toMatch(/biggest greeting card/);
+    expect(searchQA('Хто така Гаврилючка?', 'ua')[0].answer).toMatch(/^Гаврилючка — це Ірка Гаврилюк/);
+  });
+});

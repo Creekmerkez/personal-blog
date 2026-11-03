@@ -31,7 +31,7 @@ export default function App() {
   // here, inside the password-protected file.
   const prepareExport = useCallback(async () => ({ ...data, journal: await journal.entriesForExport() }), [data, journal]);
 
-  // A file's journal entries and exam topics replace them only when the file has some,
+  // A file's journal entries, exam topics and exercises replace them only when the file has some,
   // so importing a tasks-and-words file (or one from the iPhone app) never empties them.
   const applyImport = useCallback(
     async (backup) => {
@@ -43,7 +43,14 @@ export default function App() {
         }
         await journal.saveEntries(backup.journal);
       }
-      update((current) => ({ ...backup, examTopics: backup.examTopics.length ? backup.examTopics : current.examTopics, journal: [] }));
+      const keep = (list) => (backup[list].length ? backup[list] : undefined);
+      update((current) => ({
+        ...backup,
+        examTopics: keep('examTopics') ?? current.examTopics,
+        exercisePlans: keep('exercisePlans') ?? current.exercisePlans,
+        exerciseLog: keep('exerciseLog') ?? current.exerciseLog,
+        journal: [],
+      }));
     },
     [update, journal],
   );

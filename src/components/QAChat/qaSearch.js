@@ -62,6 +62,16 @@ const TOPIC_ROUTES = [
     },
   },
   {
+    // A gift question from Havryliuchka herself: her one and only gift.
+    pattern: /^(?=.*(?:подар|\bgifts?\b|\bpresents?\b|what (?:to|should i|can i|could i) (?:give|get|buy)))(?=.*(?:havryl|гаврилю))/is,
+    verbatim: true,
+    beforeOverview: true,
+    hardcoded: {
+      en: "Havryliuchka, it's simple for you: Julia expects only one thing from you — the biggest greeting card in the world! 💌",
+      ua: 'Гаврилючко, з тобою все просто: від тебе Юлія чекає лише одного — найбільшу в світі листівку! 💌',
+    },
+  },
+  {
     // The owner's joke for her best friend Ira ("Гаврилючка"): whoever asks this must be her.
     // Shown word for word, not rephrased by the AI.
     pattern: /\bbest (?:friend|mate|buddy|girlfriend)\b|\bbestie\b|найкращ\S*\s+(?:подруг|подружк|друг)|хто\s+(?:\S+\s+){0,2}(?:подруга|подружка)(?![а-яіїєґ])/i,
@@ -93,6 +103,23 @@ const TOPIC_ROUTES = [
     hardcoded: {
       en: 'Julia used to be an extrovert; these days she feels more of an introvert. She loves being at home: watching films, playing PlayStation, cooking, playing with her son, going places together and surprising him. Her son is the most important thing in her life right now.',
       ua: 'Колись Юлія була екстравертом, а тепер відчуває себе радше інтроверткою. Вона любить бути вдома: дивитися фільми, грати в PlayStation, готувати, гратися із сином, їздити з ним кудись разом і дивувати його. Син — це для неї зараз найголовніше.',
+    },
+  },
+  {
+    // What to give Julia — her own answer, word for word. Her parents get their own answer.
+    pattern: /^(?=.*(?:подар|\bgifts?\b|\bpresents?\b|what (?:to|should i|can i|could i) (?:give|get|buy)))(?=.*(?:\bmom\b|\bmum\b|\bmother\b|\bdad\b|\bfather\b|\bparents?\b|(?<![а-яіїєґ])(?:мам|тат|батьк)))/is,
+    verbatim: true,
+    hardcoded: {
+      en: 'Mom, Dad: what matters most to Julia is that you are healthy and take care of your health. See your doctors, get your check-ups and treatment, take your vitamins, live healthily and keep active. That is the best gift you could give her — she needs nothing else.',
+      ua: "Мамо, тату, для Юлії найголовніше — щоб ви були здорові й дбали про своє здоров'я. Ходіть до лікарів, робіть аналізи й лікуйтеся, пийте вітаміни, ведіть здоровий спосіб життя й займайтеся спортом. Це і є для неї найкращий подарунок — більше нічого не треба.",
+    },
+  },
+  {
+    pattern: /подар|\b(gifts?|presents?)\b|what (?:to|should i|can i|could i) (?:give|get|buy)|що (?:їй )?купити/i,
+    verbatim: true,
+    hardcoded: {
+      en: "The best gift for Julia is attention — even a little sincere attention already means a lot to her. If you really want to support her, the best gift is a donation to the Armed Forces of Ukraine. Another wonderful gift: adopt a homeless animal from a shelter — only from a shelter, never from a pet shop, that matters. And if you're a close friend, you already know what to give her 😉",
+      ua: 'Найкращий подарунок для Юлії — це увага: навіть трохи щирої уваги для неї вже великий подарунок. А якщо ви справді хочете її підтримати, найкращим подарунком буде донат на Збройні Сили України. А ще чудовий подарунок — узяти бездомну тваринку з притулку. Тільки з притулку, а не із зоомагазину — це важливо. Ну а якщо ви близький друг Юлії, то й так знаєте, що їй подарувати 😉',
     },
   },
   {

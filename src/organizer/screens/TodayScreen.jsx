@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline, IoBarbellOutline } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
 import { Empty, FlagDot, Screen, Section, Segmented } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
-import ExercisesScreen, { ExerciseSheet } from './Exercises';
+import ExerciseSheet from './Exercises';
 import { removeDay } from '../lib/exercises';
 
 export default function TodayScreen({ onOpenSettings }) {
@@ -15,7 +15,6 @@ export default function TodayScreen({ onOpenSettings }) {
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [view, setView] = useState('todo'); // 'todo' | 'done'
   const [choosing, setChoosing] = useState(null); // an exercises task being checked
-  const [showExercises, setShowExercises] = useState(false);
 
   const tasks = data.myTasks;
   const visible = todayList(tasks, today);
@@ -54,7 +53,8 @@ export default function TodayScreen({ onOpenSettings }) {
         >
           {checked ? <IoCheckmarkCircle /> : <IoEllipseOutline />}
         </button>
-        <button type="button" className="org-row-main" onClick={() => setEditing(task)}>
+        {/* An exercises task opens its run-or-workout sheet; its settings are in that sheet and in All Tasks. */}
+        <button type="button" className="org-row-main" onClick={() => (task.exercises ? setChoosing(task) : setEditing(task))}>
           <span className={checked || wasSkipped ? 'org-muted' : ''}>{task.name}</span>
         </button>
         {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
@@ -110,13 +110,15 @@ export default function TodayScreen({ onOpenSettings }) {
     />
   );
 
-  if (showExercises) return <ExercisesScreen onBack={() => setShowExercises(false)} />;
-
   const chooser = choosing && (
     <ExerciseSheet
       onClose={() => setChoosing(null)}
+      onEditTask={() => {
+        setEditing(choosing);
+        setChoosing(null);
+      }}
       onDone={() => {
-        toggle(choosing);
+        if (!isDone(choosing, today)) toggle(choosing);
         setChoosing(null);
       }}
     />
@@ -155,14 +157,9 @@ export default function TodayScreen({ onOpenSettings }) {
     <Screen
       title="Today"
       leading={
-        <>
-          <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
-            <IoListOutline />
-          </button>
-          <button type="button" className="org-icon-button" aria-label="Exercise history" onClick={() => setShowExercises(true)}>
-            <IoBarbellOutline />
-          </button>
-        </>
+        <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
+          <IoListOutline />
+        </button>
       }
       trailing={addButton}
     >

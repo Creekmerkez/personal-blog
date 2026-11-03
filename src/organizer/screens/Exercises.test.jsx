@@ -27,7 +27,9 @@ describe('Exercises on Today', () => {
   it('checking asks run or workout; a workout shows today\'s plan and counts the day (positive)', async () => {
     const storage = show({ myTasks: [task({ exercises: true })], exercisePlans: plans, exerciseLog: [{ id: 'x', dayKey: 20261027, kind: 'workout', plan: 'B' }] });
     await userEvent.click(await screen.findByRole('button', { name: 'Exercises', pressed: false }));
-    await userEvent.click(screen.getByRole('button', { name: /Workout · Day A/ }));
+    await userEvent.click(screen.getByRole('button', { name: /^Workout/ }));
+    // Day A's turn comes selected, and its exercises show
+    expect(screen.getByRole('radio', { name: 'Day A' })).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByText('Тумбочка 11 кг 4×15')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Done · Day A' }));
     await userEvent.click(screen.getByRole('radio', { name: /^Done/ }));
@@ -45,6 +47,16 @@ describe('Exercises on Today', () => {
     await userEvent.click(screen.getByRole('radio', { name: /^Done/ }));
     await userEvent.click(screen.getByRole('button', { name: 'Exercises', pressed: true }));
     expect((await storage.get('data')).exerciseLog).toEqual([]);
+  });
+
+  it('tapping the task\'s name opens the same sheet, and Day B can be chosen instead (positive)', async () => {
+    const storage = show({ myTasks: [task({ exercises: true })], exercisePlans: plans });
+    await userEvent.click(await screen.findByText('Exercises'));
+    await userEvent.click(screen.getByRole('button', { name: /^Workout/ }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Day B' }));
+    expect(screen.getByText('Присідання з грифом 28,5 кг 4×20')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Done · Day B' }));
+    expect((await storage.get('data')).exerciseLog).toMatchObject([{ dayKey: TODAY, plan: 'B' }]);
   });
 
   it('an ordinary task is still checked straight away, without asking (negative)', async () => {

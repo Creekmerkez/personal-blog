@@ -121,9 +121,12 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
           <div className="org-row"><WeekdayPicker mask={draft.exceptDays} onChange={(exceptDays) => setDraft({ ...draft, exceptDays })} /></div>
         )}
       </Section>
-      <Section footer="Checking it asks whether it was a run or a workout, shows today's workout (Day A and Day B take turns), and keeps the history.">
-        <Toggle label="Run or workout" checked={exercises} onChange={setExercises} />
-      </Section>
+      {/* Only the exercises task shows this switch; every other task's screen stays as it was. */}
+      {task?.exercises === true && (
+        <Section footer="Checking it asks whether it was a run or a workout, shows today's workout (Day A and Day B take turns), and keeps the history.">
+          <Toggle label="Run or workout" checked={exercises} onChange={setExercises} />
+        </Section>
+      )}
       <Section header="Details" footer="Shown when you open the task, not on the Today list.">
         <textarea className="org-input org-textarea" value={details} onChange={(e) => setDetails(e.target.value)} aria-label="Details" autoComplete="off" rows={5} />
       </Section>

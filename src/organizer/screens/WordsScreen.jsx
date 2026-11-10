@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { IoAdd, IoListOutline, IoLanguageOutline, IoStarOutline, IoCheckmark, IoClose } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
-import { answerCurrent, counts, isResting, nextReturn, RECALLS_TO_LEARN, resetToLearning, rotation, settleLearned } from '../lib/words';
+import { answerCurrent, counts, isCheck, isResting, migrateWords, nextReturn, RECALLS_TO_LEARN, resetToLearning, rotation } from '../lib/words';
 import { formatDay } from '../lib/dates';
 import { Empty, Screen, Section, Segmented } from '../components/ui';
 import WordEditor from './WordEditor';
@@ -11,11 +11,15 @@ function WordCard({ word, summary, onAnswer }) {
   return (
     <div className="org-word-card">
       <p className="org-word-count">{summary}</p>
-      <div className="org-recalls" aria-label={`Remembered ${word.successfulRecalls} of ${RECALLS_TO_LEARN} times`}>
-        {Array.from({ length: RECALLS_TO_LEARN }, (_, i) => (
-          <span key={i} className={i < word.successfulRecalls ? 'is-on' : ''} />
-        ))}
-      </div>
+      {isCheck(word) ? (
+        <p className="org-word-check">{word.checks === 3 ? 'Month' : 'Week'} check: remember it, and it’s learned</p>
+      ) : (
+        <div className="org-recalls" aria-label={`Remembered ${word.successfulRecalls} of ${RECALLS_TO_LEARN} times`}>
+          {Array.from({ length: RECALLS_TO_LEARN }, (_, i) => (
+            <span key={i} className={i < word.successfulRecalls ? 'is-on' : ''} />
+          ))}
+        </div>
+      )}
       <div className="org-word-center">
         <h2 className="org-word">{word.word}</h2>
         {revealed && (
@@ -44,7 +48,7 @@ const shortDay = (key) => formatDay(key, { day: 'numeric', month: 'short' });
 function statusOf(word, going, today) {
   if (word.isLearned) return 'Learned';
   if (isResting(word, today)) return `Back ${shortDay(word.nextReviewDayKey)}`;
-  if (going.has(word.id)) return `${word.successfulRecalls}/${RECALLS_TO_LEARN}`;
+  if (going.has(word.id)) return isCheck(word) ? 'Check today' : `${word.successfulRecalls}/${RECALLS_TO_LEARN}`;
   return 'Waiting';
 }
 
@@ -57,9 +61,9 @@ export default function WordsScreen() {
   const [answered, setAnswered] = useState(0); // new card after every answer, even for the same word
 
   const words = data.words;
-  // Words that went through every rest under the old 30-day rule are learned already.
+  // Words saved under the earlier rule (rests of 1 to 30 days) move to the weekly checks.
   useEffect(() => {
-    if (settleLearned(words) !== words) update((d) => ({ ...d, words: settleLearned(d.words) }));
+    if (migrateWords(words) !== words) update((d) => ({ ...d, words: migrateWords(d.words) }));
   }, [words, update]);
   const size = settings.rotationSize;
   const going = rotation(words, size, today);

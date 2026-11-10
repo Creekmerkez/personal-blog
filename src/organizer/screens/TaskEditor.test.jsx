@@ -4,7 +4,7 @@ import TaskEditor from './TaskEditor';
 import { EVERY_DAY } from '../lib/weekdays';
 
 const task = (extra) => ({ id: 'T', name: 'Task', details: '', flag: 'green', weekdayMask: EVERY_DAY, isActive: true, completionCount: 1, lastCompletedDayKey: null, sortOrder: 0, createdAt: 0, ...extra });
-const open = (t) => render(<TaskEditor task={t} sortOrder={0} onSave={() => {}} onDelete={() => {}} onClose={() => {}} />);
+const open = (t, offerExercises = false) => render(<TaskEditor task={t} sortOrder={0} offerExercises={offerExercises} onSave={() => {}} onDelete={() => {}} onClose={() => {}} />);
 
 beforeEach(() => vi.spyOn(window, 'scrollTo').mockImplementation(() => {}));
 afterEach(() => vi.restoreAllMocks());
@@ -18,6 +18,11 @@ describe('TaskEditor', () => {
   it('does not show it on any other task, new or existing (negative)', () => {
     open(task({ name: 'Vitamins' }));
     expect(screen.queryByRole('switch', { name: 'Run or workout' })).toBeNull();
+  });
+
+  it('shows it, switched off, while no task is the exercises task yet, so one can be chosen (positive)', () => {
+    open(task({ name: 'Workout and run' }), true);
+    expect(screen.getByRole('switch', { name: 'Run or workout' })).not.toBeChecked();
   });
 
   it('does not show it on a new task either (negative)', () => {

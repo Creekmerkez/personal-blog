@@ -10,7 +10,7 @@ import { Section, Segmented, Sheet, Toggle } from '../components/ui';
 const toInput = (key) => `${Math.floor(key / 10000)}-${String(Math.floor(key / 100) % 100).padStart(2, '0')}-${String(key % 100).padStart(2, '0')}`;
 const fromInput = (text) => Number(text.replaceAll('-', ''));
 
-export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose }) {
+export default function TaskEditor({ task, sortOrder, offerExercises = false, onSave, onDelete, onClose }) {
   const [name, setName] = useState(task?.name ?? '');
   const [flag, setFlag] = useState(task?.flag ?? 'green');
   const [draft, setDraft] = useState(() => {
@@ -121,8 +121,8 @@ export default function TaskEditor({ task, sortOrder, onSave, onDelete, onClose 
           <div className="org-row"><WeekdayPicker mask={draft.exceptDays} onChange={(exceptDays) => setDraft({ ...draft, exceptDays })} /></div>
         )}
       </Section>
-      {/* Only the exercises task shows this switch; every other task's screen stays as it was. */}
-      {task?.exercises === true && (
+      {/* Shown on the exercises task, or on every existing task while none is one yet; otherwise hidden. */}
+      {(task?.exercises === true || offerExercises) && (
         <Section footer="Checking it asks whether it was a run or a workout, shows today's workout (Day A and Day B take turns), and keeps the history.">
           <Toggle label="Run or workout" checked={exercises} onChange={setExercises} />
         </Section>

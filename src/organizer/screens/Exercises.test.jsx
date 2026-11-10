@@ -67,3 +67,14 @@ describe('Exercises on Today', () => {
     expect(screen.getByRole('button', { name: 'Vitamins', pressed: true })).toBeInTheDocument();
   });
 });
+
+describe('Choosing the exercises task', () => {
+  it('offers the switch on every task until one has it, then only on that one (positive and negative)', async () => {
+    show({ myTasks: [task({ id: 'T1', name: 'Workout and run' }), task({ id: 'T2', name: 'Vitamins', sortOrder: 1 })] });
+    await userEvent.click(await screen.findByText('Workout and run'));
+    await userEvent.click(screen.getByRole('switch', { name: 'Run or workout' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByText('Vitamins'));
+    expect(screen.queryByRole('switch', { name: 'Run or workout' })).toBeNull();
+  });
+});

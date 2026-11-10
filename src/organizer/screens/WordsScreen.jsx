@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { IoAdd, IoListOutline, IoLanguageOutline, IoStarOutline, IoCheckmark, IoClose } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
-import { answerCurrent, counts, isResting, nextReturn, RECALLS_TO_LEARN, resetToLearning, rotation } from '../lib/words';
+import { answerCurrent, counts, isResting, nextReturn, RECALLS_TO_LEARN, resetToLearning, rotation, settleLearned } from '../lib/words';
 import { formatDay } from '../lib/dates';
 import { Empty, Screen, Section, Segmented } from '../components/ui';
 import WordEditor from './WordEditor';
@@ -57,6 +57,10 @@ export default function WordsScreen() {
   const [answered, setAnswered] = useState(0); // new card after every answer, even for the same word
 
   const words = data.words;
+  // Words that went through every rest under the old 30-day rule are learned already.
+  useEffect(() => {
+    if (settleLearned(words) !== words) update((d) => ({ ...d, words: settleLearned(d.words) }));
+  }, [words, update]);
   const size = settings.rotationSize;
   const going = rotation(words, size, today);
   const goingIds = new Set(going.map((w) => w.id));

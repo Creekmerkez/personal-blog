@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
-import { answerCurrent, counts, nextReturn, resetToLearning, REST_DAYS, rotation, RETRY_AFTER } from './words';
+import { answerCurrent, counts, nextReturn, resetToLearning, REST_DAYS, rotation, RETRY_AFTER, settleLearned } from './words';
 
 describe('dates', () => {
   it('builds day keys from local dates and adds days across month, year and leap day (positive)', () => {
@@ -176,7 +176,7 @@ describe('word of the day rotation', () => {
     expect(rotation(words, 2, 20261018).map((w) => w.word)).toContain('a');
   });
 
-  it('rests grow 1, 2, 4, 7, 14, 30 days; remembered after the 30-day rest it is learned', () => {
+  it('rests grow 1, 2, 4 days; remembered after the 4-day rest it is learned, about a week in', () => {
     let words = [word('a'), word('b')];
     let day = TODAY;
     for (const restDays of REST_DAYS) {
@@ -186,8 +186,17 @@ describe('word of the day rotation', () => {
       expect(rotation(words, 1, day).map((w) => w.word)).not.toContain('a');
       day = a.nextReviewDayKey;
     }
+    expect(day).toBe(addDays(TODAY, 7));
     words = thrice(words, 'a', day, 1);
     expect(words.find((w) => w.word === 'a').isLearned).toBe(true);
+  });
+
+  it('words past every rest under the old 30-day rule count as learned (positive)', () => {
+    const words = [word('old', { rests: 5, nextReviewDayKey: TODAY + 20 }), word('mid', { rests: 3, nextReviewDayKey: TODAY + 2 }), word('new')];
+    const settled = settleLearned(words);
+    expect(settled.find((w) => w.word === 'old')).toMatchObject({ isLearned: true, queuePosition: null });
+    expect(settled.find((w) => w.word === 'mid').isLearned).toBeFalsy();
+    expect(settleLearned(settled)).toBe(settled); // nothing left to change (negative)
   });
 
   it('not remembered after rests starts the word over as if new (negative)', () => {

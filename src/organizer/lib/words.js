@@ -5,8 +5,9 @@ import { addDays } from './dates';
 // - "Remembered" sends the word to the end of the round. The third "Remembered"
 //   in a row means it is remembered for now: it rests, out of the round, and comes
 //   back on a later day to be remembered three times again.
-// - Each rest is longer than the one before (REST_DAYS). Only a word remembered
-//   again after the longest rest is learned and leaves for good.
+// - Each rest is longer than the one before (REST_DAYS: 1, 2, then 4 days). A word
+//   remembered again after the 4-day rest is learned and leaves for good: remembered
+//   on four separate days over about a week.
 // - "Not remembered", at any point, means it was only short-term memory: the word
 //   starts over as if new — no count, no rests passed — and comes back after a few cards.
 // - Learned words are kept, just out of the rotation.
@@ -15,7 +16,7 @@ import { addDays } from './dates';
 export const DEFAULT_ROTATION_SIZE = 20;
 export const RECALLS_TO_LEARN = 3;
 export const RETRY_AFTER = 5;
-export const REST_DAYS = [1, 2, 4, 7, 14, 30];
+export const REST_DAYS = [1, 2, 4];
 
 const hasTranslation = (w) => (w.translation ?? '').trim() !== '';
 const inRound = (w) => !w.isLearned && w.queuePosition != null;
@@ -72,6 +73,16 @@ export function answerCurrent(words, remembered, today, size = DEFAULT_ROTATION_
   }
   const replaced = words.map((w) => (w.id === word.id ? updated : w));
   return withOrder(replaced, rotation(withOrder(replaced, nextOrder), size, today));
+}
+
+/**
+ * Words that already passed every rest under the old, longer rule (up to 30 days)
+ * count as learned now. Returns the same array when nothing changes.
+ */
+export function settleLearned(words) {
+  const done = (w) => !w.isLearned && (w.rests ?? 0) > REST_DAYS.length;
+  if (!words.some(done)) return words;
+  return words.map((w) => (done(w) ? { ...w, isLearned: true, queuePosition: null } : w));
 }
 
 /** Back into learning: starts over, at the end of the current rotation. */

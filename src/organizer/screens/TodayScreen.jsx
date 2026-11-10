@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline } from 'react-icons/io5';
+import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline, IoStatsChartOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
@@ -7,11 +7,13 @@ import { Empty, FlagDot, Screen, Section, Segmented } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
 import ExerciseSheet from './Exercises';
+import StatsScreen from './StatsScreen';
 import { removeDay } from '../lib/exercises';
 
 export default function TodayScreen({ onOpenSettings }) {
   const { data, update, today } = useOrganizer();
   const [showAll, setShowAll] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [view, setView] = useState('todo'); // 'todo' | 'done'
   const [choosing, setChoosing] = useState(null); // an exercises task being checked
@@ -90,6 +92,11 @@ export default function TodayScreen({ onOpenSettings }) {
     update((d) => ({ ...d, myTasks: d.myTasks.map((t) => ({ ...t, sortOrder: order.get(t.id) })) }));
   };
 
+  const openStats = () => {
+    setShowStats(true);
+    window.scrollTo(0, 0);
+  };
+
   const addButton = (
     <button type="button" className="org-icon-button" aria-label="Add Task" onClick={() => setEditing('new')}>
       <IoAdd />
@@ -118,12 +125,18 @@ export default function TodayScreen({ onOpenSettings }) {
         setEditing(choosing);
         setChoosing(null);
       }}
+      onOpenStats={() => {
+        setChoosing(null);
+        openStats();
+      }}
       onDone={() => {
         if (!isDone(choosing, today)) toggle(choosing);
         setChoosing(null);
       }}
     />
   );
+
+  if (showStats) return <StatsScreen onBack={() => setShowStats(false)} />;
 
   if (showAll) {
     const ordered = [...tasks].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -158,9 +171,14 @@ export default function TodayScreen({ onOpenSettings }) {
     <Screen
       title="Today"
       leading={
-        <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
-          <IoListOutline />
-        </button>
+        <>
+          <button type="button" className="org-icon-button" aria-label="All Tasks" onClick={() => setShowAll(true)}>
+            <IoListOutline />
+          </button>
+          <button type="button" className="org-icon-button" aria-label="Statistics" onClick={openStats}>
+            <IoStatsChartOutline />
+          </button>
+        </>
       }
       trailing={addButton}
     >

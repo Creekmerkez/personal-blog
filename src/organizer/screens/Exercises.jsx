@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoBarbellOutline, IoChevronForward, IoTimeOutline, IoWalkOutline } from 'react-icons/io5';
+import { IoBarbellOutline, IoChevronForward, IoStatsChartOutline, IoTimeOutline, IoWalkOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
 import { byYear, entryLabel, logRun, logWorkout, nextPlan, PLAN_IDS, planItems, planTitle, shortDate } from '../lib/exercises';
@@ -13,7 +13,7 @@ const List = ({ lines }) => <ol className="org-exam-sentences">{lines.map((line,
  * workout, Day A or Day B (the one whose turn it is comes selected) and its exercises;
  * editing the two days; and the history by year.
  */
-export default function ExerciseSheet({ onDone, onEditTask, onClose }) {
+export default function ExerciseSheet({ onDone, onEditTask, onOpenStats, onClose }) {
   const { data, update, today } = useOrganizer();
   const [page, setPage] = useState('choose'); // choose | workout | edit | history | year | entry
   const [planId, setPlanId] = useState(() => nextPlan(data.exerciseLog));
@@ -127,6 +127,11 @@ export default function ExerciseSheet({ onDone, onEditTask, onClose }) {
         <button type="button" className="org-row org-nav-row" onClick={() => setPage('history')}>
           <IoTimeOutline className="org-nav-icon" aria-hidden="true" />
           <span className="org-row-main"><span>History</span><small>{years.reduce((n, y) => n + y.workouts, 0)} workouts · {years.reduce((n, y) => n + y.runs, 0)} runs</small></span>
+          <IoChevronForward className="org-chevron" aria-hidden="true" />
+        </button>
+        <button type="button" className="org-row org-nav-row" onClick={onOpenStats}>
+          <IoStatsChartOutline className="org-nav-icon" aria-hidden="true" />
+          <span className="org-row-main"><span>Statistics</span><small>By year, month and weekday</small></span>
           <IoChevronForward className="org-chevron" aria-hidden="true" />
         </button>
         <button type="button" className="org-row org-action" onClick={onEditTask}>Edit Task</button>

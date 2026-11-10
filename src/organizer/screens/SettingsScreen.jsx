@@ -9,21 +9,9 @@ import PasswordSheet from './PasswordSheet';
 import { fileToTranslate, isJournalFile, journalEntriesFrom } from '../lib/journalFile';
 import { exerciseFileFrom, isExerciseFile, mergeLog } from '../lib/exercises';
 import { BLOG_URL, checkToken, TOKEN_KEY } from '../lib/publish';
+import { saveFile } from '../lib/share';
 
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
-
-/** Hands the file to the iOS share sheet (Save to Files, Google Drive…), or downloads it. */
-async function saveFile(text, name) {
-  const file = new File([text], name, { type: 'application/json' });
-  if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file] });
-    return;
-  }
-  const url = URL.createObjectURL(file);
-  const link = Object.assign(document.createElement('a'), { href: url, download: name });
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 
 export default function SettingsScreen({ prepareExport, applyImport, addJournalEntries, journal }) {
   const { data, update, settings, updateSettings, storage } = useOrganizer();

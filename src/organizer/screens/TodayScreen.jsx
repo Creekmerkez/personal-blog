@@ -101,6 +101,7 @@ export default function TodayScreen({ onOpenSettings }) {
       key={`editor-${editing === 'new' ? 'new' : editing.id}`}
       task={editing === 'new' ? null : editing}
       sortOrder={firstSortOrder}
+      offerExercises={editing !== 'new' && !tasks.some((t) => t.exercises === true)}
       onClose={() => setEditing(null)}
       onDelete={remove}
       onSave={(task) => {

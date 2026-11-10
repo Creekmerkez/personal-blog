@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
 import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
-import { answerCurrent, counts, nextReturn, resetToLearning, REST_DAYS, rotation, RETRY_AFTER } from './words';
+import { answerCurrent, CHECK_DAYS, counts, migrateWords, nextReturn, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
   it('builds day keys from local dates and adds days across month, year and leap day (positive)', () => {
@@ -164,50 +164,69 @@ describe('word of the day rotation', () => {
   };
   const thrice = (words, name, today, size) => [1, 2, 3].reduce((w) => answerWord(w, name, true, today, size), words);
 
-  it('three remembered in a row rest the word for a day, and the next waiting word takes its place', () => {
+  it('three remembered in a row put the word away for a week, and the next waiting word takes its place', () => {
     let words = ['a', 'b', 'c'].map((x) => word(x));
     words = thrice(words, 'a', TODAY, 2);
     const a = words.find((w) => w.word === 'a');
-    expect(a).toMatchObject({ isLearned: false, successfulRecalls: 0, rests: 1, nextReviewDayKey: 20261018 });
+    expect(a).toMatchObject({ isLearned: false, successfulRecalls: 0, checks: 1, nextReviewDayKey: 20261024 });
     expect(rotation(words, 2, TODAY).map((w) => w.word)).toEqual(['b', 'c']);
     expect(counts(words, 2, TODAY)).toMatchObject({ resting: 1, learned: 0 });
-    expect(nextReturn(words, TODAY)).toBe(20261018);
-    // Back the next day, ahead of new words, to be remembered three times again
-    expect(rotation(words, 2, 20261018).map((w) => w.word)).toContain('a');
+    expect(nextReturn(words, TODAY)).toBe(20261024);
+    expect(rotation(words, 2, 20261023).map((w) => w.word)).not.toContain('a');
+    // Back after the week, ahead of new words
+    expect(rotation(words, 2, 20261024).map((w) => w.word)).toContain('a');
   });
 
-  it('rests grow 1, 2, 4, 7, 14, 30 days; remembered after the 30-day rest it is learned', () => {
+  it('remembered once at the check after a week: learned (positive)', () => {
     let words = [word('a'), word('b')];
-    let day = TODAY;
-    for (const restDays of REST_DAYS) {
-      words = thrice(words, 'a', day, 1);
-      const a = words.find((w) => w.word === 'a');
-      expect(a.nextReviewDayKey).toBe(addDays(day, restDays));
-      expect(rotation(words, 1, day).map((w) => w.word)).not.toContain('a');
-      day = a.nextReviewDayKey;
-    }
-    words = thrice(words, 'a', day, 1);
+    words = thrice(words, 'a', TODAY, 1);
+    words = answerWord(words, 'a', true, 20261024, 1);
     expect(words.find((w) => w.word === 'a').isLearned).toBe(true);
   });
 
-  it('not remembered after rests starts the word over as if new (negative)', () => {
-    let words = [word('a'), word('b'), word('c')];
-    words = thrice(words, 'a', TODAY, 3);
-    words = thrice(words, 'a', 20261018, 3);
-    expect(words.find((w) => w.word === 'a').rests).toBe(2);
-    words = answerWord(words, 'a', true, 20261020, 3);
-    words = answerWord(words, 'a', false, 20261020, 3);
+  it('not remembered at the checks: another week, then a month, then it starts over (negative)', () => {
+    let words = [word('a'), word('b')];
+    words = thrice(words, 'a', TODAY, 1);
+    words = answerWord(words, 'a', false, 20261024, 1);
+    expect(words.find((w) => w.word === 'a')).toMatchObject({ checks: 2, nextReviewDayKey: addDays(20261024, CHECK_DAYS[1]), isLearned: false });
+    words = answerWord(words, 'a', false, 20261031, 1);
+    expect(words.find((w) => w.word === 'a')).toMatchObject({ checks: 3, nextReviewDayKey: addDays(20261031, 30), isLearned: false });
+    words = answerWord(words, 'a', false, 20261130, 1);
     const a = words.find((w) => w.word === 'a');
-    expect(a).toMatchObject({ successfulRecalls: 0, rests: 0, nextReviewDayKey: 20261020, isLearned: false });
-    expect(rotation(words, 3, 20261020).map((w) => w.word)).toContain('a');
+    expect(a).toMatchObject({ checks: 0, successfulRecalls: 0, nextReviewDayKey: 20261130, isLearned: false });
+    expect(rotation(words, 1, 20261130).map((w) => w.word)).toContain('a');
   });
 
-  it('words back from a rest come even when the round is full', () => {
-    const back = word('back', { rests: 2, nextReviewDayKey: TODAY });
-    const resting = word('later', { rests: 1, nextReviewDayKey: TODAY + 1 });
+  it('remembered at the month check: learned (positive)', () => {
+    let words = [word('a'), word('b')];
+    words = thrice(words, 'a', TODAY, 1);
+    words = answerWord(words, 'a', false, 20261024, 1);
+    words = answerWord(words, 'a', false, 20261031, 1);
+    words = answerWord(words, 'a', true, 20261130, 1);
+    expect(words.find((w) => w.word === 'a').isLearned).toBe(true);
+  });
+
+  it('words due for a check come even when the round is full', () => {
+    const back = word('back', { checks: 2, nextReviewDayKey: TODAY });
+    const resting = word('later', { checks: 1, nextReviewDayKey: TODAY + 1 });
     const words = [word('a', { queuePosition: 0 }), word('b', { queuePosition: 1 }), back, resting, word('new')];
     expect(rotation(words, 2, TODAY).map((w) => w.word)).toEqual(['a', 'b', 'back']);
     expect(counts(words, 2, TODAY)).toEqual({ going: 3, learned: 0, resting: 1, waiting: 1 });
+  });
+
+  it('words from the earlier rule: past a check they are learned, after one rest the check is a week on (positive)', () => {
+    const words = [
+      word('passed', { rests: 4, nextReviewDayKey: TODAY + 20 }),
+      word('once', { rests: 1, nextReviewDayKey: TODAY + 1, lastReviewedDayKey: TODAY }),
+      word('new', { rests: 0 }),
+      word('ios'),
+    ];
+    const moved = migrateWords(words);
+    expect(moved.find((w) => w.word === 'passed')).toMatchObject({ isLearned: true, queuePosition: null });
+    expect(moved.find((w) => w.word === 'once')).toMatchObject({ checks: 1, nextReviewDayKey: 20261024, isLearned: false });
+    expect(moved.find((w) => w.word === 'new')).toMatchObject({ checks: 0 });
+    expect(moved.some((w) => 'rests' in w)).toBe(false);
+    expect(migrateWords(moved)).toBe(moved); // nothing left to change (negative)
   });
 
   it('not remembered starts over and comes back after a few cards, not a whole round', () => {

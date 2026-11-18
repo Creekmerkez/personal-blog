@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WordEditor from './WordEditor';
 
@@ -13,7 +13,10 @@ describe('WordEditor', () => {
     expect(screen.queryByRole('textbox', { name: 'Notes' })).toBeNull();
     const translation = screen.getByRole('textbox', { name: 'Translation' });
     expect(translation.tagName).toBe('TEXTAREA');
-    await userEvent.type(screen.getByRole('textbox', { name: 'Word' }), 'výročí');
+    // The sheet puts the cursor in Word once it has slid up; wait, so it can't jump fields mid-typing.
+    const wordField = screen.getByRole('textbox', { name: 'Word' });
+    await waitFor(() => expect(wordField).toHaveFocus());
+    await userEvent.type(wordField, 'výročí');
     await userEvent.type(translation, 'річниця{Enter}🇬🇧 anniversary');
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(onSave.mock.calls[0][0]).toMatchObject({ word: 'výročí', translation: 'річниця\n🇬🇧 anniversary', notes: '' });

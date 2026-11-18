@@ -390,3 +390,27 @@ a.org-row { text-decoration: none; }
 .org-hbar-track > span:last-child { border-radius: 0 4px 4px 0; }
 .org-hbar-total { text-align: right; font-variant-numeric: tabular-nums; }
 .org-export { gap: 8px; }
+
+/* Undo: a dark bar above the tab bar, for a few seconds after a change on Today. */
+.org-undo {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(62px + env(safe-area-inset-bottom));
+  z-index: 15;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 16px;
+  border-radius: 14px;
+  background: rgba(44, 44, 46, 0.96);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  animation: org-undo-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.org-undo-text { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.org-undo-button { color: #64d2ff; font-size: 16px; font-weight: 600; min-height: 44px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; flex: none; }
+@keyframes org-undo-in { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .org-undo { animation: none; } }

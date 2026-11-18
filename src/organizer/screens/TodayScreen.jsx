@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline, IoStatsChartOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
@@ -10,6 +10,20 @@ import ExerciseSheet from './Exercises';
 import StatsScreen from './StatsScreen';
 import { removeDay } from '../lib/exercises';
 
+const UNDO_MS = 6000;
+
+/** A bar above the tab bar for a few seconds after a change, with a button to take it back. */
+function UndoBar({ message, onUndo }) {
+  return (
+    <div className="org-undo" role="status">
+      <span className="org-undo-text">{message}</span>
+      <button type="button" className="org-undo-button" onClick={onUndo}>
+        <IoArrowUndoOutline aria-hidden="true" /> Undo
+      </button>
+    </div>
+  );
+}
+
 export default function TodayScreen({ onOpenSettings }) {
   const { data, update, today } = useOrganizer();
   const [showAll, setShowAll] = useState(false);
@@ -17,6 +31,13 @@ export default function TodayScreen({ onOpenSettings }) {
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [view, setView] = useState('todo'); // 'todo' | 'done'
   const [choosing, setChoosing] = useState(null); // an exercises task being checked
+  const [undo, setUndo] = useState(null); // the last change on a task, for a few seconds: { message, task, log? }
+
+  useEffect(() => {
+    if (!undo) return undefined;
+    const timer = setTimeout(() => setUndo(null), UNDO_MS);
+    return () => clearTimeout(timer);
+  }, [undo]);
 
   const tasks = data.myTasks;
   const visible = todayList(tasks, today);
@@ -29,16 +50,33 @@ export default function TodayScreen({ onOpenSettings }) {
   const replaceTask = (task) =>
     update((d) => ({ ...d, myTasks: d.myTasks.some((t) => t.id === task.id) ? d.myTasks.map((t) => (t.id === task.id ? task : t)) : [...d.myTasks, task] }));
 
-  const toggle = (task) => replaceTask(toggleCompletion(task, today));
+  // Keeps the task as it was (and the exercise history, when it changes too), so the change can be undone.
+  const remember = (task, message, withLog = false) => setUndo({ message, task, ...(withLog ? { log: data.exerciseLog } : {}) });
+  const undoLast = () => {
+    const { task, log } = undo;
+    setUndo(null);
+    update((d) => ({ ...d, myTasks: d.myTasks.map((t) => (t.id === task.id ? task : t)), ...(log ? { exerciseLog: log } : {}) }));
+  };
+
+  const toggle = (task, withLog = false) => {
+    remember(task, `${isDone(task, today) ? 'Not done' : 'Done'}: ${task.name}`, withLog);
+    replaceTask(toggleCompletion(task, today));
+  };
   // An exercises task asks "run or workout?" when checked; unchecking takes the day out of the history.
   const check = (task) => {
     if (!task.exercises) return toggle(task);
     if (!isDone(task, today)) return setChoosing(task);
     update((d) => ({ ...d, exerciseLog: removeDay(d.exerciseLog, today) }));
-    return toggle(task);
+    return toggle(task, true);
   };
-  const skip = (task) => replaceTask(skipToday(task, today));
-  const restore = (task) => replaceTask(unskip(task));
+  const skip = (task) => {
+    remember(task, `Skipped today: ${task.name}`);
+    replaceTask(skipToday(task, today));
+  };
+  const restore = (task) => {
+    remember(task, `Back on To Do: ${task.name}`);
+    replaceTask(unskip(task));
+  };
 
   const row = (task) => {
     const checked = isDone(task, today);
@@ -112,6 +150,8 @@ export default function TodayScreen({ onOpenSettings }) {
       onClose={() => setEditing(null)}
       onDelete={remove}
       onSave={(task) => {
+        const before = tasks.find((t) => t.id === task.id);
+        if (before) remember(before, `Saved: ${task.name}`);
         replaceTask(task);
         setEditing(null);
       }}
@@ -130,7 +170,8 @@ export default function TodayScreen({ onOpenSettings }) {
         openStats();
       }}
       onDone={() => {
-        if (!isDone(choosing, today)) toggle(choosing);
+        // The sheet has just written today's run or workout; data here is still from before it.
+        if (!isDone(choosing, today)) toggle(choosing, true);
         setChoosing(null);
       }}
     />
@@ -163,6 +204,7 @@ export default function TodayScreen({ onOpenSettings }) {
           </Section>
         )}
         {editor}
+        {undo && <UndoBar message={undo.message} onUndo={undoLast} />}
       </Screen>
     );
   }
@@ -223,6 +265,7 @@ export default function TodayScreen({ onOpenSettings }) {
 
       {editor}
       {chooser}
+      {undo && <UndoBar message={undo.message} onUndo={undoLast} />}
     </Screen>
   );
 }

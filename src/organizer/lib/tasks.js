@@ -46,12 +46,34 @@ export function scheduleSummary(task, today) {
 }
 
 /** Active tasks scheduled for today: green first, then red, each in manual order. */
+const byOrder = (a, b) => a.sortOrder - b.sortOrder || a.createdAt - b.createdAt;
+
+/** Today's tasks in the owner's own order (she drags them into it on Today). */
 export function todayList(tasks, today) {
-  return tasks
-    .filter((task) => task.isActive && isScheduled(task, today))
-    .sort((a, b) => {
-      if (a.flag !== b.flag) return a.flag === 'green' ? -1 : 1;
-      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
-      return a.createdAt - b.createdAt;
-    });
+  return tasks.filter((task) => task.isActive && isScheduled(task, today)).sort(byOrder);
+}
+
+/** sortOrder from 0, in the given order. */
+const numbered = (tasks, ordered) => {
+  const place = new Map(ordered.map((t, i) => [t.id, i]));
+  return tasks.map((t) => ({ ...t, sortOrder: place.get(t.id) }));
+};
+
+/**
+ * Today used to show green tasks first, then red ones. Before the order became entirely
+ * the owner's, the tasks are numbered that way once, so nothing moves on screen.
+ */
+export const greenFirstOrder = (tasks) =>
+  numbered(tasks, [...tasks].sort((a, b) => (a.flag === b.flag ? byOrder(a, b) : a.flag === 'green' ? -1 : 1)));
+
+/**
+ * A few tasks put in a new order (`ids`, e.g. today's To Do after a drag): they take the
+ * places they had between them, so every other task stays where it was.
+ */
+export function reorderSome(tasks, ids) {
+  const moved = new Set(ids);
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+  let next = 0;
+  const ordered = [...tasks].sort(byOrder).map((t) => (moved.has(t.id) ? byId.get(ids[next++]) : t));
+  return numbered(tasks, ordered);
 }

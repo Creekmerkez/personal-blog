@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { addDays, appleSeconds, dateFromAppleSeconds, dayKeyFromDate, weekdayOf } from './dates';
 import { complement, draftFromMask, EVERY_DAY, fromWeekdays, includesDay, maskFromDraft, summary, toggleDay } from './weekdays';
-import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
+import { greenFirstOrder, isDone, isSkipped, reorderSome, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from './tasks';
 import { answerCurrent, CHECK_DAYS, counts, migrateWords, nextReturn, resetToLearning, rotation, RETRY_AFTER } from './words';
 
 describe('dates', () => {
@@ -125,7 +125,7 @@ describe('daily tasks', () => {
     expect(maskFromDraft({ mode: 'monthly', monthDay: 1 })).toBe(EVERY_DAY);
   });
 
-  it('shows only active tasks for today, green first, each in manual order', () => {
+  it('shows only active tasks for today, in the owner\'s order', () => {
     const tasks = [
       task({ id: '1', name: 'Alcohol', flag: 'red', sortOrder: 0 }),
       task({ id: '2', name: 'Reading', sortOrder: 3 }),
@@ -133,7 +133,30 @@ describe('daily tasks', () => {
       task({ id: '4', name: 'Paused', isActive: false, sortOrder: 2 }),
       task({ id: '5', name: 'Workout', sortOrder: 2 }),
     ];
-    expect(todayList(tasks, 20260929).map((t) => t.name)).toEqual(['Workout', 'Reading', 'Alcohol']);
+    expect(todayList(tasks, 20260929).map((t) => t.name)).toEqual(['Alcohol', 'Workout', 'Reading']);
+  });
+
+  it('numbers tasks green first once, so the old order stays (positive)', () => {
+    const tasks = [
+      task({ id: '1', name: 'Alcohol', flag: 'red', sortOrder: 0 }),
+      task({ id: '2', name: 'Reading', sortOrder: 3 }),
+      task({ id: '5', name: 'Workout', sortOrder: 2 }),
+    ];
+    expect(todayList(greenFirstOrder(tasks), 20260929).map((t) => t.name)).toEqual(['Workout', 'Reading', 'Alcohol']);
+  });
+
+  it('a drag reorders today\'s tasks and leaves the others in their places (positive)', () => {
+    const tasks = ['a', 'b', 'c', 'd', 'e'].map((id, i) => task({ id, name: id, sortOrder: i * 10 }));
+    // b, d and e are on today's list; e is dragged to the top of it
+    const result = reorderSome(tasks, ['e', 'b', 'd']);
+    const order = [...result].sort((x, y) => x.sortOrder - y.sortOrder).map((t) => t.id);
+    expect(order).toEqual(['a', 'e', 'c', 'b', 'd']);
+    expect(result.map((t) => t.sortOrder).sort()).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it('a drop in the same place changes nothing in the order (negative)', () => {
+    const tasks = ['a', 'b', 'c'].map((id, i) => task({ id, name: id, sortOrder: i }));
+    expect(reorderSome(tasks, ['a', 'b', 'c']).map((t) => t.sortOrder)).toEqual([0, 1, 2]);
   });
 });
 

@@ -25,8 +25,10 @@ const videos = shuffle(youtubeVideos).map((video, index) => ({
   thumbnail: `/images/youtube/${video.id}.jpg`,
   // youtube-nocookie.com, not youtube.com: the standard embed drops tracking
   // cookies on the visitor before they press play. This variant doesn't.
-  embedUrl: `https://www.youtube-nocookie.com/embed/${video.id}?controls=1&rel=0&modestbranding=1`,
-  autoplayEmbedUrl: `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&controls=1&rel=0&modestbranding=1`,
+  // enablejsapi=1 lets the page know when the video plays, so the background
+  // music pauses meanwhile (youtubeWatch.js).
+  embedUrl: `https://www.youtube-nocookie.com/embed/${video.id}?controls=1&rel=0&modestbranding=1&enablejsapi=1`,
+  autoplayEmbedUrl: `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&controls=1&rel=0&modestbranding=1&enablejsapi=1`,
 }));
 
 export default videos;

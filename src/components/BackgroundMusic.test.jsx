@@ -70,4 +70,43 @@ describe('BackgroundMusic', () => {
     expect(play).toHaveBeenCalled();
     video.remove();
   });
+  it('pauses when a video that started muted gets its sound turned on, and plays again when it is muted (positive)', async () => {
+    render(<BackgroundMusic />);
+    await tapPage();
+    const reel = document.createElement('video');
+    reel.muted = true;
+    document.body.appendChild(reel);
+    Object.defineProperty(reel, 'paused', { configurable: true, get: () => false });
+    act(() => { reel.dispatchEvent(new Event('play')); });
+    pause.mockClear();
+    reel.muted = false;
+    act(() => { reel.dispatchEvent(new Event('volumechange')); });
+    expect(pause).toHaveBeenCalled();
+    play.mockClear();
+    reel.muted = true;
+    act(() => { reel.dispatchEvent(new Event('volumechange')); });
+    expect(play).toHaveBeenCalled();
+    reel.remove();
+  });
+
+  it('pauses while an embedded YouTube video plays, and plays again when it pauses (positive)', async () => {
+    render(<BackgroundMusic />);
+    await tapPage();
+    const say = (info, origin = 'https://www.youtube-nocookie.com') =>
+      act(() => { window.dispatchEvent(new MessageEvent('message', { origin, data: JSON.stringify({ event: 'onStateChange', info }) })); });
+    pause.mockClear();
+    say(1);
+    expect(pause).toHaveBeenCalled();
+    play.mockClear();
+    say(2);
+    expect(play).toHaveBeenCalled();
+  });
+
+  it('ignores the same message from a site that is not YouTube (negative)', async () => {
+    render(<BackgroundMusic />);
+    await tapPage();
+    pause.mockClear();
+    act(() => { window.dispatchEvent(new MessageEvent('message', { origin: 'https://evil.example', data: JSON.stringify({ event: 'onStateChange', info: 1 }) })); });
+    expect(pause).not.toHaveBeenCalled();
+  });
 });

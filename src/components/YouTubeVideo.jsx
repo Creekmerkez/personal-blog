@@ -15,7 +15,7 @@ function getEmbedUrl(link) {
   const match = link.match(/youtu(?:\.be\/|be\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)?)([\w-]{11})/);
   const id = match ? match[1] : '';
   return id
-    ? `https://www.youtube.com/embed/${id}?controls=1&rel=0&modestbranding=1`
+    ? `https://www.youtube.com/embed/${id}?controls=1&rel=0&modestbranding=1&enablejsapi=1`
     : '';
 }
 

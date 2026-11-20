@@ -414,3 +414,19 @@ a.org-row { text-decoration: none; }
 .org-undo-button { color: #64d2ff; font-size: 16px; font-weight: 600; min-height: 44px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; flex: none; }
 @keyframes org-undo-in { from { opacity: 0; transform: translateY(12px); } }
 @media (prefers-reduced-motion: reduce) { .org-undo { animation: none; } }
+
+/* Today's order: hold a task to lift it, drag it, and the others make room. */
+.org-drag-list .org-task { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.org-group:has(.org-drag-lifted) { overflow: visible; }
+.org-drag-moving { transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.org-drag-lifted {
+  z-index: 3;
+  background: var(--org-card);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22), 0 0 0 0.5px var(--org-separator);
+  scale: 1.03;
+  transition: scale 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+.org-drag-lifted::before, .org-drag-lifted + .org-row::before { opacity: 0; }
+.org-task-number { color: var(--org-secondary); font-variant-numeric: tabular-nums; margin-right: 6px; }
+@media (prefers-reduced-motion: reduce) { .org-drag-moving, .org-drag-lifted { transition: none; } }

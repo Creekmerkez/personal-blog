@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { IoCheckmarkDoneOutline, IoAdd, IoCheckmarkCircle, IoEllipseOutline, IoListOutline, IoDocumentTextOutline, IoSunnyOutline, IoCheckboxOutline, IoChevronUp, IoChevronDown, IoPlaySkipForwardOutline, IoArrowUndoOutline, IoStatsChartOutline } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { formatDay } from '../lib/dates';
-import { isDone, isSkipped, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
+import { greenFirstOrder, isDone, isSkipped, reorderSome, scheduleSummary, skipToday, todayList, toggleCompletion, unskip } from '../lib/tasks';
+import { useReorder } from '../components/useReorder';
 import { Empty, FlagDot, Screen, Section, Segmented } from '../components/ui';
 import TaskEditor from './TaskEditor';
 import BackupReminder from './BackupReminder';
@@ -25,13 +26,21 @@ function UndoBar({ message, onUndo }) {
 }
 
 export default function TodayScreen({ onOpenSettings }) {
-  const { data, update, today } = useOrganizer();
+  const { data, update, settings, updateSettings, today } = useOrganizer();
   const [showAll, setShowAll] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [editing, setEditing] = useState(null); // task, 'new', or null
   const [view, setView] = useState('todo'); // 'todo' | 'done'
   const [choosing, setChoosing] = useState(null); // an exercises task being checked
   const [undo, setUndo] = useState(null); // the last change on a task, for a few seconds: { message, task, log? }
+
+  // Today's order is the owner's own now; it used to put green tasks first. Number them
+  // that way once, so the list looks the same until she moves something.
+  useEffect(() => {
+    if (settings.ownTaskOrder) return;
+    updateSettings({ ownTaskOrder: true });
+    update((d) => ({ ...d, myTasks: greenFirstOrder(d.myTasks) }));
+  }, [settings.ownTaskOrder, updateSettings, update]);
 
   useEffect(() => {
     if (!undo) return undefined;
@@ -69,6 +78,14 @@ export default function TodayScreen({ onOpenSettings }) {
     update((d) => ({ ...d, exerciseLog: removeDay(d.exerciseLog, today) }));
     return toggle(task, true);
   };
+  // Hold a task on To Do and drag it: its new place is its priority for the day, and stays.
+  const { listProps, itemProps, placeOf } = useReorder((from, to) => {
+    const ids = todo.map((t) => t.id);
+    const [moved] = ids.splice(from, 1);
+    ids.splice(to, 0, moved);
+    update((d) => ({ ...d, myTasks: reorderSome(d.myTasks, ids) }));
+  });
+
   const skip = (task) => {
     remember(task, `Skipped today: ${task.name}`);
     replaceTask(skipToday(task, today));
@@ -78,11 +95,13 @@ export default function TodayScreen({ onOpenSettings }) {
     replaceTask(unskip(task));
   };
 
-  const row = (task) => {
+  // index: the task's place on To Do, numbered and draggable there.
+  const row = (task, index = null) => {
     const checked = isDone(task, today);
     const wasSkipped = isSkipped(task, today);
+    const drag = index == null ? {} : itemProps(index);
     return (
-      <div key={task.id} className="org-row org-task">
+      <div key={task.id} {...drag} className={`org-row org-task ${drag.className ?? ''}`}>
         <FlagDot flag={task.flag} />
         <button
           type="button"
@@ -95,7 +114,10 @@ export default function TodayScreen({ onOpenSettings }) {
         </button>
         {/* An exercises task opens its run-or-workout sheet; its settings are in that sheet and in All Tasks. */}
         <button type="button" className="org-row-main" onClick={() => (task.exercises ? setChoosing(task) : setEditing(task))}>
-          <span className={checked || wasSkipped ? 'org-muted' : ''}>{task.name}</span>
+          <span className={checked || wasSkipped ? 'org-muted' : ''}>
+            {index != null && <span className="org-task-number">{placeOf(index) + 1}.</span>}
+            {task.name}
+          </span>
         </button>
         {task.details && <IoDocumentTextOutline className="org-details-mark" aria-hidden="true" />}
         <span className="org-count" aria-label={`${task.completionCount} days`}>{task.completionCount}</span>
@@ -248,15 +270,17 @@ export default function TodayScreen({ onOpenSettings }) {
             todo.length === 0 ? (
               <Empty icon={<IoCheckmarkDoneOutline />} title="Everything Done" text="All of today's tasks are checked or skipped. Tomorrow the list starts again." />
             ) : (
-              <Section header={formatDay(today)} footer="Circle: done, counts one more day. Skip: not today, no count.">{todo.map(row)}</Section>
+              <Section header={formatDay(today)} footer="Hold a task and drag it up or down to set today’s order. Circle: done, counts one more day. Skip: not today, no count.">
+                <div className="org-drag-list" {...listProps}>{todo.map((task, i) => row(task, i))}</div>
+              </Section>
             )
           ) : done.length + skipped.length === 0 ? (
             <Empty icon={<IoEllipseOutline />} title="Nothing Checked Yet" text="Tasks you check or skip today move here." />
           ) : (
             <>
-              {done.length > 0 && <Section header="Done">{done.map(row)}</Section>}
+              {done.length > 0 && <Section header="Done">{done.map((task) => row(task))}</Section>}
               {skipped.length > 0 && (
-                <Section header="Skipped" footer="Not counted. Tap the circle if you did it after all, or the arrow to put it back on To Do.">{skipped.map(row)}</Section>
+                <Section header="Skipped" footer="Not counted. Tap the circle if you did it after all, or the arrow to put it back on To Do.">{skipped.map((task) => row(task))}</Section>
               )}
             </>
           )}

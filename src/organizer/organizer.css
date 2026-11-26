@@ -432,3 +432,7 @@ a.org-row { text-decoration: none; }
 .org-drag-lifted::before, .org-drag-lifted + .org-row::before { opacity: 0; }
 .org-task-number { color: var(--org-secondary); font-variant-numeric: tabular-nums; margin-right: 6px; }
 @media (prefers-reduced-motion: reduce) { .org-drag-moving, .org-drag-lifted { transition: none; } }
+
+/* Son → Games: quick ideas, one line each. */
+.org-quick-ideas { list-style: none; margin: 0; padding: 0; }
+.org-quick-emoji { font-size: 22px; width: 28px; text-align: center; flex: none; }

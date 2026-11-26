@@ -5,7 +5,7 @@ import {
 } from 'react-icons/io5';
 import { useOrganizer } from '../lib/context';
 import { appleSeconds, formatStoredDate } from '../lib/dates';
-import { CATEGORIES, GAMES, GAMES_TIP } from '../content/games';
+import { CATEGORIES, GAMES, GAMES_TIP, QUICK_IDEAS } from '../content/games';
 import { mapsUrl, PLACE_GROUPS, PLACES } from '../content/places';
 import { Empty, Screen, Section, Sheet } from '../components/ui';
 import ItemEditor from './ItemEditor';
@@ -241,6 +241,16 @@ function Games({ onBack }) {
         })}
       </div>
       <p className="org-section-footer org-tip">{GAMES_TIP}</p>
+      <Section header="Quick ideas" footer="Без підготовки, на 5–15 хвилин разом.">
+        <ul className="org-quick-ideas">
+          {QUICK_IDEAS.map((idea) => (
+            <li key={idea.text} className="org-row">
+              <span className="org-quick-emoji" aria-hidden="true">{idea.emoji}</span>
+              <span className="org-row-main"><span>{idea.text}</span></span>
+            </li>
+          ))}
+        </ul>
+      </Section>
       <Section header="My ideas" footer={mine.length ? null : 'Tap + to jot down your own idea.'}>
         {mine.map((item) => (
           <button key={item.id} type="button" className="org-row" onClick={() => setEditing(item)}>
